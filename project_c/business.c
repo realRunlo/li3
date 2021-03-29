@@ -60,7 +60,7 @@ void ler_ficheiro(char fic [] ){
     }
     else printf("ERROR opening file\n");
 }
-
+/*para testar
 void main(){
     ler_ficheiro("business_full.csv");
-}
+}*/
