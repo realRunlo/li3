@@ -13,11 +13,11 @@ typedef struct business{
 
 } * Business;
 
-int valida_linha (char *str);
+int check_line (char *str);
 
 void add_b (Business *b, char *str,int p);
 
-void ler_ficheiro(char fic []);
+void read_file(char fic []);
 
 #endif //___BUSINESS_H___
 

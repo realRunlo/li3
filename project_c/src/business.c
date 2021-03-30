@@ -2,7 +2,7 @@
 #include "business.h"
 
 //Verifica se cada linha tem todos os campos corretamente
-int valida_linha (char *str){
+int check_line (char *str){
     char * a[5];
     for(int i=0; i<5;i++)
             a[i] =NULL;
@@ -30,7 +30,7 @@ void add_b (Business *b, char *str,int p){
 }
 
 //Lê todo ficheiro linha a linha
-void ler_ficheiro(char fic [] ){
+void read_file (char fic [] ){
     char buffer [5000];
     Business b [160587]; // número de linhas do ficheiro
     FILE *f = fopen(fic,"r");
