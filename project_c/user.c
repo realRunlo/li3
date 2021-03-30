@@ -22,7 +22,7 @@ char * getUserId(User u){
 }
 
 void setUserId(User u, char* newUserId){
-    printf("%s\n",newUserId);
+    //printf("%s\n",newUserId);
     u->user_id = strdup(newUserId);
 }
 
@@ -60,6 +60,16 @@ User createUser(char * buffer){
     return u;
 }
 
+GHashTable * initHashT(){
+    GHashTable * ht = g_hash_table_new(g_str_hash, g_str_equal); 
+    return ht;
+}
+
+gboolean addToHashT(GHashTable * ht,void * c,void * value){
+    gboolean  rt = g_hash_table_insert(ht,c,value);
+    return rt;
+}
+
 
 void readUser(GHashTable * table, char * filename){
 
@@ -70,14 +80,15 @@ void readUser(GHashTable * table, char * filename){
         exit(1);
     }
 
-    char buffer[100000];
+    char buffer[400000]; // enough space for 3 excel cells
     User u;
     int i = 0;
 
-    while(fgets(buffer,100000,f)){
-        printf("%d : %s",i,buffer);
+    while(fgets(buffer,400000,f)){
+        //printf("%d : %s",i,buffer);
+        //printf("%d\n",i);
         u = createUser(buffer);
-        g_hash_table_insert(table, GINT_TO_POINTER((getUserId(u))),u);
+        addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
         i++;
     }
     fclose(f);
@@ -87,22 +98,15 @@ void readUser(GHashTable * table, char * filename){
 
 //main to test functions of user.c for now
 int main(){
-    char filename[100] ="./input_files/users_teste.csv";
+    char filename[100] ="./input_files/users_full.csv";
 /*
     printf("Indique o ficheiro a ler.\n");
     scanf("%s",filename);
 */
 
-    GHashTable* table = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable* table = initHashT();
     readUser(table,filename);
-    g_hash_table_foreach(table, (GHFunc)iterator, "%s;%s;%s;\n");
-
-    int size =(int) g_hash_table_size(table);
-    printf("numero de elementos :%d\n",size);
-
-    if(g_hash_table_lookup(table,"dfsfa")) printf("encontrei\n");
-    else printf("n encontrei\n");
-
+    g_hash_table_foreach(table, (GHFunc)iterator, " ->%s;%s;%s;\n");
 
 
 //testes das funcoes
