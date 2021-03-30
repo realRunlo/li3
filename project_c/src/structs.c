@@ -21,13 +21,3 @@ gpointer lookUpHashT(GHashTable * ht,char * tofind){
     return rt;
 }
 
-int main(){
-   GHashTable * table = mapToHash_ReviewsFile("input_files/reviews_1M.csv");
-
-    Reviews  r = g_hash_table_lookup(table,"fv0V4HFlY-LlizyYwH13JQ");
-
-    printf("%s\n",r->text);
-    
-    
-    return 0;
-}
