@@ -22,7 +22,7 @@ char * getUserId(User u){
 }
 
 void setUserId(User u, char* newUserId){
-    //printf("%s\n",newUserId);
+    printf("%s\n",newUserId);
     u->user_id = strdup(newUserId);
 }
 
@@ -45,63 +45,44 @@ void setFriends(User u, char* newFriends){
 }
 
 
-User * userList(){
-    User* list = malloc(sizeof(User));
-    list[0] = NULL;
-    return list;
-}
 
-
-void printUserList(User * uList){
-    for(int n = 0; uList[n] != NULL;n++){
-        //printf("%d : %s;\n",n,getUserId(uList[n]));
-
-        printf("%d : %s;%s;%s\n",n,getUserId(uList[n]),getName(uList[n]),getFriends(uList[n]));
-
-    }
-}
-
-
-void addUser(User* u, char * buffer, int n){
-    u[n] = malloc(sizeof(struct user));
-
-
-    setUserId(u[n],strsep(&buffer,";"));
-    setName(u[n],strsep(&buffer,";"));
-    setFriends(u[n],strsep(&buffer,"\n"));
-
+void iterator(gpointer key, gpointer value, gpointer user_data) {
+ printf(user_data, getUserId((User) value),getName((User) value),getFriends((User) value));
 }
 
 
 
-User* readUser(char * filename){
+User createUser(char * buffer){
+    User u = malloc(sizeof(struct user));
+    setUserId(u,strsep(&buffer,";"));
+    setName(u,strsep(&buffer,";"));
+    setFriends(u,strsep(&buffer,"\n"));
+    return u;
+}
+
+
+void readUser(GHashTable * table, char * filename){
 
     FILE* f;
     f = fopen(filename,"r");
     if (f==NULL){
         printf("ERROR_FILE_readUser\n");
-        return NULL;
+        exit(1);
     }
 
-    char buffer[300];
-    User* ulist = userList();
+    char buffer[100000];
+    User u;
     int i = 0;
 
-    while(fgets(buffer,300,f)){
-        printf("%d : %s\n",i,buffer);
-        addUser(ulist,buffer,i);
+    while(fgets(buffer,100000,f)){
+        printf("%d : %s",i,buffer);
+        u = createUser(buffer);
+        g_hash_table_insert(table, GINT_TO_POINTER((getUserId(u))),u);
         i++;
     }
-    ulist[i] = malloc(sizeof(User));
-    ulist[i] = NULL;
     fclose(f);
-
-    return ulist;
 }
 
-void iterator(gpointer key, gpointer value, gpointer user_data) {
- printf(user_data, key,getName((User) value),getFriends((User) value));
-}
 
 
 //main to test functions of user.c for now
@@ -112,18 +93,15 @@ int main(){
     scanf("%s",filename);
 */
 
+    GHashTable* table = g_hash_table_new(g_str_hash, g_str_equal);
+    readUser(table,filename);
+    g_hash_table_foreach(table, (GHFunc)iterator, "%s;%s;%s;\n");
 
-    User* uList = readUser(filename);
-    printUserList(uList);
-/*
-    User u = malloc(sizeof(struct user));
-    setUserId(u,"primeiro");
-    setName(u,"goncalo");
-    setFriends(u,"ze,runlo,nuno");
+    int size =(int) g_hash_table_size(table);
+    printf("numero de elementos :%d\n",size);
 
-    GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
-    g_hash_table_insert(hash, GINT_TO_POINTER((getUserId(u))),u);
-    g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;\n");
+    if(g_hash_table_lookup(table,"dfsfa")) printf("encontrei\n");
+    else printf("n encontrei\n");
 
 
 
@@ -142,5 +120,7 @@ int main(){
     printf("string copiada :%d\n",getUserId(u));
 */
 
+
+    printf("Programa terminado\n");
     return 0;
 }
