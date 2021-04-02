@@ -2,7 +2,7 @@
 #define ___READING_H___
 #include "../includes/structs.h"
 
-GHashTable *  mapToHash_ReviewsFile(char *filename);
+GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * table);
 
 
 #endif //___READING_H___
