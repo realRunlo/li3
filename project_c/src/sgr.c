@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 SGR init_sgr(){
-    SGR  new_sgr = malloc(sizeof(struct sgr));
+    SGR  new_sgr;
 
     new_sgr.hashT_users = initHashT();
     new_sgr.hashT_reviews= initHashT();
@@ -14,7 +14,7 @@ SGR init_sgr(){
 }
 
 void free_sgr(SGR sgr){
-    free(sgr);    //not working
+    free(&sgr);    //not working
  
 }
 
