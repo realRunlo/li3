@@ -1,7 +1,4 @@
-#include "../includes/reviews.h"
-#include "../includes/structs.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "../includes/reading.h"
 #define BUFFER_SIZE 10000
 
 GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){

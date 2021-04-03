@@ -1,20 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <glib.h>
-#include "user.h"
+#include "../includes/user.h"
 
 
-char *strsep(char **stringp, const char *delim) {
-    char *rv = *stringp;
-    if (rv) {
-        *stringp += strcspn(*stringp, delim);
-        if (**stringp)
-            *(*stringp)++ = '\0';
-        else
-            *stringp = 0; }
-    return rv;
-}
+
 
 
 char * getUserId(User u){
@@ -46,7 +33,7 @@ void setFriends(User u, char* newFriends){
 
 
 
-void iterator(gpointer key, gpointer value, gpointer user_data) {
+void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
  printf(user_data, getUserId((User) value),getName((User) value),getFriends((User) value));
 }
 
@@ -60,15 +47,7 @@ User createUser(char * buffer){
     return u;
 }
 
-GHashTable * initHashT(){
-    GHashTable * ht = g_hash_table_new(g_str_hash, g_str_equal); 
-    return ht;
-}
 
-gboolean addToHashT(GHashTable * ht,void * c,void * value){
-    gboolean  rt = g_hash_table_insert(ht,c,value);
-    return rt;
-}
 
 
 void readUser(GHashTable * table, char * filename){
@@ -96,35 +75,36 @@ void readUser(GHashTable * table, char * filename){
 
 
 
-//main to test functions of user.c for now
-int main(){
-    char filename[100] ="./input_files/users_full.csv";
-/*
-    printf("Indique o ficheiro a ler.\n");
-    scanf("%s",filename);
-*/
-
-    GHashTable* table = initHashT();
-    readUser(table,filename);
-    g_hash_table_foreach(table, (GHFunc)iterator, " ->%s;%s;%s;\n");
-
-
-//testes das funcoes
-/*
-    User *list = userList();
-    list[0] = malloc(sizeof(User));
-    setUserId(list[0],"122341");
-    setName(list[0],"goncalo");
-    setFriends(list[0],"joaquim,jose,pedro");
-    list[1]=malloc(sizeof(User));
-    list[1] = NULL;
-    printUserList(list);
-
-    printf("string original :%d\n",u->user_id);
-    printf("string copiada :%d\n",getUserId(u));
-*/
-
-
-    printf("Programa terminado\n");
-    return 0;
-}
+////main to test functions of user.c for now
+//int main(){
+//    char filename[100] ="./input_files/users_full.csv";
+///*
+//    printf("Indique o ficheiro a ler.\n");
+//    scanf("%s",filename);
+//*/
+//
+//    GHashTable* table = initHashT();
+//    readUser(table,filename);
+//    g_hash_table_foreach(table, (GHFunc)iterator, " ->%s;%s;%s;\n");
+//
+//
+////testes das funcoes
+///*
+//    User *list = userList();
+//    list[0] = malloc(sizeof(User));
+//    setUserId(list[0],"122341");
+//    setName(list[0],"goncalo");
+//    setFriends(list[0],"joaquim,jose,pedro");
+//    list[1]=malloc(sizeof(User));
+//    list[1] = NULL;
+//    printUserList(list);
+//
+//    printf("string original :%d\n",u->user_id);
+//    printf("string copiada :%d\n",getUserId(u));
+//*/
+//
+//
+//    printf("Programa terminado\n");
+//    return 0;
+//}
+//

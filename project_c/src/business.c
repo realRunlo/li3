@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include "business.h"
+#include "../includes/business.h"
 
 //Verifica se cada linha tem todos os campos corretamente
 int check_line (char *str){
@@ -52,6 +51,8 @@ void iterator(gpointer key, gpointer value, gpointer user_data) {
                     get_categ((Business) value));
 }
 
+
+/*
 //Lê todo ficheiro linha a linha
 void read_file (char fic [] ){
     char buffer [5000];
@@ -82,3 +83,4 @@ void read_file (char fic [] ){
 void main(){
     read_file("business_full.csv");
 }
+*/

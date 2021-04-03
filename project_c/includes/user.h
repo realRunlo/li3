@@ -27,7 +27,7 @@ char * getFriends(User u);
 void setFriends(User u, char* newFriends);
 
 // hash table iterator that prints every element
-void iterator(gpointer key, gpointer value, gpointer user_data);
+void print_user_iterator(gpointer key, gpointer value, gpointer user_data);
 
 // creates a new user by processing the contents of a buffer into 3 strings, one for each parameter of User
 User createUser(char * buffer);

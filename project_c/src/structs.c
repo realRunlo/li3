@@ -1,8 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "../includes/structs.h"
-#include "../includes/reviews.h"
-#include "../includes/reading.h"
 
 GHashTable * initHashT(){
 
