@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 
 typedef struct business{
     char * business_id;
@@ -12,6 +13,14 @@ typedef struct business{
     char * categories;
 
 } * Business;
+
+char * get_id(Business b);
+char * get_name(Business b);
+char * get_city(Business b);
+char * get_state(Business b);
+char * get_categ(Business b);
+
+void iterator(gpointer key, gpointer value, gpointer user_data);
 
 int check_line (char *str);
 

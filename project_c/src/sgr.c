@@ -29,3 +29,4 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 
     return sgr_load;
 }
+

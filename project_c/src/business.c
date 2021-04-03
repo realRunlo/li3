@@ -20,47 +20,65 @@ int check_line (char *str){
 }
 
 //Adiciona cada linha do ficheiro à estrutura Business
-void add_b (Business *b, char *str,int p){
-    b[p] = malloc(sizeof(struct business));
-    b[p]->business_id = strdup(strsep(&str,";"));
-    b[p]->name = strdup(strsep(&str,";"));
-    b[p]->city = strdup(strsep(&str,";"));
-    b[p]->state = strdup(strsep(&str,";"));
-    b[p]->categories = strdup(strsep(&str,";"));
+Business create_b (char *str){
+    Business b= malloc(sizeof(struct business));
+    b->business_id = strdup(strsep(&str,";"));
+    b->name = strdup(strsep(&str,";"));
+    b->city = strdup(strsep(&str,";"));
+    b->state = strdup(strsep(&str,";"));
+    b->categories = strdup(strsep(&str,";")); 
+    return b;
+}
+char * get_id(Business b){
+    return strdup(b->business_id);
+}
+char * get_name(Business b){
+    return strdup(b->name);
+}
+char * get_city(Business b){
+    return strdup(b->city);
+}
+char * get_state(Business b){
+    return strdup(b->state);
+}
+char * get_categ(Business b){
+    return strdup(b->categories);
+}
+void iterator(gpointer key, gpointer value, gpointer user_data) {
+ printf(user_data,  get_id((Business) value),
+                    get_name((Business) value),
+                    get_city((Business) value),
+                    get_state((Business) value),
+                    get_categ((Business) value));
 }
 
 //Lê todo ficheiro linha a linha
 void read_file (char fic [] ){
     char buffer [5000];
-    Business b [160587]; // número de linhas do ficheiro
+    Business b;
     FILE *f = fopen(fic,"r");
 
     if(f!=NULL){
-        for(int i=0; i<160587;i++)
-            b[i] =NULL;
+        GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
         
         int i=0;
         while(fgets(buffer,1024,f)){
             char dest [5000];
             strcpy(dest,buffer);
-            int r = valida_linha(dest);
+            int r = check_line(dest);
             if(r == 1){
-                add_b(b,buffer,i);
+                b = create_b(buffer);
+                g_hash_table_insert(hash,GINT_TO_POINTER(get_id(b)),b);
                 i++;
             }
-        }/*para testar
-        for(int j=0;j<10;j++){
-            printf("indice %d: ",j);
-            printf("%s ",b[j]->business_id);
-            printf("%s ",b[j]->name);
-            printf("%s ",b[j]->city);
-            printf("%s ",b[j]->state);
-            printf("%s",b[j]->categories); 
-        }*/
+        }
+        int t = g_hash_table_size(hash);
+        printf("%d\n",t);
+        g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;%s;%s");
     }
     else printf("ERROR opening file\n");
 }
-/*para testar
+
 void main(){
-    ler_ficheiro("business_full.csv");
-}*/
+    read_file("business_full.csv");
+}
