@@ -5,6 +5,12 @@
 #include <string.h>
 #define BUFFER_SIZE 10000
 
+/**
+\brief Lê informação de um ficheiro de reviews e guarda numa hashtable
+@param filename string
+@param htable apontador para uma tabela de hash
+@returns hTable apontador para uma tabela de hash
+*/
 GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
 
     FILE *  fp = fopen(filename,"r");
@@ -15,7 +21,7 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
         printf("Loading...\n");
         while(fgets(buffer,BUFFER_SIZE,fp)!=NULL){
             rev = addReview(rev,buffer);
-            addToHashT(hTable,getReviewId(rev),rev);
+            addToHashT(hTable,r_getReviewId(rev),rev);
         }
         printf("file loaded.\n");
 

@@ -1,6 +1,10 @@
 #include "../includes/sgr.h"
 #include <string.h>
 
+/**
+\brief Inicializador de dados SGR
+@returns new_sgr stuct sgr
+*/
 SGR init_sgr(){
     SGR  new_sgr;
 
@@ -10,9 +14,10 @@ SGR init_sgr(){
 
     return new_sgr;
 }
+
 /*
 void free_sgr(SGR sgr){
-    free(&sgr);    //not working
+    free(sgr);    //not working
  
 }
 */
@@ -114,4 +119,17 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     g_hash_table_foreach(sgr.hashT_businesses, (GHFunc)query6_iterator, process);
 
     free(process);
+}
+
+
+
+/**
+\brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
+@param sgr struct sgr
+@param top int
+@param word string
+@returns TABLE apontador para struct table
+*/
+TABLE reviews_with_word(SGR sgr,int top,char * word){
+
 }
