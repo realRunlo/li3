@@ -39,39 +39,12 @@ void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
 
 
 
-User createUser(char * buffer){
-    User u = malloc(sizeof(struct user));
-    setUserId(u,strsep(&buffer,";"));
-    setName(u,strsep(&buffer,";"));
-    setFriends(u,strsep(&buffer,"\n"));
-    return u;
-}
 
 
 
 
-void readUser(GHashTable * table, char * filename){
 
-    FILE* f;
-    f = fopen(filename,"r");
-    if (f==NULL){
-        printf("ERROR_FILE_readUser\n");
-        exit(1);
-    }
 
-    char buffer[400000]; // enough space for 3 excel cells
-    User u;
-    int i = 0;
-
-    while(fgets(buffer,400000,f)){
-        //printf("%d : %s",i,buffer);
-        //printf("%d\n",i);
-        u = createUser(buffer);
-        addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
-        i++;
-    }
-    fclose(f);
-}
 
 
 

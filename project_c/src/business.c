@@ -52,7 +52,7 @@ void iterator(gpointer key, gpointer value, gpointer user_data) {
 }
 
 
-/*
+
 //Lê todo ficheiro linha a linha
 void read_file (char fic [] ){
     char buffer [5000];
@@ -80,6 +80,7 @@ void read_file (char fic [] ){
     else printf("ERROR opening file\n");
 }
 
+/*
 void main(){
     read_file("business_full.csv");
 }
