@@ -1,6 +1,6 @@
 #ifndef ___USER_H___
 #define ___USER_H___
-
+#include "structs.h"
 typedef struct user{
     char * user_id;
     char * name;

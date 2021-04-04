@@ -1,5 +1,5 @@
 #include "../includes/business.h"
-
+#include <stdio.h>
 //Verifica se cada linha tem todos os campos corretamente
 int check_line (char *str){
     char * a[5];

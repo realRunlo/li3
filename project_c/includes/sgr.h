@@ -1,7 +1,10 @@
 #ifndef ___SGR_H___
 #define ___SGR_H___
-
-
+#include "structs.h"
+#include "reading.h"
+#include "user.h"
+#include "reviews.h"
+#include "business.h"
 
 typedef struct sgr{
 

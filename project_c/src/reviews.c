@@ -1,5 +1,6 @@
 #include "../includes/reviews.h"
-
+#include <stdlib.h>
+#include <string.h>
 
 char * getReviewId(Reviews  rev){
     return rev->review_id;

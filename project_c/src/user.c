@@ -1,8 +1,5 @@
 #include "../includes/user.h"
-
-
-
-
+#include <stdio.h>
 
 char * getUserId(User u){
     return strdup(u->user_id);
