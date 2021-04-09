@@ -1,6 +1,12 @@
 #include "../includes/user.h"
 #include <stdio.h>
 
+typedef struct user{
+    char * user_id;
+    char * name;
+    char * friends;
+};
+
 char * getUserId(User u){
     return strdup(u->user_id);
 }

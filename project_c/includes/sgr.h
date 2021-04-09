@@ -6,20 +6,9 @@
 #include "reviews.h"
 #include "business.h"
 
-typedef struct sgr{
+typedef struct sgr SGR;
 
-    GHashTable * hashT_users;
-    GHashTable * hashT_businesses;
-    GHashTable * hashT_reviews;
-
-}SGR;
-
-typedef struct table{
-
-   char ** tab;
-   int entries;
-
-}*TABLE;
+typedef struct table * TABLE;
 
 SGR init_sgr();
 void free_sgr(SGR sgr);
