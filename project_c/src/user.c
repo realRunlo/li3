@@ -1,7 +1,7 @@
 #include "../includes/user.h"
 #include <stdio.h>
 
-typedef struct user{
+struct user{
     char * user_id;
     char * name;
     char * friends;

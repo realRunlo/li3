@@ -2,7 +2,7 @@
 #include <string.h>
 
 
-typedef struct sgr{
+struct sgr{
 
     GHashTable * hashT_users;
     GHashTable * hashT_businesses;
@@ -10,7 +10,7 @@ typedef struct sgr{
 
 };
 
-typedef struct table{
+struct table{
 
    char ** tab;
    int entries;
@@ -163,8 +163,8 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
     Query9 process = malloc(sizeof(struct query9));
     Reviews rev = (Reviews) value;
 
-    for(int i=0;rev->text!='\0'){
-        for(int j=;rev->text!='\0';j++){
+    for(int i=0;rev->text!='\0';){
+        for(int j=0;rev->text!='\0';j++){
 
         }
     }

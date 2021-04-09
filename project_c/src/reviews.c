@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct reviews{
+struct reviews{
     char * review_id;
     char * user_id;
     char * business_id;

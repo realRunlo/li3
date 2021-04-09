@@ -3,7 +3,7 @@
 #include "structs.h"
 
 
-typedef structs user * User;
+typedef struct user * User;
 
 // gets UserId
 char * getUserId(User u);

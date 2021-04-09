@@ -2,14 +2,14 @@
 #include <stdio.h>
 
 
-typedef struct business{
+struct business{
     char * business_id;
     char * name;
     char * city;
     char * state;
     char * categories;
 
-} * Business;
+};
 
 
 //Verifica se cada linha tem todos os campos corretamente
