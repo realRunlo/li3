@@ -28,7 +28,7 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 
     readUser(sgr_load.hashT_users,users_file);
 
-    //read business
+    readBusiness (sgr_load.hashT_businesses,business_file);
 
     return sgr_load;
 }

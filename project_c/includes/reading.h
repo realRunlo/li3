@@ -4,5 +4,5 @@
 
 GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * table);
 
-
+void readBusiness (GHashTable * hash, char fic [] );
 #endif //___READING_H___
