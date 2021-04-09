@@ -1,6 +1,21 @@
 #include "../includes/sgr.h"
 #include <string.h>
 
+typedef struct sgr{
+
+    GHashTable * hashT_users;
+    GHashTable * hashT_businesses;
+    GHashTable * hashT_reviews;
+
+};
+
+typedef struct table{
+
+   char ** tab;
+   int entries;
+
+};
+
 /**
 \brief Inicializador de dados SGR
 @returns new_sgr stuct sgr
@@ -123,6 +138,24 @@ TABLE top_businesses_by_city(SGR sgr, int top){
 
 
 
+typedef struct query9{
+       TABLE result; 
+        char *word;
+        
+}*Query9;
+
+void query9_iterator(gpointer key, gpointer value, gpointer user_data){
+    Query9 process = malloc(sizeof(struct query9));
+    Reviews rev = (Reviews) value;
+
+    for(int i=0;rev->text!='\0'){
+        for(int j=;rev->text!='\0';j++){
+
+        }
+    }
+    
+}
+
 /**
 \brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
 @param sgr struct sgr
@@ -130,6 +163,6 @@ TABLE top_businesses_by_city(SGR sgr, int top){
 @param word string
 @returns TABLE apontador para struct table
 */
-TABLE reviews_with_word(SGR sgr,int top,char * word){
+TABLE reviews_with_word(SGR sgr,char * word){
 
 }

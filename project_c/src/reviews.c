@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct reviews{
+    char * review_id;
+    char * user_id;
+    char * business_id;
+    float stars;
+    int useful;
+    int funny;
+    int cool;
+    char * date;
+    char * text;
+};
+
 /**
 \brief Mapea dados de uma linha de texto para uma estrutrutua review
 @param rev apontador para struct reviews

@@ -3,16 +3,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
+#include "structs.h"
 
-typedef struct business{
-    char * business_id;
-    char * name;
-    char * city;
-    char * state;
-    char * categories;
+typedef struct business * Business;
 
-} * Business;
 
 char * get_id(Business b);
 char * get_name(Business b);
