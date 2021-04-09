@@ -14,7 +14,11 @@ typedef struct reviews{
     char * text;
 }* Reviews;
 
-char * getReviewId(Reviews  rev);
+char * r_getReviewId(Reviews  rev);
+
+char * r_getUserId(Reviews  rev);
+
+char * r_getBusinessId(Reviews  rev);
 Reviews addReview(Reviews  rev,char * str);
 
 

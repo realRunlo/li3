@@ -24,11 +24,12 @@ void free_sgr(SGR sgr){
 SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     SGR sgr_load = init_sgr();
 
-    mapToHash_ReviewsFile(reviews_file,sgr_load.hashT_reviews);
-
     readUser(sgr_load.hashT_users,users_file);
 
-    //read business
+    read_file(sgr_load.hashT_businesses,buinesses_file);
+
+    mapToHash_ReviewsFile(reviews_file,sgr_load.hashT_reviews);
+
 
     return sgr_load;
 }
@@ -39,10 +40,11 @@ void query2_iterator(gpointer key, gpointer value, gpointer user_data){
     char* name = get_name((Business) value);
     Query2 data = (Query2) user_data;
     char letter = data->letter;
-    if(name[1] == letter){
-        data->result = (char*) realloc(data->result,strlen(data->result) + strlen(name) + 1);
-        strcat(data->result,name);
-        strcat(data->result,",");
+    if(name[0] == letter){ 
+        int col = data->column;
+        data->result[col] =(char *) malloc(strlen(name) * sizeof(char));
+        data->result[col] = name;
+        data->column++;
         data->total++;
     }
 }
@@ -51,19 +53,20 @@ void query2_iterator(gpointer key, gpointer value, gpointer user_data){
 /* query 2 */
 //list of businesses whose name starts with char "letter"
 TABLE businesses_started_by_letter(SGR sgr, char letter){
+    int max_lines = g_hash_table_size(sgr.hashT_businesses);
     Query2 process = malloc(sizeof(struct query2));
     process->letter = letter;
-    process->result = "";
+    process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
+    process->column = 0;
     process->total = 0;
     //search every key in the hash for a business name starting with letter
     //if one is found, then result and total are updated 
-    g_hash_table_foreach(sgr.hashT_users, (GHFunc)query2_iterator,process);
-
+    g_hash_table_foreach(sgr.hashT_businesses, (GHFunc)query2_iterator,process);
     //turning the results from process into TABLE
     TABLE result = malloc(sizeof(struct table));
-    result->tab[2] = strdup(process->result);
-    result->entries = process->total;
-    free(process);
+    result->tab = process->result;
+    result->entries =  process->total;
+    //free();
     return result;
 }
 
@@ -71,16 +74,24 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
 // Iterator for query4
 void query4_iterator(gpointer key, gpointer value, gpointer user_data){
     Reviews r = (Reviews) value;
+    char* user_id = r_getUserId(r);
     Query4 data = (Query4) user_data;
 
-    if(strcmp(r->user_id,data->user_id)){
+    if(strcmp(user_id,data->user_id) == 0){
         //Encontra o business correspondente ao business_id na review
-        Business b = (Business) g_hash_table_lookup(data->hashT_businesses, r->business_id);
-        data->result = (char*) realloc(data->result,strlen(data->result) + strlen(r->business_id) + strlen(b->name) + 2);
-        strcat(data->result,r->business_id);
-        strcat(data->result,",");
-        strcat(data->result,b->name);
-        strcat(data->result,",");
+        int col = data->column;
+        char* b_id = r_getBusinessId(r);
+        Business b = (Business) g_hash_table_lookup(data->hashT_businesses,b_id);
+        char* b_name = get_name(b);
+        
+        char* result = (char*) malloc( sizeof(char) * (1 + strlen(b_name) + strlen(b_id)));
+        strcat(result,b_id);
+        strcat(result,",");
+        strcat(result,b_name);
+        data->result[col] = (char*) malloc(strlen(result) * sizeof(char));
+        data->result[col] = result;
+        data->column++;
+        printf("%s\n",result);
     }
 }
 
@@ -88,16 +99,19 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
 /* query 4 */
 //searches for the business_id and name of every business a certain user has reviewed
 TABLE businesses_reviewed(SGR sgr, char *user_id){
+    int max_lines = g_hash_table_size(sgr.hashT_businesses);
     Query4 process = malloc(sizeof(struct query4));
-    process->result = "";
+
+    process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
     process->user_id = strdup(user_id);
     process->hashT_businesses = sgr.hashT_businesses;
-
+    process->column = 0;
+    
     //procura o user_id nas reviews
     g_hash_table_foreach(sgr.hashT_reviews, (GHFunc)query4_iterator, process);
     TABLE result = malloc(sizeof(struct table));
-    result->tab[4] = strdup(process->result);
-    free(process);
+    result->tab = process->result;
+    free(process->user_id);
     return result;
 }
 

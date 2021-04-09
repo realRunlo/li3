@@ -28,8 +28,9 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file);
 
 //struct used to store results found by query2_iterator
 typedef struct query2{
-        char* result; //[business1,business2,...]
+        char** result; //[business1,business2,...]
         char letter;
+        int column;
         int total;
 }*Query2;
 
@@ -44,9 +45,10 @@ TABLE businesses_started_by_letter(SGR sgr, char letter);
 
 
 typedef struct query4{
-        char* result; //[business_id1,business1,business_id2,business2,...]
+        char** result; //[business_id1,business1,business_id2,business2,...]
         char* user_id;
         GHashTable * hashT_businesses; // used to look for the name of the business in case there is a review on it by the user
+        int column;
 }*Query4;
 
 //iterator for query4, verifies if the user_id from value(review) equals user_id from user_data

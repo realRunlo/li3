@@ -54,13 +54,12 @@ void iterator(gpointer key, gpointer value, gpointer user_data) {
 
 
 //Lê todo ficheiro linha a linha
-void read_file (char fic [] ){
+read_file (GHashTable* hash,char fic [] ){
     char buffer [5000];
     Business b;
     FILE *f = fopen(fic,"r");
 
     if(f!=NULL){
-        GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
         
         int i=0;
         while(fgets(buffer,1024,f)){
@@ -74,10 +73,11 @@ void read_file (char fic [] ){
             }
         }
         int t = g_hash_table_size(hash);
-        printf("%d\n",t);
-        g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;%s;%s");
+        //printf("%d\n",t);
+        //g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;%s;%s");
     }
     else printf("ERROR opening file\n");
+    
 }
 
 /*
