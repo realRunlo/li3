@@ -5,14 +5,7 @@
 #include <string.h>
 #include <glib.h>
 
-typedef struct business{
-    char * business_id;
-    char * name;
-    char * city;
-    char * state;
-    char * categories;
-
-} * Business;
+typedef struct business * Business;
 
 char * get_id(Business b);
 char * get_name(Business b);

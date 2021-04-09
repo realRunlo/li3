@@ -1,5 +1,17 @@
 #include "../includes/business.h"
 #include <stdio.h>
+
+
+typedef struct business{
+    char * business_id;
+    char * name;
+    char * city;
+    char * state;
+    char * categories;
+
+} * Business;
+
+
 //Verifica se cada linha tem todos os campos corretamente
 int check_line (char *str){
     char * a[5];
