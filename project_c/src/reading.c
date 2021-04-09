@@ -65,3 +65,28 @@ void readUser(GHashTable * table, char * filename){
     }
     fclose(f);
 }
+
+
+void readBusiness (GHashTable * hash, char fic [] ){
+    char buffer [5000];
+    Business b;
+    FILE *f = fopen(fic,"r");
+
+    if(f!=NULL){
+        int i=0;
+        while(fgets(buffer,1024,f)){
+            char dest [5000];
+            strcpy(dest,buffer);
+            int r = check_line(dest);
+            if(r == 1){
+                b = create_b(buffer);
+                g_hash_table_insert(hash,GINT_TO_POINTER(get_id(b)),b);
+                i++;
+            }
+        }
+        //int t = g_hash_table_size(hash);
+        //printf("%d\n",t);
+        //g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;%s;%s");
+    }
+    else printf("ERROR opening file\n");
+}

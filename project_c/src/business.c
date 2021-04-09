@@ -63,7 +63,7 @@ void iterator(gpointer key, gpointer value, gpointer user_data) {
 
 
 
-//Lê todo ficheiro linha a linha
+/*//Lê todo ficheiro linha a linha
 void read_file (char fic [] ){
     char buffer [5000];
     Business b;
@@ -88,7 +88,7 @@ void read_file (char fic [] ){
         g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;%s;%s");
     }
     else printf("ERROR opening file\n");
-}
+}*/
 
 /*
 void main(){
