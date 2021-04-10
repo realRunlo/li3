@@ -66,7 +66,7 @@ void iterator(gpointer key, gpointer value, gpointer user_data) {
 
 
 //Lê todo ficheiro linha a linha
-read_file (GHashTable* hash,char fic [] ){
+void read_file (GHashTable* hash,char fic [] ){
     char buffer [5000];
     Business b;
     FILE *f = fopen(fic,"r");

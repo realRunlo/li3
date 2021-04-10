@@ -1,5 +1,7 @@
 #include "../includes/sgr.h"
+#include <ctype.h>
 #include <string.h>
+#include <stdio.h>
 
 
 struct sgr{
@@ -25,9 +27,9 @@ struct table{
 SGR init_sgr(){
     SGR  new_sgr;
 
-    new_sgr.hashT_users = initHashT();
-    new_sgr.hashT_reviews= initHashT();
-    new_sgr.hashT_businesses = initHashT();
+    new_sgr->hashT_users = initHashT();
+    new_sgr->hashT_reviews= initHashT();
+    new_sgr->hashT_businesses = initHashT();
 
     return new_sgr;
 }
@@ -39,13 +41,14 @@ void free_sgr(SGR sgr){
 }
 */
 SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
+    
     SGR sgr_load = init_sgr();
 
-    readUser(sgr_load.hashT_users,users_file);
+    readUser(sgr_load->hashT_users,users_file);
 
-    read_file(sgr_load.hashT_businesses,buinesses_file);
+    readBusiness(sgr_load->hashT_businesses,buinesses_file);
 
-    mapToHash_ReviewsFile(reviews_file,sgr_load.hashT_reviews);
+    mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
 
 
     return sgr_load;
@@ -70,7 +73,7 @@ void query2_iterator(gpointer key, gpointer value, gpointer user_data){
 /* query 2 */
 //list of businesses whose name starts with char "letter"
 TABLE businesses_started_by_letter(SGR sgr, char letter){
-    int max_lines = g_hash_table_size(sgr.hashT_businesses);
+    int max_lines = g_hash_table_size(sgr->hashT_businesses);
     Query2 process = malloc(sizeof(struct query2));
     process->letter = letter;
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
@@ -78,7 +81,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     process->total = 0;
     //search every key in the hash for a business name starting with letter
     //if one is found, then result and total are updated 
-    g_hash_table_foreach(sgr.hashT_businesses, (GHFunc)query2_iterator,process);
+    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)query2_iterator,process);
     //turning the results from process into TABLE
     TABLE result = malloc(sizeof(struct table));
     result->tab = process->result;
@@ -86,6 +89,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     //free();
     return result;
 }
+
 
 
 // Iterator for query4
@@ -108,7 +112,7 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
         data->result[col] = (char*) malloc(strlen(result) * sizeof(char));
         data->result[col] = result;
         data->column++;
-        printf("%s\n",result);
+        
     }
 }
 
@@ -116,16 +120,16 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
 /* query 4 */
 //searches for the business_id and name of every business a certain user has reviewed
 TABLE businesses_reviewed(SGR sgr, char *user_id){
-    int max_lines = g_hash_table_size(sgr.hashT_businesses);
+    int max_lines = g_hash_table_size(sgr->hashT_businesses);
     Query4 process = malloc(sizeof(struct query4));
 
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
     process->user_id = strdup(user_id);
-    process->hashT_businesses = sgr.hashT_businesses;
+    process->hashT_businesses = sgr->hashT_businesses;
     process->column = 0;
     
     //procura o user_id nas reviews
-    g_hash_table_foreach(sgr.hashT_reviews, (GHFunc)query4_iterator, process);
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query4_iterator, process);
     TABLE result = malloc(sizeof(struct table));
     result->tab = process->result;
     free(process->user_id);
@@ -144,10 +148,10 @@ void query6_iterator(gpointer key, gpointer value, gpointer user_data){
 TABLE top_businesses_by_city(SGR sgr, int top){
     Query6 process = malloc(sizeof(struct query6));
     process->result = NULL;
-    process->hashT_reviews = sgr.hashT_reviews;
+    process->hashT_reviews = sgr->hashT_reviews;
 
     //percorre todos os businesses
-    g_hash_table_foreach(sgr.hashT_businesses, (GHFunc)query6_iterator, process);
+    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)query6_iterator, process);
 
     free(process);
 }
@@ -160,14 +164,25 @@ typedef struct query9{
 }*Query9;
 
 void query9_iterator(gpointer key, gpointer value, gpointer user_data){
-    Query9 process = malloc(sizeof(struct query9));
+    
     Reviews rev = (Reviews) value;
+    Query9 query_data = (Query9) user_data;
+    char buffer[100];
+    int j=0,entries_count=0;
+    char * txt = strdup(r_getText(rev));
 
-    for(int i=0;rev->text!='\0';){
-        for(int j=0;rev->text!='\0';j++){
-
+    for(int i=0;txt[i]!='\0';i++){
+        if(!isspace(txt[i]) && !ispunct(txt[i])){
+            buffer[j++] = txt[i];
+        }else{
+            if(strcmp(buffer,query_data->word)){
+                query_data->result->tab[entries_count] = strdup(r_getReviewId(value));
+            }
+            j = 0;
         }
     }
+
+    query_data->result->entries = entries_count;
     
 }
 
@@ -180,6 +195,14 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 @param word string
 @returns TABLE apontador para struct table
 */
-TABLE reviews_with_word(SGR sgr,int top,char * word){
+TABLE reviews_with_word(SGR sgr,char * word){
+    Query9 data_q9 = malloc(sizeof(struct query9));
+    TABLE results_table;
+    data_q9->result = results_table;
+    data_q9->word = word;
 
+    g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,data_q9);
+
+
+    return results_table;
 }

@@ -6,9 +6,11 @@
 #include "reviews.h"
 #include "business.h"
 
-typedef struct sgr SGR;
+typedef struct sgr * SGR;
 
 typedef struct table * TABLE;
+
+
 
 SGR init_sgr();
 void free_sgr(SGR sgr);
@@ -77,6 +79,9 @@ typedef struct query6{
 
 /* query 6 */
 TABLE top_businesses_by_city(SGR sgr, int top);
+
+
+TABLE reviews_with_word(SGR sgr,char * word);
 
 
 

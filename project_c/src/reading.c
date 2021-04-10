@@ -1,6 +1,7 @@
 #include "../includes/reading.h"
 #include "../includes/user.h"
 #include "../includes/reviews.h"
+#include "../includes/business.h"
 #include <stdio.h>
 #include <string.h>
 #define BUFFER_SIZE 10000
@@ -36,7 +37,7 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
 }
 
 User createUser(char * buffer){
-    User u = malloc(sizeof(struct user));
+    User u = malloc(sizeof(User));
     setUserId(u,strsep(&buffer,";"));
     setName(u,strsep(&buffer,";"));
     setFriends(u,strsep(&buffer,"\n"));
@@ -80,7 +81,7 @@ void readBusiness (GHashTable * hash, char fic [] ){
             int r = check_line(dest);
             if(r == 1){
                 b = create_b(buffer);
-                g_hash_table_insert(hash,GINT_TO_POINTER(get_id(b)),b);
+                addToHashT(hash,GINT_TO_POINTER(get_id(b)),b);
                 i++;
             }
         }
