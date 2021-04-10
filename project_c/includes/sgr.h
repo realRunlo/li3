@@ -47,6 +47,8 @@ void b_name_hash(gpointer key, gpointer value, gpointer user_data);
 
 void b_add_stars(gpointer key, gpointer value, gpointer user_data);
 
+void top_city(gpointer key, gpointer value, gpointer user_data);
+
 TABLE top_businesses_by_city(SGR sgr, int top);
 
 
