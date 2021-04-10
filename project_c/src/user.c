@@ -17,7 +17,7 @@ void setUserId(User u, char* newUserId){
 }
 
 
-char * getName(User u){
+char * getUserName(User u){
     return strdup(u->name);
 }
 
@@ -37,7 +37,7 @@ void setFriends(User u, char* newFriends){
 
 
 void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
- printf(user_data, getUserId((User) value),getName((User) value),getFriends((User) value));
+ printf(user_data, getUserId((User) value),getUserName((User) value),getFriends((User) value));
 }
 
 
