@@ -12,7 +12,7 @@ char * getUserId(User u);
 void setUserId(User u, char* newUserId);
 
 // gets Name
-char * getName(User u);
+char * getUserName(User u);
 
 // sets Name
 void setName(User u, char* newName);

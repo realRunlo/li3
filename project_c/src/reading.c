@@ -52,8 +52,8 @@ void readUser(GHashTable * table, char * filename){
         printf("ERROR_FILE_readUser\n");
         exit(1);
     }
-
-    char buffer[400000]; // enough space for 3 excel cells
+    
+    char buffer[400000]; // espaco suficiente para os exemplos do input file
     User u;
     int i = 0;
 
