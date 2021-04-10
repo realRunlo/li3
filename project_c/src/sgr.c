@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
 struct sgr{
 
     GHashTable * hashT_users;
@@ -11,6 +10,7 @@ struct sgr{
     GHashTable * hashT_reviews;
 
 };
+
 
 struct table{
 
@@ -20,12 +20,16 @@ struct table{
 };
 
 
+int getEntries(TABLE t){
+    return t->entries;
+}
 /**
 \brief Inicializador de dados SGR
 @returns new_sgr stuct sgr
 */
 SGR init_sgr(){
-    SGR  new_sgr;
+
+    SGR new_sgr = malloc(sizeof(struct sgr));
 
     new_sgr->hashT_users = initHashT();
     new_sgr->hashT_reviews= initHashT();
@@ -44,12 +48,13 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     
     SGR sgr_load = init_sgr();
 
+    mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
+
     readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
 
-    mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
-
+    
 
     return sgr_load;
 }
@@ -82,6 +87,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     //search every key in the hash for a business name starting with letter
     //if one is found, then result and total are updated 
     g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)query2_iterator,process);
+    
     //turning the results from process into TABLE
     TABLE result = malloc(sizeof(struct table));
     result->tab = process->result;

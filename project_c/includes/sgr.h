@@ -1,16 +1,17 @@
 #ifndef ___SGR_H___
 #define ___SGR_H___
-#include "structs.h"
-#include "reading.h"
-#include "user.h"
-#include "reviews.h"
-#include "business.h"
+
+#include "../includes/structs.h"
+#include "../includes/reading.h"
+#include "../includes/user.h"
+#include "../includes/reviews.h"
+#include "../includes/business.h"
 
 typedef struct sgr * SGR;
 
 typedef struct table * TABLE;
 
-
+int getEntries(TABLE t);
 
 SGR init_sgr();
 void free_sgr(SGR sgr);
