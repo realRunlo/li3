@@ -11,6 +11,7 @@ typedef struct sgr * SGR;
 
 typedef struct table * TABLE;
 
+
 int getEntries(TABLE t);
 
 SGR init_sgr();

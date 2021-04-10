@@ -35,13 +35,13 @@ Reviews addReview(Reviews  rev,char * str){
 }
 
 char * r_getReviewId(Reviews  rev){
-    return rev->review_id;
+    return strdup(rev->review_id);
 }
 char * r_getUserId(Reviews  rev){
-    return rev->user_id;
+    return strdup(rev->user_id);
 }
 char * r_getBusinessId(Reviews  rev){
-    return rev->business_id;
+    return strdup(rev->business_id);
 }
 
 int r_getStars(Reviews  rev){
@@ -57,9 +57,9 @@ int r_getCool(Reviews  rev){
     return rev->cool;
 }
 char *  r_getDate(Reviews  rev){
-    return rev->date;
+    return strdup(rev->date);
 }
 char * r_getText(Reviews rev){
-    return rev->text;
+    return strdup(rev->text);
 }
 

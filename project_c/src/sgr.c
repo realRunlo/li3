@@ -23,6 +23,7 @@ struct table{
 int getEntries(TABLE t){
     return t->entries;
 }
+
 /**
 \brief Inicializador de dados SGR
 @returns new_sgr stuct sgr
@@ -48,13 +49,14 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     
     SGR sgr_load = init_sgr();
 
-    mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
+    printf("Loading...\n");
 
+    mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
+    
     readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
 
-    
 
     return sgr_load;
 }
@@ -163,37 +165,33 @@ TABLE top_businesses_by_city(SGR sgr, int top){
 }
 
 
-typedef struct query9{
-       TABLE result; 
-        char *word;
-        
-}*Query9;
-
 void query9_iterator(gpointer key, gpointer value, gpointer user_data){
+ 
+    TABLE results_table = (TABLE) user_data;
+    char * buffer = malloc(100);
+    int j=0;
+     
+    char * word = strdup(results_table->tab[0]);
+    char * txt = strdup(r_getText((Reviews) value));
     
-    Reviews rev = (Reviews) value;
-    Query9 query_data = (Query9) user_data;
-    char buffer[100];
-    int j=0,entries_count=0;
-    char * txt = strdup(r_getText(rev));
-
     for(int i=0;txt[i]!='\0';i++){
         if(!isspace(txt[i]) && !ispunct(txt[i])){
             buffer[j++] = txt[i];
         }else{
-            if(strcmp(buffer,query_data->word)){
-                query_data->result->tab[entries_count] = strdup(r_getReviewId(value));
+            
+            buffer[j++] = '\0';
+            if(strcmp(buffer,word)==0){
+                int entries = results_table->entries;
+                results_table->tab[entries] = strdup(r_getReviewId((Reviews) value));
+                results_table->entries++;
+                
             }
             j = 0;
         }
+        
     }
-
-    query_data->result->entries = entries_count;
     
 }
-
-
-
 /**
 \brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
 @param sgr struct sgr
@@ -202,13 +200,15 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 @returns TABLE apontador para struct table
 */
 TABLE reviews_with_word(SGR sgr,char * word){
-    Query9 data_q9 = malloc(sizeof(struct query9));
-    TABLE results_table;
-    data_q9->result = results_table;
-    data_q9->word = word;
+    int max_lines = g_hash_table_size(sgr->hashT_reviews);
+    TABLE results_table = malloc(sizeof(struct table));
+    results_table->tab = (char **) malloc(max_lines);
+    results_table->entries = 0;
 
-    g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,data_q9);
-
+    results_table->tab[0] = strdup(word);
+   
+    
+    g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,results_table);
 
     return results_table;
 }
