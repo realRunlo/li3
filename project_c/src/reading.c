@@ -19,12 +19,11 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
     if(fp!=NULL){
         char * buffer = malloc(BUFFER_SIZE);
         Reviews rev;
-        printf("Loading...\n");
         while(fgets(buffer,BUFFER_SIZE,fp)!=NULL){
             rev = addReview(rev,buffer);
             addToHashT(hTable,r_getReviewId(rev),rev);
         }
-        printf("file loaded.\n");
+        printf("reviews file loaded.\n");
 
         free(buffer);
         fclose(fp);
