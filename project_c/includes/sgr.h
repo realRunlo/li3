@@ -54,13 +54,25 @@ void top_city(gpointer key, gpointer value, gpointer user_data);
 TABLE top_businesses_by_city(SGR sgr, int top);
 
 
-TABLE reviews_with_word(SGR sgr,char * word);
+
 
 /*query 7 */
 void query7_iterator(gpointer key, gpointer value, gpointer user_data);
 TABLE international_users (SGR sgr);
 
+/*query 8 */
 
+int cmp_category(char* c_condition,char* c_comparing); 
+
+void b_category(gpointer key, gpointer value, gpointer user_data);
+
+void top_category(gpointer key, gpointer value, gpointer user_data);
+
+TABLE top_businesses_with_category(SGR sgr, int top, char *category);
+
+
+/*query 9 */
+TABLE reviews_with_word(SGR sgr,char * word);
 #endif //___SGR_H___
 
 
