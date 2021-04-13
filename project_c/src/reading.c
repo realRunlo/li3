@@ -50,19 +50,21 @@ void readUser(GHashTable * table, char * filename){
     f = fopen(filename,"r");
     if (f==NULL){
         printf("ERROR_FILE_readUser\n");
-        exit(1);
     }
+    else{
     
-    char buffer[400000]; // espaco suficiente para os exemplos do input file
-    User u;
-    int i = 0;
+        char buffer[400000]; // espaco suficiente para os exemplos do input file
+        User u;
+        int i = 0;
 
-    while(fgets(buffer,400000,f)){
-        //printf("%d : %s",i,buffer);
-        //printf("%d\n",i);
-        u = createUser(buffer);
-        addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
-        i++;
+        while(fgets(buffer,400000,f)){
+            //printf("%d : %s",i,buffer);
+            //printf("%d\n",i);
+            u = createUser(buffer);
+            addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
+            i++;
+        }
+        printf("users file loaded.\n");
     }
     fclose(f);
     printf("Users loaded.\n");

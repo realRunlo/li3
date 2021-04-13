@@ -64,7 +64,7 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
-
+    printf("Starting...\n");
 
     return sgr_load;
 }
@@ -115,7 +115,40 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     return result;
 }
 
-
+///* query 3 
+//Dado um id de negócio, determinar a sua informação: nome,
+//cidade,estado,stars,e número total reviews*/
+///*query 3*/
+//typedef struct query3{
+//        char* b_id;
+//        int total;
+//}*Query3;
+//// Iterator for query3
+//void query3_iterator(gpointer key, gpointer value, gpointer user_data){
+//    char* b_id = r_getBusinessId((Reviews) value);
+//    if(strcmp(b_id,user_data->b_id) == 0)
+//        user_data->total++;
+//}
+//
+//TABLE business_info (SGR sgr, char* business_id){
+//    TABLE r; 
+//    Business c = malloc(sizeof(struct business));
+//    char* id = NULL;
+//    char** key_ptr = &id;
+//    struct business** value_ptr = &c;
+//    gboolean result = g_hash_table_lookup_extended(hash,business_id, 
+//                    (gpointer*)key_ptr, (gpointer*) value_ptr);
+//    if (result){ 
+//        //printf("%s\n%s\n%s\n%s\n%s\n",id, c->name,c->city,c->state,c->categories);
+//        Query3 pro = malloc(sizeof(struct query3));
+//        pro->b_id = strdup (business_id);
+//        pro->total = 0;
+//        g_hash_table_foreach(sgr.hashT_reviews, (GHFunc)query3_iterator,pro);
+//        //printf("%d\n",pro->total);
+//        free(pro);
+//    }
+//    return r;
+//}
 
 typedef struct query4{
         char** result; //[business_id1,business1],[business_id2,business2][...]
@@ -166,7 +199,46 @@ TABLE businesses_reviewed(SGR sgr, char *user_id){
     return result;
 }
 
-
+//
+///* query 5 
+//Dado um número n de stars e uma cidade, determinar a lista de negócios com n ou mais
+//stars na cidade.A informação associada a cada negócio deve ser o seu id e nome.*/
+//typedef struct query5{
+//        char* list; //[id_business1,name_business1,id_business2,...]
+//        char* city;
+//        float stars;
+//}*Query5;
+//
+//void query5_iterator(gpointer key, gpointer value, gpointer user_data){
+//    Reviews r = ((Reviews)value);
+//    char* city = get_city((Business) value);
+//    float b_stars = get_stars(Business) value);
+//
+//    if(b_stars >= user_data->stars){
+//        Business b = (Business) g_hash_table_lookup(data->hashT_business, r->business_id);
+//         if(strcmp(city,user_data_city)==0){
+//             user_data->list = (char*) realloc(user_data->list, strlen(user_data->list) 
+//                                        + strlen(b->business_id) + strlen(b->name) + 2);
+//            strcat(user_data->list,b->business_id);
+//            strcat(user_data->list,",");
+//            strcat(user_data->list,b->name);
+//            strcat(user_data->list,",");
+//        }
+//    }
+//}
+//
+//TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
+//    TABLE r = malloc(sizeof(struct table));
+//    Query5 pro = malloc(sizeof(struct query5));
+//    pro->city = strdup (city);
+//    pro->stars = stars;
+//    g_hash_table_foreach(sgr.hashT_reviews, (GHFunc)query5_iterator,pro);
+//    r->tab[5] = strdup(pro->list);
+//    free(pro);   
+//    return r;
+//}
+//
+//struct para guardar informacoes sobre os top negocios de cada cidade 
 typedef struct city{
     char* name;
     char** top; //[score1,business1][score2,business2][...]
@@ -176,6 +248,7 @@ typedef struct city{
 
 //elemento da tabela que guarda a media de estrelas de cada negocio
 typedef struct b_stars{
+    char* b_id;
     char* b_name;
     int n_reviews;
     float total;
@@ -184,56 +257,61 @@ typedef struct b_stars{
 //user_data para business_average_stars
 typedef struct b_average_stars{
     SGR sgr;
-    GHashTable * b_same_name;
+    GHashTable * b_same;
     GHashTable * cities;
     int top;
+    char* condition; //pode ser utilizado pelo query 8 para guardar a categoria procurada
+    char** results;
+    int entries; //numero de linhas preenchidas de results
+    float lowScore;
 }*B_AVERAGE_STARS;
 
 
 
-// Cria uma hash em que cada elemento sao todos os negocios com o mesmo nome
-// Alem disso verifica se a cidade do business ja foi adicionada na table das cidades
-void b_name_hash(gpointer key, gpointer value, gpointer user_data){
+
+//Cria uma hash com todas as diferentes cidades 
+void city_hash(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
-    char* b_name = get_name(b);
-    //verifica se ja existe um negocio na table com o mesmo nome
-    if(g_hash_table_lookup(data->b_same_name,GINT_TO_POINTER(b_name)) == NULL)
-    {
-        B_STARS business = malloc(sizeof(B_STARS));
-        business->b_name= b_name;
-        business->n_reviews = 0;
-        business->total = 0;
-        addToHashT(data->b_same_name,GINT_TO_POINTER(b_name),business);
-    }
 
     //verifica se ja foi adicionada a cidade na table
     char* city = get_city(b);
     if(g_hash_table_lookup(data->cities,GINT_TO_POINTER(city)) == NULL){
-        CITY c = malloc(sizeof(CITY));
+        CITY c = malloc(sizeof(struct city));
         c->entries = 0;
         c->low_score = 0;
         c->name = city;
         c->top = malloc(sizeof(char*) * data->top);
-        addToHashT(data->b_same_name,GINT_TO_POINTER(city),c);
+        addToHashT(data->cities,GINT_TO_POINTER(city),c);
     }
 }
 
-//para cada review vai a table "b_same_name" e adiciona no negocio correspondente o numero de estrelas
+//para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
 void b_add_stars(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
     char *b_id = r_getBusinessId(r);
     
-    //encontra o negocio da review
+    //encontra o id do negocio da review
     Business b = g_hash_table_lookup(data->sgr->hashT_businesses,GINT_TO_POINTER(b_id));
     char* b_name = get_name(b);
 
-    //encontra o negocio (na table com os negocios de mesmo nome juntos)
-    B_STARS b_average = g_hash_table_lookup(data->b_same_name,GINT_TO_POINTER(b_name));
-
-    b_average->n_reviews++;
-    b_average->total += r_getStars(r);
+    //verifica se ja existe um negocio na table de media de estrelas com o mesmo id
+    if(g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id)) == NULL)
+    {
+        B_STARS business = malloc(sizeof(struct b_stars));
+        business->b_id = b_id;
+        business->b_name= b_name;
+        business->n_reviews = 1;
+        business->total = r_getStars(r);
+        addToHashT(data->b_same,GINT_TO_POINTER(b_id),business);
+    }
+    //se ja existir da update no numero de reviews e no total de estrelas
+    else{
+        B_STARS update = g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id));
+        update->n_reviews++;
+        update->total += r_getStars(r);
+    }
 }
 
 
@@ -241,62 +319,72 @@ void b_add_stars(gpointer key, gpointer value, gpointer user_data){
 void top_city(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
-    GHashTable * b_same_name = data->b_same_name;
+    GHashTable * b_same_name = data->b_same;
     GHashTable * cities = data->cities;
     char* b_name    = get_name(b);
     char* b_id      = get_id(b);
     char* city_name = get_city(b);
-    B_STARS bStar   = g_hash_table_lookup(b_same_name,GINT_TO_POINTER(b_name));
+    B_STARS bStar   = g_hash_table_lookup(b_same_name,GINT_TO_POINTER(b_id));
     CITY c          = g_hash_table_lookup(cities,GINT_TO_POINTER(city_name));
+    
+    //verifica se houve reviews para o negocio em questao
+    if(bStar != NULL){
     float average   = bStar->total / bStar->n_reviews;
-    int i = 0;
-
-    //se a cidade ainda nao top negocios guardados, adiciona imediatamente numa posicao livre
-    if(c->entries < data->top){
-        char stars[20];
-        sprintf(stars,"%.2f",average);
-        char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 2));
-        snprintf(result,strlen(stars) + strlen(b_name) + strlen(b_id)+ 2,"%s,%s,%s",stars,b_name,b_id);
-        while(c->top[i]) i++; //procura uma posicao vazia
-        c->top[i] = result;
-        c->low_score = average;
-        c->entries++;
-    }
-    //se o min score da cidade for maior do que o do business nao adiciona
-    else if(c->low_score > average);
-         else{
-             char *buffer = malloc(sizeof(char) * 1000);
-             char*b_compare;
-             int found = 0;
-             int i_lowest = 0;
-             float lowest;
-             //primeiro verificar se o negocio ja foi adicionado
-             while(c->top[i] && found !=1){
+    int i = 0; int top = data->top;
+    
+    //verifica se o negocio tem reviews e caso tenha o top cheio, se o score do negocio e menor do que o minimo do top
+    //caso a cidade ja n tenha espaco no top e o score do negocio e menor do que o minimo do top
+    if(c->entries == top && average < c->low_score);
+    else{
+        char stars[20]; //string para colocar as estrelas medias
+        sprintf(stars,"%.2f",average); //float to string
+        char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 2)); //declaracao da string q sera colocada
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 2,"%s %s,%s",stars,b_id,b_name);
+        //caso em que ainda nao foram adicionados nenhuns negocios
+        if(c->entries == 0){
+            c->top[0] = result;
+            c->low_score = average;
+            c->entries++;
+        }
+        else{
+            //verificar se o negocio ja foi adicionado
+            i = 0;
+            char*buffer = malloc(sizeof(char) * 1000);
+            int found = 0;
+            int i_lowest = 0;
+            float lowest;
+            while(i < c->entries && found !=1){
                 strcpy(buffer,c->top[i]);
-                sprintf(strsep(&buffer,","),"%2.f",lowest);
+                lowest = atof(strsep(&buffer," "));  //torna a string da media de estrelas em um float 
                 if (lowest == c->low_score) i_lowest = i; //guarda a posicao do menor score
-                if (strcmp(b_name,strsep(&buffer,",")) == 0) found++;
+                if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
                 i++;
-             } 
-             //se n foi adicionado trocar pelo negocio com o score mais baixo
-             if(found == 0){
-                char stars[20];
-                sprintf(stars,"%.2f",average);
-                char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 2));
-                snprintf(result,strlen(stars) + strlen(b_name) + strlen(b_id)+ 2,"%s,%s,%s",stars,b_name,b_id);
+            }
+            //se o negocio ainda n foi adicionado(e o seu score e superior ao minimo da cidade) mas o top ja esteja cheio, necessario trocar pelo de menor score
+            if(found == 0 && c->entries == data->top && average > c->low_score){
+                i = 0;
                 c->top[i_lowest] = result;
                 //atualizar score mais baixo
                 float min = 20;
-                float s;
-                while(c->top[i]){
+                float s = 20;
+                while(i < top){
                     strcpy(buffer,c->top[i]);
-                    sprintf(strsep(&buffer,","),"%.2f",s);
+                    s = (float) atof(strsep(&buffer," "));
                     if(s< min) min = s;
                     i++;
                 }
                 c->low_score = min;
-             }
-         }
+            }
+            //se a cidade ainda nao tem top negocios guardados, adiciona imediatamente numa posicao livre
+            if(found == 0 && c->entries < data->top){
+                c->top[c->entries] = result;
+                if(average < c->low_score) c->low_score = average;
+                c->entries++;
+                //printf("cidade %s\n",c->top[i]);
+            }
+        }
+        }   
+    }
 }
 
 //torna os dados de uma cidade em formato de uma linha de TABLE
@@ -305,61 +393,253 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
     CITY c = (CITY) value;
     int i = result->entries;
     int j = 0 ,k = 0, length = 0 ;
+    
+    //printf("city: %s -> entries :%d\n",c->name,c->entries);
+    
+    if(c->entries > 0){
     //calcula o tamanho necessario para concatenar os dados dos negocios todos da cidade
-    for(; c->top[j];j++) length += strlen(c->top[j]) ;
-
-    result->tab[i] = malloc(sizeof(char) * (length + j));
-    result->tab[i][0] = '\0';
+    for(; j< c->entries;j++){ 
+        //printf("%s\n",c->top[0]);
+        length += strlen(c->top[j]);
+        }
+    result->tab[i] = malloc(sizeof(char) * (length + j + strlen(c->name) + j + 1));
     //concatena os dados dos negocios e coloca-os na table
+    snprintf(result->tab[i],strlen(c->name)+2,"%s;",c->name);
     for(k=0 ; k<j;k++){
         strcat(result->tab[i],c->top[k]);
         strcat(result->tab[i],";");
     }
+    //printf("%d -> %s\n",result->entries,result->tab[i]);
     result->entries++;
+    }
 }
 
 
 /* query 6 */
 //searches for the top n businesses from each city
 TABLE top_businesses_by_city(SGR sgr, int top){
-    GHashTable * b_same_name = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
-    GHashTable * cities = initHashT(); //hash para descobrir o numero total de cidades diferentes 
-    B_AVERAGE_STARS process = malloc(sizeof(B_AVERAGE_STARS));
-    process->b_same_name = b_same_name;
+    B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
+    process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
     process->sgr = sgr;
-    process->cities = cities;
+    process->cities = initHashT(); //hash para descobrir o numero total de cidades diferentes 
     process->top = top;
 
-    //cria table q une negocios com o mesmo nome em elementos singulares
-    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)b_name_hash, process);
+    printf("Making city hashTable...");
+    //cria table em q cada elemento e uma cidade distinta
+    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)city_hash, process);
+    printf("Done!\n");
     int total_cities = g_hash_table_size(process->cities);
 
-
-    //percorrer todas as reviews e vai adicionando estrelas ao negocio correspondente
+    printf("Calculating average stars of each business...");
+    //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_add_stars, process);
-
+    printf("Done!\n");
+    
+    printf("Calculating top of each city...");
     //para cada business verifica a cidade a que pertence e verifica se pertence ao top dessa cidade
     g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)top_city, process);
-
+    printf("Done!\n");
     
 
     TABLE result = malloc(sizeof(struct table));
     result->entries = 0;
-    
-    g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
-    
+    result->tab = malloc(sizeof(char*) * top);
 
-    //To do
-    //Para cada cidade encontrar os top business
-    //Criar estrutura para q facilmente se possa modificar os top business numa cidade enquanto se analisa os dados
-    //  por exemplo uma matriz para cada cidade
-    //Utilizar matriz na table, cada linha sera um cidade e as colunas serao os business
-    //free das hashes criadas
     
+    printf("Turning data into TABLE structure...\n");
+    g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
+    printf("Done!\n");    
+    return result;
+}
+
+///*query 7
+//Lista ids de utilizadores e o número total de utilizadores que tenham visitado mais 
+//de um estado,i.e. que tenham feito reviews em negócios de diferentes estados.*/
+//typedef struct query7{
+//    char** list_b;
+//    GHashTable * hashT_businesses; 
+//    char * state_atual;
+//    int total;
+//}Query7;
+//
+//void query7_iterator(gpointer key, gpointer value, gpointer user_data){
+//    char* user_id = r_getUserId(r);
+//    TABLE t = businesses_reviewed(user_data->sgr, user_id);
+//    char* b_id_atual = strdup(strsep(&(t[4][0]),","));
+//    Business b_atual = (Business) g_hash_table_lookup(user_data->hashT_businesses,GINT_TO_POINTER(b_id_atual));
+//    user_data->state_atual = get_state(b);
+//    
+//    int r = 1,i=1;
+//    while(r!= 0 && t[4]!NULL){
+//        char* b_id = strdup(strsep(&(t[4][i]),","));
+//        Business b = (Business)g_hash_table_lookup(user_data->hashT_businesses,GINT_TO_POINTER(b_id));
+//        if (strcmp (user_data->state_atual,get_state(b))==0) i++;
+//        else{
+//            user_data->list[user_data->total] = user_id;
+//            user_data->total++;
+//            r=0;
+//        }
+//    }
+//}
+//TABLE international_users (SGR sgr){
+//    TABLE r = malloc(sizeof(struct table));
+//    Query7 pro = malloc(sizeof(struct query7));
+//    pro->sgr = sgr;
+//    pro->total = 0;
+//    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query5_iterator,pro);
+//    r->tab[5] = strdup(pro->list);
+//    r->entries[5] = pro->total;
+//    free(pro);   
+//    return r;
+//}
+
+
+int cmp_category(char* c_condition,char* c_comparing){
+    int i = 0, j = 0;
+    if(c_condition[0] == '\0' && c_comparing[0] == '\0') return 0;
+    for(;c_comparing[j] != '\0' ;j++){
+        if(c_condition[i] == '\0' && (c_comparing[j] == ',' || c_comparing[j] == ';')) return 0;
+        else if(c_condition[i] == c_comparing[j]) i++;
+            else if(c_condition[i] != c_comparing[j]) i = 0;
+    }
+    return 1;
+}
+
+
+//para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
+void b_category(gpointer key, gpointer value, gpointer user_data){
+    B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
+    Reviews r = (Reviews) value;
+    char *b_id = r_getBusinessId(r);
+    
+    //encontra o id do negocio da review
+    Business b = g_hash_table_lookup(data->sgr->hashT_businesses,GINT_TO_POINTER(b_id));
+    char* b_category = get_categ(b);
+
+    //verifica se o negocio reviewed pertence a categoria procurada
+    if(cmp_category(data->condition,b_category) == 0){
+        //verifica se ja existe um negocio na table de media de estrelas com o mesmo id
+        if(g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id)) == NULL)
+        {
+            char* b_name = get_name(b);
+            B_STARS business = malloc(sizeof(struct b_stars));
+            business->b_id = b_id;
+            business->b_name= b_name;
+            business->n_reviews = 1;
+            business->total = r_getStars(r);
+            addToHashT(data->b_same,GINT_TO_POINTER(b_id),business);
+        }
+        //se ja existir da update no numero de reviews e no total de estrelas
+        else{
+            B_STARS update = g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id));
+            update->n_reviews++;
+            update->total += r_getStars(r);
+        }
+    }
+
+}
+
+//procura dentro da hash, os business com top score 
+void top_category(gpointer key, gpointer value, gpointer user_data){
+    B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
+    B_STARS b = (B_STARS) value;
+    GHashTable * b_same_name = data->b_same;
+    char** results  = data->results; 
+    char* b_name    = b->b_name;
+    char* b_id      = b->b_id;    
+    float average   = b->total / b->n_reviews;
+    int i = 0; int top = data->top;
+    //verifica se o negocio tem reviews e caso tenha o top cheio, se o score do negocio e menor do que o minimo do top
+    //caso a cidade ja n tenha espaco no top e o score do negocio e menor do que o minimo do top
+    if(data->entries == top && average < data->lowScore);
+    else{
+        char stars[20]; //string para colocar as estrelas medias
+        sprintf(stars,"%.2f",average); //float to string
+        char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 3)); //declaracao da string q sera colocada
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s %s,%s",stars,b_id,b_name);
+        //caso em que ainda nao foram adicionados nenhuns negocios
+        if(data->entries == 0){
+            results[0] = result;
+            data->lowScore = average;
+            data->entries++;
+        }
+        else{
+            //verificar se o negocio ja foi adicionado
+            i = 0;
+            char*buffer = malloc(sizeof(char) * 1000);
+            int found = 0;
+            int i_lowest = 0;
+            float lowest;
+            while(i < data->entries && found !=1){
+                strcpy(buffer,results[i]);
+                lowest = atof(strsep(&buffer," "));  //torna a string da media de estrelas em um float 
+                if (lowest == data->lowScore) i_lowest = i; //guarda a posicao do menor score
+                if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
+                i++;
+            }
+            //se o negocio ainda n foi adicionado(mas tem score superior ao minimo da categoria) mas o top ja esteja cheio, necessario trocar pelo de menor score
+            if(found == 0 && data->entries == top && average > data->lowScore){
+                i = 0;
+                results[i_lowest] = result;
+                //atualizar score mais baixo
+                float min = 20;
+                float s = 20;
+                while(i < data->entries){
+                    strcpy(buffer,results[i]);
+                    s = (float) atof(strsep(&buffer," "));
+                    if(s< min) min = s;
+                    i++;
+                }
+                data->lowScore = min;
+                
+            }
+            //se a cidade ainda nao tem top negocios guardados, adiciona imediatamente numa posicao livre
+            if(found == 0 && data->entries < data->top){
+                results[data->entries] = result;
+                //atualizar min score se necessario
+                if (average < data->lowScore) data->lowScore = average;
+                data->entries++;
+                //printf("cidade %s\n",c->top[i]);
+            }
+        }
+    }   
+}
+
+
+/* query 8 */
+//calcula os top n negocios de uma dada categoria
+TABLE top_businesses_with_category(SGR sgr, int top, char *category){
+    B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
+    process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
+    process->sgr = sgr;
+    process->top = top;
+    process->condition = strdup(category);
+    process->results = malloc(sizeof(char*) * top);
+    process->entries = 0;
+
+    //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
+    printf("Calculating average stars of each business...");
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_category, process);
+    printf("Done!\n");
+
+    //calcular os top negocios e guardar numa matriz de top linhas
+    printf("Calculating top businesses...");
+    g_hash_table_foreach(process->b_same, (GHFunc)top_category, process);
+    printf("Done!\n");
+    
+    //tornar a matriz em forma TABLE
+    printf("entries = %d\n",process->entries);
+    printf("Turning data into TABLE structure...\n");
+    TABLE result = malloc(sizeof(struct table));
+    result->entries = process->entries;
+    result->tab = process->results;
+    printf("Done!\n");
+
     return result;
 }
 
 
+ 
 void query9_iterator(gpointer key, gpointer value, gpointer user_data){
  
     TABLE results_table = (TABLE) user_data;
