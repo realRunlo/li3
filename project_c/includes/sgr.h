@@ -11,6 +11,8 @@ typedef struct sgr * SGR;
 
 typedef struct table * TABLE;
 
+GHashTable * getHashT_reviews(SGR sgr);
+
 
 int getEntries(TABLE t);
 char* get_string_table(TABLE t,int n);

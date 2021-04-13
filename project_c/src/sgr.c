@@ -20,7 +20,16 @@ struct table{
 
 };
 
+TABLE initTable(){
+    TABLE t = malloc(sizeof(struct table));
+    t->tab = NULL;
+    t->entries = 0;
+    return t;
+}
 
+GHashTable * getHashT_reviews(SGR sgr){
+    return sgr->hashT_reviews;
+}
 int getEntries(TABLE t){
     return t->entries;
 }
@@ -638,34 +647,41 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     return result;
 }
 
-
- 
-void query9_iterator(gpointer key, gpointer value, gpointer user_data){
- 
-    TABLE results_table = (TABLE) user_data;
+int wordInString(char *str,char * word){
     char * buffer = malloc(100);
     int j=0;
-     
-    char * word = strdup(results_table->tab[0]);
-    char * txt = strdup(r_getText((Reviews) value));
-    
-    for(int i=0;txt[i]!='\0';i++){
-        if(!isspace(txt[i]) && !ispunct(txt[i])){
-            buffer[j++] = txt[i];
+    for(int i=0;str[i]!='\0';i++){
+        if((!isspace(str[i]) && !ispunct(str[i])) || str[i] == '\''){
+            buffer[j++] = str[i];
         }else{
             
-            buffer[j++] = '\0';
+            buffer[++j] = '\0';
             if(strcmp(buffer,word)==0){
-                int entries = results_table->entries;
-                results_table->tab[entries] = strdup(r_getReviewId((Reviews) value));
-                results_table->entries++;
-                
+                free(buffer);
+                return 1;
             }
             j = 0;
         }
         
     }
+    free(buffer);
+    return 0;
+}
+
+typedef struct query9{
+        TABLE t;
+        char * word;
+}*Query9;
+
+ 
+void query9_iterator(gpointer key, gpointer value, gpointer user_data){
     
+    Query9 data = (Query9) user_data;
+    char * word = data->word ;
+    char * txt = strdup(r_getText((Reviews) value));
+    
+    if(wordInString(txt,word))
+        data->t->tab[data->t->entries++] = r_getReviewId((Reviews) value);  
 }
 /**
 \brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
@@ -676,14 +692,13 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 */
 TABLE reviews_with_word(SGR sgr,char * word){
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
-    TABLE results_table = malloc(sizeof(struct table));
-    results_table->tab = (char **) malloc(max_lines);
-    results_table->entries = 0;
-
-    results_table->tab[0] = strdup(word);
-   
+    Query9 query_data = malloc(sizeof(struct query9));
+    query_data->t = initTable();
+    query_data->word = strdup(word);
+    query_data->t->tab= (char **) malloc(max_lines);
     
-    g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,results_table);
+   
+    g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,query_data);
 
-    return results_table;
+    return query_data->t;
 }
