@@ -699,7 +699,7 @@ int wordInString(char *str,char * word){
             buffer[j++] = str[i];
         }else{
             
-            buffer[++j] = '\0';
+            buffer[j] = '\0';
             if(strcmp(buffer,word)==0){
                 free(buffer);
                 return 1;
@@ -708,6 +708,11 @@ int wordInString(char *str,char * word){
         }
         
     }
+     buffer[j] = '\0';
+        if(strcmp(buffer,word)==0){
+            free(buffer);
+            return 1;
+        }
     free(buffer);
     return 0;
 }
@@ -741,7 +746,6 @@ TABLE reviews_with_word(SGR sgr,char * word){
     query_data->word = strdup(word);
     query_data->t->tab= (char **) malloc(max_lines);
     
-   
     g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,query_data);
 
     return query_data->t;
