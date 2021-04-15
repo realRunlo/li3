@@ -25,8 +25,8 @@ void setTable(TABLE t,char ** matrix){
     t->tab = matrix;
 }
 void setNewLine(TABLE t,char * line){
-    t->entries++;
     t->tab[t->entries] = strdup(line);
+    t->entries++;
 }
 
 int getEntries(TABLE t){
