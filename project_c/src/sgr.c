@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include "../includes/table.h"
 
 struct sgr{
 
@@ -13,34 +14,11 @@ struct sgr{
 };
 
 
-struct table{
-
-   char ** tab;
-   int entries;
-
-};
-
-TABLE initTable(){
-    TABLE t = malloc(sizeof(struct table));
-    t->tab = NULL;
-    t->entries = 0;
-    return t;
-}
-
 GHashTable * getHashT_reviews(SGR sgr){
     return sgr->hashT_reviews;
 }
-int getEntries(TABLE t){
-    return t->entries;
-}
 
 
-char* get_string_table(TABLE t,int n){
-    char* r;
-    if(t->tab[n]) r = strdup(t->tab[n]);
-    else r = NULL;
-    return r;
-}
 /**
 \brief Inicializador de dados SGR
 @returns new_sgr stuct sgr
@@ -744,14 +722,14 @@ typedef struct query9{
 }*Query9;
 
  
-void query9_iterator(gpointer key, gpointer value, gpointer user_data){
-    
+void query9_iterator(gpointer key, gpointer value, gpointer user_data){ 
     Query9 data = (Query9) user_data;
     char * word = data->word ;
     char * txt = strdup(r_getText((Reviews) value));
     
     if(wordInString(txt,word))
-        data->t->tab[data->t->entries++] = r_getReviewId((Reviews) value);  
+        setNewLine(data->t->tab,r_getReviewId((Reviews) value));
+         
 }
 /**
 \brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
