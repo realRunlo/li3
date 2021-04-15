@@ -51,7 +51,6 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
-    printf("Starting...\n");
 
     return sgr_load;
 }
@@ -734,7 +733,7 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
     char * txt = strdup(r_getText((Reviews) value));
     
     if(wordInString(txt,word))
-        setNewLine(data->t->tab,r_getReviewId((Reviews) value));
+        setNewLine(data->t,r_getReviewId((Reviews) value));
          
 }
 /**
@@ -747,9 +746,8 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 TABLE reviews_with_word(SGR sgr,char * word){
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     Query9 query_data = malloc(sizeof(struct query9));
-    query_data->t = initTable();
+    query_data->t = init_Sized_Table(max_lines);
     query_data->word = strdup(word);
-    query_data->t->tab= (char **) malloc(max_lines);
     
     g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,query_data);
 
