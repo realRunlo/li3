@@ -1,12 +1,13 @@
 #ifndef ___SGR_H___
 #define ___SGR_H___
 
+#include "../includes/table.h"
 #include "../includes/structs.h"
 #include "../includes/reading.h"
 #include "../includes/user.h"
 #include "../includes/reviews.h"
 #include "../includes/business.h"
-#include "../includes/table.h"
+
 
 typedef struct sgr * SGR;
 

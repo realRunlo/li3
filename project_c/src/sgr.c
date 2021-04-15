@@ -354,7 +354,7 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
         char stars[20]; //string para colocar as estrelas medias
         sprintf(stars,"%.2f",average); //float to string
         char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 2)); //declaracao da string q sera colocada
-        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 2,"%s %s,%s",stars,b_id,b_name);
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 2,"%s,%s,%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(c->entries == 0){
             c->top[0] = result;
@@ -370,7 +370,7 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
             float lowest;
             while(i < c->entries && found !=1){
                 strcpy(buffer,c->top[i]);
-                lowest = atof(strsep(&buffer," "));  //torna a string da media de estrelas em um float 
+                lowest = atof(strsep(&buffer,","));  //torna a string da media de estrelas em um float 
                 if (lowest == c->low_score) i_lowest = i; //guarda a posicao do menor score
                 if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
                 i++;
@@ -384,7 +384,7 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
                 float s = 20;
                 while(i < top){
                     strcpy(buffer,c->top[i]);
-                    s = (float) atof(strsep(&buffer," "));
+                    s = (float) atof(strsep(&buffer,","));
                     if(s< min) min = s;
                     i++;
                 }
@@ -406,7 +406,6 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
 void city_to_table(gpointer key, gpointer value, gpointer user_data){
     TABLE result = (TABLE) user_data;
     CITY c = (CITY) value;
-    int i = getEntries(result);
     int j = 0 ,k = 0, length = 0 ;
     
     //printf("city: %s -> entries :%d\n",c->name,c->entries);
@@ -426,7 +425,6 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
     }
     setNewLine(result,buff);
     //printf("%d -> %s\n",result->entries,result->tab[i]);
-    setEntries(result,i++);
     }
 }
 
@@ -613,7 +611,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
         char stars[20]; //string para colocar as estrelas medias
         sprintf(stars,"%.2f",average); //float to string
         char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 3)); //declaracao da string q sera colocada
-        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s %s,%s",stars,b_id,b_name);
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s,%s,%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(data->entries == 0){
             results[0] = result;
@@ -629,7 +627,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
             float lowest;
             while(i < data->entries && found !=1){
                 strcpy(buffer,results[i]);
-                lowest = atof(strsep(&buffer," "));  //torna a string da media de estrelas em um float 
+                lowest = atof(strsep(&buffer,","));  //torna a string da media de estrelas em um float 
                 if (lowest == data->lowScore) i_lowest = i; //guarda a posicao do menor score
                 if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
                 i++;
@@ -643,7 +641,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
                 float s = 20;
                 while(i < data->entries){
                     strcpy(buffer,results[i]);
-                    s = (float) atof(strsep(&buffer," "));
+                    s = (float) atof(strsep(&buffer,","));
                     if(s< min) min = s;
                     i++;
                 }
