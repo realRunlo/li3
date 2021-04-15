@@ -5,14 +5,16 @@
 typedef struct table * TABLE;
 
 TABLE initTable();
+TABLE init_Sized_Table(int size);
 void clearTable(TABLE t);
 void setEntries(TABLE t,int x);
-void setTable(TABLE t,char ** matrix);
+void setTab(TABLE t, char** result);
 void setNewLine(TABLE t,char * line);
 int getEntries(TABLE t);
 char* get_string_table(TABLE t,int n);
 char** getTab(TABLE t);
-void setTab(TABLE t, char** result);
+
+
 
 
 #endif //___TABLE_H___

@@ -58,7 +58,6 @@ void readUser(GHashTable * table, char * filename){
             addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
             i++;
         }
-        printf("users file loaded.\n");
     }
     fclose(f);
     printf("Users loaded.\n");

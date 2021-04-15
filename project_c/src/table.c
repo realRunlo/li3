@@ -1,4 +1,5 @@
 #include "../includes/table.h"
+#include <string.h>
 #include <stdlib.h>
 
 struct table{
@@ -14,6 +15,12 @@ TABLE initTable(){
     t->entries = 0;
     return t;
 }
+TABLE init_Sized_Table(int size){
+    TABLE t = malloc(sizeof(struct table));
+    t->tab = (char **) malloc(sizeof(char *)*size);
+    t->entries = 0;
+    return t;
+}
 void clearTable(TABLE t){
     for(int i=0;i<t->entries;i++)
         free(t->tab[i]);
@@ -21,9 +28,10 @@ void clearTable(TABLE t){
 void setEntries(TABLE t,int x){
     t->entries = x;
 }
-void setTable(TABLE t,char ** matrix){
-    t->tab = matrix;
+void setTab(TABLE t, char** result){
+    t->tab = result;
 }
+
 void setNewLine(TABLE t,char * line){
     t->entries++;
     t->tab[t->entries] = strdup(line);
@@ -40,10 +48,6 @@ char** getTab(TABLE t){
         results[i] = strdup(t->tab[i]);
     }
     return results;
-}
-
-void setTab(TABLE t, char** result){
-    t->tab = result;
 }
 
 char * get_string_table(TABLE t,int n){
