@@ -169,6 +169,7 @@ TABLE business_info (SGR sgr, char* business_id){
     return r;
 }*/
 
+
 typedef struct query4{
         char** result; //[business_id1,business1],[business_id2,business2][...]
         char* user_id;
@@ -600,63 +601,83 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
         }
     }   
 }
-/*
+/*//query 7
+//Lista ids de utilizadores e o número total de utilizadores que tenham visitado mais 
+//de um estado,i.e. que tenham feito reviews em negócios de diferentes estados.
+typedef struct aux{
+        GHashTable * h_state; //[state1],[state2][...]
+        char* user_id;
+        GHashTable * hashT_businesses; // used to look for the name of the business in case there is a review on it by the user
+}*Aux;
+
+
+void filter_state_iterator(gpointer key, gpointer value, gpointer user_data){
+    Reviews r = (Reviews) value;
+    char* user_id = r_getUserId(r);
+    Aux data = (Aux) user_data;
+    int n_states=1;
+    if((strcmp(user_id,data->user_id) == 0)&&n_states==1){
+        char* b_id = r_getBusinessId(r);
+        Business b = malloc(sizeof(struct business));
+        char* id = NULL;
+        char** key_ptr = &id;
+        struct business** value_ptr = &b;
+        g_hash_table_lookup_extended(data->hashT_businesses,b_id, 
+                    (gpointer*)key_ptr, (gpointer*) value_ptr);
+        g_hash_table_insert(data->h_state, b->state,"a");
+        n_states= g_hash_table_size(data->h_state);
+    }
+}
+
+
+int check_state(SGR sgr, char *user_id){
+    Aux process = malloc(sizeof(struct Aux));
+
+    process->h_state = g_hash_table_new(g_str_hash, g_str_equal);
+    process->user_id = strdup(user_id);
+    process->hashT_businesses = sgr->hashT_businesses;
+    
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)filter_state_iterator, process);
+    return g_hash_table_size((process->h_state));
+}
+
 typedef struct query7{
     GSList * list;
+    GHashTable * h_user_visitado;
     SGR s; 
     char * state_atual;
     int total;
 }*Query7;
 
+
 void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     char* user_id = strdup(r_getUserId((Reviews) value));
     Query7 data = (Query7) user_data;
-    TABLE t = businesses_reviewed(data->s, user_id);
-   
-    char* b = strdup(strsep(&(t->tab[0]),","));
-
-    Business c = malloc(sizeof(struct business));
-    char* id = NULL;
-    char** key_ptr = &id;
-    struct business** value_ptr = &c;
-    g_hash_table_lookup_extended(((data->s)->hashT_businesses), b, 
-                    (gpointer*)key_ptr, (gpointer*) value_ptr);
-    data->state_atual = get_state(c);
-    int r = 1,i=1;
-    while(r!= 0 && t->tab[i]){
-        char* b_id = strdup(strsep(&(t->tab[i]),","));
-        Business a = malloc(sizeof(struct business));
-        char* ida = NULL;
-        char** key_ptr = &ida;
-        struct business** value_ptr = &a;
-        g_hash_table_lookup_extended(((data->s)->hashT_businesses), b_id, 
-                    (gpointer*)key_ptr, (gpointer*) value_ptr);
-        if (strcmp (data->state_atual,get_state(a))==0) i++;
-        else{
+    gboolean r = g_hash_table_insert(data->h_user_visitado, user_id,"a"); 
+    if(r){
+        int t = check_state(data->s,user_id);
+        if (t>1){
             data->list = g_slist_append(data->list, user_id);
-            data->total+=1;
-            r=0;
+            data->total++;
         }
-    }
+    } 
 }
-TABLE international_users (SGR sgr){
-    TABLE r = malloc(sizeof(struct table));
+
+void international_users (SGR sgr){
+    //TABLE r = malloc(sizeof(struct table));
     Query7 pro = malloc(sizeof(struct query7));
     pro->list = NULL;
     GSList* iterator = NULL;
+    pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
     pro->s = sgr;
     pro->total = 0;
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query7_iterator,pro);
     int i =1;
-    printf("%d\n", pro->total);
+    printf("......%d\n", pro->total);
     for (iterator = (pro->list); iterator; iterator = iterator->next) {
-        printf("is %d: '%s'\n", i,iterator->data);
-        i++;
+         printf("is %d: '%s'\n", i,iterator->data);
+         i++;
     }
-    //r->tab = strdup(pro->list);
-    //r->entries = pro->total;
-    free(pro);   
-    return r;
 }*/
 
 /* query 8 */
