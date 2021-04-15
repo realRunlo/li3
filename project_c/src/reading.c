@@ -36,13 +36,7 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
     
 }
 
-User createUser(char * buffer){
-    User u = malloc(sizeof(User));
-    setUserId(u,strsep(&buffer,";"));
-    setName(u,strsep(&buffer,";"));
-    setFriends(u,strsep(&buffer,"\n"));
-    return u;
-}
+
 
 void readUser(GHashTable * table, char * filename){
 

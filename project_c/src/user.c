@@ -40,7 +40,13 @@ void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
  printf(user_data, getUserId((User) value),getUserName((User) value),getFriends((User) value));
 }
 
-
+User createUser(char * buffer){
+    User u = malloc(sizeof(struct user));
+    setUserId(u,strsep(&buffer,";"));
+    setName(u,strsep(&buffer,";"));
+    setFriends(u,strsep(&buffer,"\n"));
+    return u;
+}
 
 
 
