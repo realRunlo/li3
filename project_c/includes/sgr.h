@@ -6,6 +6,7 @@
 #include "../includes/user.h"
 #include "../includes/reviews.h"
 #include "../includes/business.h"
+#include "../includes/table.h"
 
 typedef struct sgr * SGR;
 

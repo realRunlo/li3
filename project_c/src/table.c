@@ -33,6 +33,19 @@ int getEntries(TABLE t){
     return t->entries;
 }
 
+char** getTab(TABLE t){
+    int entries = getEntries(t);
+    char **results = malloc(sizeof(char*) * entries);
+    for(int i=0; i<entries ; i++){
+        results[i] = strdup(t->tab[i]);
+    }
+    return results;
+}
+
+void setTab(TABLE t, char** result){
+    t->tab = result;
+}
+
 char * get_string_table(TABLE t,int n){
     char* r;
     if(t->tab[n]) r = strdup(t->tab[n]);

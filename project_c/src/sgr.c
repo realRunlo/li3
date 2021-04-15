@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include "../includes/table.h"
+
 
 struct sgr{
 
@@ -95,9 +95,9 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)query2_iterator,process);
     
     //turning the results from process into TABLE
-    TABLE result = malloc(sizeof(struct table));
-    result->tab = process->result;
-    result->entries =  process->total;
+    TABLE result = initTable();
+    setTab(result,process->result);
+    setEntries(result,process->total);
     //free();
     return result;
 }
@@ -191,9 +191,9 @@ TABLE businesses_reviewed(SGR sgr, char *user_id){
     
     //procura o user_id nas reviews
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query4_iterator, process);
-    TABLE result = malloc(sizeof(struct table));
-    result->tab = process->result;
-    result->entries = process->column;
+    TABLE result = initTable();
+    setTab(result,process->result);
+    setEntries(result,process->column);
     free(process->user_id);
     return result;
 }
@@ -407,7 +407,7 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
 void city_to_table(gpointer key, gpointer value, gpointer user_data){
     TABLE result = (TABLE) user_data;
     CITY c = (CITY) value;
-    int i = result->entries;
+    int i = getEntries(result);
     int j = 0 ,k = 0, length = 0 ;
     
     //printf("city: %s -> entries :%d\n",c->name,c->entries);
@@ -418,15 +418,16 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
         //printf("%s\n",c->top[0]);
         length += strlen(c->top[j]);
         }
-    result->tab[i] = malloc(sizeof(char) * (length + j + strlen(c->name) + j + 1));
+    char * buff = malloc(sizeof(char) * (length + j + strlen(c->name) + j + 1));
     //concatena os dados dos negocios e coloca-os na table
-    snprintf(result->tab[i],strlen(c->name)+2,"%s;",c->name);
+    snprintf(buff,strlen(c->name)+2,"%s;",c->name);
     for(k=0 ; k<j;k++){
-        strcat(result->tab[i],c->top[k]);
-        strcat(result->tab[i],";");
+        strcat(buff,c->top[k]);
+        strcat(buff,";");
     }
+    setNewLine(result,buff);
     //printf("%d -> %s\n",result->entries,result->tab[i]);
-    result->entries++;
+    setEntries(result,i++);
     }
 }
 
@@ -457,62 +458,15 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     printf("Done!\n");
     
 
-    TABLE result = malloc(sizeof(struct table));
-    result->entries = 0;
-    result->tab = malloc(sizeof(char*) * top);
+    TABLE result = initTable();
+    setEntries(result,0);
+    setTab(result,malloc(sizeof(char*) * top));
 
     
     printf("Turning data into TABLE structure...\n");
     g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
     printf("Done!\n");    
     return result;
-}
-
-
-
-int cmp_category(char* c_condition,char* c_comparing){
-    int i = 0, j = 0;
-    if(c_condition[0] == '\0' && c_comparing[0] == '\0') return 0;
-    for(;c_comparing[j] != '\0' ;j++){
-        if(c_condition[i] == '\0' && (c_comparing[j] == ',' || c_comparing[j] == ';')) return 0;
-        else if(c_condition[i] == c_comparing[j]) i++;
-            else if(c_condition[i] != c_comparing[j]) i = 0;
-    }
-    return 1;
-}
-
-
-//para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
-void b_category(gpointer key, gpointer value, gpointer user_data){
-    B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
-    Reviews r = (Reviews) value;
-    char *b_id = r_getBusinessId(r);
-    
-    //encontra o id do negocio da review
-    Business b = g_hash_table_lookup(data->sgr->hashT_businesses,GINT_TO_POINTER(b_id));
-    char* b_category = get_categ(b);
-
-    //verifica se o negocio reviewed pertence a categoria procurada
-    if(cmp_category(data->condition,b_category) == 0){
-        //verifica se ja existe um negocio na table de media de estrelas com o mesmo id
-        if(g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id)) == NULL)
-        {
-            char* b_name = get_name(b);
-            B_STARS business = malloc(sizeof(struct b_stars));
-            business->b_id = b_id;
-            business->b_name= b_name;
-            business->n_reviews = 1;
-            business->total = r_getStars(r);
-            addToHashT(data->b_same,GINT_TO_POINTER(b_id),business);
-        }
-        //se ja existir da update no numero de reviews e no total de estrelas
-        else{
-            B_STARS update = g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id));
-            update->n_reviews++;
-            update->total += r_getStars(r);
-        }
-    }
-
 }
 
 /*//query 7
@@ -593,6 +547,53 @@ void international_users (SGR sgr){
          i++;
     }
 }*/
+
+int cmp_category(char* c_condition,char* c_comparing){
+    int i = 0, j = 0;
+    if(c_condition[0] == '\0' && c_comparing[0] == '\0') return 0;
+    for(;c_comparing[j] != '\0' ;j++){
+        if(c_condition[i] == '\0' && (c_comparing[j] == ',' || c_comparing[j] == ';')) return 0;
+        else if(c_condition[i] == c_comparing[j]) i++;
+            else if(c_condition[i] != c_comparing[j]) i = 0;
+    }
+    return 1;
+}
+
+
+//para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
+void b_category(gpointer key, gpointer value, gpointer user_data){
+    B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
+    Reviews r = (Reviews) value;
+    char *b_id = r_getBusinessId(r);
+    
+    //encontra o id do negocio da review
+    Business b = g_hash_table_lookup(data->sgr->hashT_businesses,GINT_TO_POINTER(b_id));
+    char* b_category = get_categ(b);
+
+    //verifica se o negocio reviewed pertence a categoria procurada
+    if(cmp_category(data->condition,b_category) == 0){
+        //verifica se ja existe um negocio na table de media de estrelas com o mesmo id
+        if(g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id)) == NULL)
+        {
+            char* b_name = get_name(b);
+            B_STARS business = malloc(sizeof(struct b_stars));
+            business->b_id = b_id;
+            business->b_name= b_name;
+            business->n_reviews = 1;
+            business->total = r_getStars(r);
+            addToHashT(data->b_same,GINT_TO_POINTER(b_id),business);
+        }
+        //se ja existir da update no numero de reviews e no total de estrelas
+        else{
+            B_STARS update = g_hash_table_lookup(data->b_same,GINT_TO_POINTER(b_id));
+            update->n_reviews++;
+            update->total += r_getStars(r);
+        }
+    }
+
+}
+
+
 
 
 
@@ -687,9 +688,9 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     //tornar a matriz em forma TABLE
     printf("entries = %d\n",process->entries);
     printf("Turning data into TABLE structure...\n");
-    TABLE result = malloc(sizeof(struct table));
-    result->entries = process->entries;
-    result->tab = process->results;
+    TABLE result = initTable();
+    setEntries(result,process->entries);
+    setTab(result,process->results);
     printf("Done!\n");
 
     return result;

@@ -35,7 +35,7 @@ int main(){
     int pflag = 0, cflag = 0; //flag para detecao de parenteses e para detecao de fim de comando
     int j = 0;
     for(int i =0; s[i] != '\n'; i++){
-        b[j] = s[i];
+        buff[j] = s[i];
         if(s[i] == '('){
             pflag++;
         }
