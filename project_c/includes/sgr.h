@@ -59,8 +59,8 @@ TABLE top_businesses_by_city(SGR sgr, int top);
 
 
 /*query 7 */
-void filter_state_iterator(gpointer key, gpointer value, gpointer user_data);
-int check_state(SGR sgr, char *user_id);
+
+void check_state(gpointer key, gpointer value, gpointer user_data);
 void query7_iterator(gpointer key, gpointer value, gpointer user_data);
 TABLE international_users (SGR sgr);
 
