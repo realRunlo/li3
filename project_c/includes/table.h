@@ -13,8 +13,8 @@ void setNewLine(TABLE t,char * line);
 int getEntries(TABLE t);
 char* get_string_table(TABLE t,int n);
 char** getTab(TABLE t);
-
-
+void toCSV (TABLE x);
+TABLE fromCSV (char* file);
 
 
 #endif //___TABLE_H___

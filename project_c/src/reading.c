@@ -19,7 +19,6 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
     if(fp!=NULL){
         char * buffer = malloc(BUFFER_SIZE);
         Reviews rev;
-        
         while(fgets(buffer,BUFFER_SIZE,fp)!=NULL){
             rev = addReview(rev,buffer);
             addToHashT(hTable,r_getReviewId(rev),rev);
