@@ -16,7 +16,7 @@ int isDigitOrLetter(char c);
 
 char* commandString(char* c);
 
-void variable_command(char *var,char *function,char *comando,SGR sgr,VARIAVEIS v);
+int variable_command(char *comando,char *var,char *function,SGR sgr,VARIAVEIS v);
 
 int check_variable(VARIAVEIS v, char* variavel);
 
