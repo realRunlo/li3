@@ -48,7 +48,7 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 
     mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
     
-    readUser(sgr_load->hashT_users,users_file);
+    //readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
 
@@ -119,30 +119,26 @@ void q3_iterator (gpointer key, gpointer value, gpointer user_data){
 }
 
 TABLE business_info (SGR sgr, char* business_id){
-    TABLE r = init_Sized_Table(3);
-    Business c = malloc(sizeof(struct business));
-    char* id = NULL;
-    char** key_ptr = &id;
-    struct business** value_ptr = &c;
-    gboolean result = g_hash_table_lookup_extended(sgr->hashT_businesses,business_id, 
-                    (gpointer*)key_ptr, (gpointer*) value_ptr);
-    if (result){ 
-        Query3 pro = malloc(sizeof(struct query3));
-        pro->b_id = strdup (business_id);
-        pro->total = 0;
-        g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)q3_iterator,pro);
-        char indicador [50] = "b_id,b_nome,b_city,b_state,b_categories,total";
-        setNewLine(r,indicador);
-        char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(c->name) + 
-                        strlen(c->categories)+strlen(c->city)+ strlen(c->state)+8));
-        sprintf(res,"%s,%s,%s,%s,%s",c->business_id, c->name,c->city,c->state,c->categories);
-        setNewLine(r,res);
-        char total [2];
-        sprintf(total,"%d",pro->total);
-        setNewLine(r,total);
-        free(pro->b_id);
-    }
+    TABLE r = init_Sized_Table(2);
+    char indicador [50] = "total;b_id;b_nome;b_city;b_state;b_categories";
+    setNewLine(r,indicador);
+    Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
+                                            GINT_TO_POINTER(business_id));
+    char* b_name = get_name(b);
+    char* b_c = get_city(b);
+    char* b_s = get_state(b);
+    char* b_cat = get_categ(b);
     
+    Query3 pro = malloc(sizeof(struct query3));
+    pro->b_id = strdup (business_id);
+    pro->total = 0;
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)q3_iterator,pro);
+    char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(b_name) + 
+                        strlen(b_cat)+strlen(b_c)+ strlen(b_s)+10));
+    sprintf(res,"%d;%s;%s;%s;%s;%s",pro->total,business_id, b_name,b_c,b_s,b_cat);
+    setNewLine(r,res);
+    free(pro->b_id);   
+
     return r;
 }
 
@@ -215,19 +211,16 @@ void query5_iterator(gpointer key, gpointer value, gpointer user_data){
     Query5 data = (Query5) user_data;
     char* city_data = strdup(data->city);
     if(b_stars >= (data->stars)){
-        char* b = strdup(r_getBusinessId(r));
-        gboolean r = g_hash_table_insert(data->h_business_visitado,b,"a");
+        char* b_id = strdup(r_getBusinessId(r));
+        gboolean r = g_hash_table_insert(data->h_business_visitado,b_id,"a");
         if(r){
-            Business c = malloc(sizeof(struct business));
-            char* id = NULL;
-            char** key_ptr = &id;
-            struct business** value_ptr = &c;
-            
-            g_hash_table_lookup_extended(data->hashT_business, b, 
-                        (gpointer*)key_ptr, (gpointer*) value_ptr);
-            if(strcmp(c->city,city_data) == 0){
-                char* a = malloc( sizeof(char) * (strlen(c->business_id) + strlen(c->name) + 5));
-                sprintf(a,"%s,%s",c->business_id, c->name);
+            Business b = (Business) g_hash_table_lookup(data->hashT_business,
+                                            GINT_TO_POINTER(b_id));
+            char* b_city = get_city(b);
+            if(strcmp(b_city,city_data) == 0){
+                char* b_name = get_name(b);
+                char* a = malloc( sizeof(char) * (strlen(b_id) + strlen(b_name) + 5));
+                sprintf(a,"%s;%s",b_id, b_name);
                 setNewLine(data->t,a);
             }
         }
@@ -238,7 +231,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     pro->t = init_Sized_Table(max_lines);
-    char ind [14] = "b_id,b_name";
+    char ind [16] = "b_id;b_name";
     setNewLine(pro->t,ind);
     pro->city = strdup (city);
     pro->stars = stars;
@@ -488,15 +481,14 @@ void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
     if(t>1){
         for (iterator = (GSList*)value; iterator; iterator = iterator->next) {
             char* b_id = strdup(iterator->data);
-            Business b = malloc(sizeof(struct business));
-            char* id = NULL;
-            char** key_ptr = &id;
-            struct business** value_ptr = &b;
-            g_hash_table_lookup_extended(data->hashT_businesses,b_id, 
-                    (gpointer*)key_ptr, (gpointer*) value_ptr);
-            g_hash_table_insert(data->h_state, b->state,"a");
+            Business b = (Business) g_hash_table_lookup(data->hashT_businesses,
+                                            GINT_TO_POINTER(b_id));
+            char* b_state = get_state(b);
+            g_hash_table_insert(data->h_state, b_state,"a");
         }
-        if(g_hash_table_size(data->h_state)>=2)
+        if((g_hash_table_size(data->h_state))>=2)
+
+            
             setNewLine(data->t,key);
             data->total++;
     } 
@@ -511,13 +503,15 @@ void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     g_hash_table_insert(data->h_user_visitado, user_id,
         g_slist_append(g_hash_table_lookup(data->h_user_visitado, user_id),b_id));
 }
-
+void destroy(gpointer key, gpointer value, gpointer data) {
+ g_slist_free(value);
+}
 
 TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    char ind [15] = "user_id,total";
+    char ind [15] = "user_id;total";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
     pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
