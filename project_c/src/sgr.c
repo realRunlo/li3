@@ -350,8 +350,8 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
     else{
         char stars[20]; //string para colocar as estrelas medias
         sprintf(stars,"%.2f",average); //float to string
-        char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 2)); //declaracao da string q sera colocada
-        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 2,"%s,%s,%s",stars,b_id,b_name);
+        char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 3)); //declaracao da string q sera colocada
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s,%s,%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(c->entries == 0){
             c->top[0] = result;
@@ -411,9 +411,10 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
     //calcula o tamanho necessario para concatenar os dados dos negocios todos da cidade
     for(; j< c->entries;j++){ 
         //printf("%s\n",c->top[0]);
-        length += strlen(c->top[j]);
+        length += strlen(c->top[j]) + 2;
         }
-    char * buff = malloc(sizeof(char) * (length + j + strlen(c->name) + j + 1));
+    char  buff[length + j + strlen(c->name) + j + 1];
+    buff[0] = '\0';
     //concatena os dados dos negocios e coloca-os na table
     snprintf(buff,strlen(c->name)+2,"%s;",c->name);
     for(k=0 ; k<j;k++){
@@ -421,10 +422,22 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
         strcat(buff,";");
     }
     setNewLine(result,buff);
-    //printf("%d -> %s\n",result->entries,result->tab[i]);
+    //printf("%d -> %s\n",getEntries(result),buff);
     }
 }
-
+/*
+3 -> AUSTIN
+4 -> Bee Cave
+5 -> Bowen Island
+6 -> Gresham
+7 -> Cohasset
+8 -> Norwell
+9 -> Maitland
+10 -> Chestnut Hill
+11 -> Pickerington
+12 -> Ridgefield
+13 -> Galloway
+14 -> San Marcos*/
 
 /* query 6 */
 //searches for the top n businesses from each city
@@ -454,7 +467,7 @@ TABLE top_businesses_by_city(SGR sgr, int top){
 
     TABLE result = initTable();
     setEntries(result,0);
-    setTab(result,malloc(sizeof(char*) * top));
+    setTab(result,malloc(sizeof(char*) * (total_cities + 1)));
     setNewLine(result,"city;stars,b_id,b_name;");
     
     printf("Turning data into TABLE structure...\n");
