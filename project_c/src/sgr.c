@@ -72,7 +72,7 @@ void query2_iterator(gpointer key, gpointer value, gpointer user_data){
     char letter = data->letter;
     if(name[0] == letter){ 
         int col = data->column;
-        data->result[col] =(char *) malloc(strlen(name) * sizeof(char));
+        data->result[col] = malloc(strlen(name) * sizeof(char));
         data->result[col] = name;
         data->column++;
         data->total++;
@@ -83,11 +83,13 @@ void query2_iterator(gpointer key, gpointer value, gpointer user_data){
 /* query 2 */
 //list of businesses whose name starts with char "letter"
 TABLE businesses_started_by_letter(SGR sgr, char letter){
-    int max_lines = g_hash_table_size(sgr->hashT_businesses);
+    int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query2 process = malloc(sizeof(struct query2));
+    char* firstLine = "business_name";
     process->letter = letter;
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
-    process->column = 0;
+    process->result[0] = strdup(firstLine);
+    process->column = 1;
     process->total = 0;
     //search every key in the hash for a business name starting with letter
     //if one is found, then result and total are updated 
@@ -165,7 +167,7 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
         char* b_name = get_name(b);
         char* result = malloc( sizeof(char) * (strlen(b_name) + strlen(b_id) + 1));
         //result = b_id,b_name
-        snprintf(result,strlen(b_name) + strlen(b_id) + 1,"%s,%s",b_id,b_name);
+        snprintf(result,strlen(b_name) + strlen(b_id) + 1,"%s;%s",b_id,b_name);
         data->result[col] = result;
         data->column++;
         
@@ -176,13 +178,14 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
 /* query 4 */
 //searches for the business_id and name of every business a certain user has reviewed
 TABLE businesses_reviewed(SGR sgr, char *user_id){
-    int max_lines = g_hash_table_size(sgr->hashT_businesses);
+    int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query4 process = malloc(sizeof(struct query4));
-
+    char* firstLine = "b_id;b_name";
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
+    process->result[0] = strdup(firstLine);
     process->user_id = strdup(user_id);
     process->hashT_businesses = sgr->hashT_businesses;
-    process->column = 0;
+    process->column = 1;
     
     //procura o user_id nas reviews
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query4_iterator, process);
@@ -231,7 +234,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     pro->t = init_Sized_Table(max_lines);
-    char ind [16] = "b_id;b_name";
+    char ind [16] = "b_id,b_name";
     setNewLine(pro->t,ind);
     pro->city = strdup (city);
     pro->stars = stars;
@@ -452,7 +455,7 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     TABLE result = initTable();
     setEntries(result,0);
     setTab(result,malloc(sizeof(char*) * top));
-
+    setNewLine(result,"city;stars,b_id,b_name;");
     
     printf("Turning data into TABLE structure...\n");
     g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
@@ -601,18 +604,18 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
         snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s,%s,%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(data->entries == 0){
-            results[0] = result;
+            results[1] = result;
             data->lowScore = average;
             data->entries++;
         }
         else{
             //verificar se o negocio ja foi adicionado
-            i = 0;
+            i = 1;
             char*buffer = malloc(sizeof(char) * 1000);
             int found = 0;
             int i_lowest = 0;
             float lowest;
-            while(i < data->entries && found !=1){
+            while(i < data->entries+1 && found !=1){
                 strcpy(buffer,results[i]);
                 lowest = atof(strsep(&buffer,","));  //torna a string da media de estrelas em um float 
                 if (lowest == data->lowScore) i_lowest = i; //guarda a posicao do menor score
@@ -621,12 +624,12 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
             }
             //se o negocio ainda n foi adicionado(mas tem score superior ao minimo da categoria) mas o top ja esteja cheio, necessario trocar pelo de menor score
             if(found == 0 && data->entries == top && average > data->lowScore){
-                i = 0;
+                i = 1;
                 results[i_lowest] = result;
                 //atualizar score mais baixo
                 float min = 20;
                 float s = 20;
-                while(i < data->entries){
+                while(i < data->entries+1){
                     strcpy(buffer,results[i]);
                     s = (float) atof(strsep(&buffer,","));
                     if(s< min) min = s;
@@ -637,7 +640,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
             }
             //se a cidade ainda nao tem top negocios guardados, adiciona imediatamente numa posicao livre
             if(found == 0 && data->entries < data->top){
-                results[data->entries] = result;
+                results[data->entries+1] = result;
                 //atualizar min score se necessario
                 if (average < data->lowScore) data->lowScore = average;
                 data->entries++;
@@ -656,7 +659,8 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     process->sgr = sgr;
     process->top = top;
     process->condition = strdup(category);
-    process->results = malloc(sizeof(char*) * top);
+    process->results = malloc(sizeof(char*) * (top + 1));
+    process->results[0] = strdup("stars,b_id,b_name");
     process->entries = 0;
 
     //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
@@ -673,7 +677,7 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     printf("entries = %d\n",process->entries);
     printf("Turning data into TABLE structure...\n");
     TABLE result = initTable();
-    setEntries(result,process->entries);
+    setEntries(result,process->entries+1);
     setTab(result,process->results);
     printf("Done!\n");
 
