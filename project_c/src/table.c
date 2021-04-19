@@ -1,4 +1,5 @@
 #include "../includes/table.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -111,5 +112,34 @@ void show(TABLE t){
     int space_in_line = getBlen_str(t) + MARGIN;
     print_Table(space_in_line,t);
     
+
+}
+void toCSV (TABLE x){
+    int entries = getEntries(x);
+    FILE* f = fopen("filepath.csv","w");
+    for(int i=0; i<entries ; i++){
+        char * r = get_string_table(x,i);
+        fprintf(f,"%s\n",r);   
+    }
+    fclose(f);
+}
+
+
+TABLE fromCSV (char* file){
+    TABLE t = init_Sized_Table(1000000);
+    FILE* f = fopen(file,"r");
+    if (f==NULL){
+        printf("ERROR_FILE_readFILE\n");
+    }
+    else{
+        char buffer[1024]; // espaco suficiente para os exemplos do input file
+        while(fgets(buffer,1024,f)){
+            setNewLine(t,buffer);
+            printf("%s",buffer);
+        }
+    }
+    fclose(f);
+    printf("Read File.\n");
+    return t;
 
 }
