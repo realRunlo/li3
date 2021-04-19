@@ -15,6 +15,10 @@ char* get_string_table(TABLE t,int n);
 char** getTab(TABLE t);
 
 
+void print_Table(int n,TABLE t);
+void show(TABLE t);
+int getBlen_str(TABLE t);
+
 
 
 #endif //___TABLE_H___
