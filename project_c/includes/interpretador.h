@@ -26,6 +26,8 @@ int executeCommand(char *comando,VARIAVEIS v,SGR sgr);
 
 int interpretador();
 
+void toCSV (TABLE x,char* delim, char* name);
+TABLE fromCSV (char* file, char* delim);
 
 
 #endif //___INTERPRETADOR_H___

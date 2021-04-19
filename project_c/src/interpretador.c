@@ -111,6 +111,58 @@ int executeShow(char *comando,int i, VARIAVEIS v){
     return -1;
 }
 
+void toCSV (TABLE x,char* delim, char* name){
+    char s[2] = ",";
+    int entries = getEntries(x);
+    char* f_csv = malloc(sizeof(char)*(strlen(name)+4));
+    sprintf(f_csv,"%s%s",name,".csv");
+    FILE* f = fopen(f_csv,"w"); 
+    if(strcmp(delim,s)!=0){
+        for(int i=0; i<entries ; i++){
+            char * str = get_string_table(x,i);  
+            char *token = strtok(str,s);
+            while(token != NULL) {
+                fprintf(f,"%s", token);
+                token = strtok(NULL, s);
+                if (token != NULL) fprintf(f,"%s",delim);// para não colocar no último token
+                
+            }
+            fprintf(f,"\n");
+        }
+    }
+    fclose(f);
+}
+
+
+TABLE fromCSV (char* file, char* delim){
+    TABLE t = init_Sized_Table(1000000);
+    FILE* f = fopen(file,"r");
+    if (f==NULL){
+        printf("ERROR_FILE_readFILE\n");
+    }
+    else{
+        char buffer[1024]; // espaco suficiente para os exemplos do input file
+        
+        int i =0;
+        while(fgets(buffer,1024,f) ){
+            char r [1024] = "\0";
+            char *token = strtok(buffer,delim);
+            while(token != NULL) {                
+                strcat(r,token);
+                token = strtok(NULL, delim);
+                if (token != NULL)  strcat(r,",");//sprintf(r,",");// para não colocar no último token
+            }
+            setNewLine(t,r);
+            i++;
+        }
+        fclose(f);
+        printf("Read File.\n");
+    }
+    return t;
+}
+
+
+
 int executeToCSV(char* comando, int i, VARIAVEIS v){
     char* var = commandString(comando+i); //primeira variavel de toCSV
     if(check_variable(v,var) == 0){
