@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#define MARGIN 6
 
 struct table{
 
@@ -18,7 +20,7 @@ TABLE initTable(){
 }
 TABLE init_Sized_Table(int size){
     TABLE t = malloc(sizeof(struct table));
-    t->tab = (char **) malloc(sizeof(char *)*size);
+    t->tab = (char **) malloc(size);
     t->entries = 0;
     return t;
 }
@@ -56,6 +58,61 @@ char * get_string_table(TABLE t,int n){
     if(t->tab[n]) r = strdup(t->tab[n]);
     else r = NULL;
     return r;
+}
+
+int getBlen_str(TABLE t){
+    int bigger = 0;
+    int nEntries = getEntries(t);
+    for(int i=0;i<nEntries;i++){
+        if((int) strlen(t->tab[i]) > bigger){
+            bigger = strlen(t->tab[i]);
+            //printf("%d------%d: %s\n",bigger,i,get_string_table(t,i));
+            //printf("%d------%s\n",bigger,get_string_table(t,i));
+        }
+            
+        
+            
+    }
+    return bigger;
+}
+
+void print_LineTops(int n){
+    for(int i=0;i<n;i++)
+        printf("-");
+    printf("\n");
+}
+void printN_space(int n){
+    for(int i=0;i<n;i++)
+        printf(" ");
+}
+void print_Table(int space_in_line,TABLE t){
+    
+    char * seped;
+    for(int i=0;i<getEntries(t);i++){
+        char * str_zero = strdup(t->tab[i]);
+        print_LineTops(space_in_line);
+        printf("|");
+        while((seped = strsep(&str_zero,";"))){
+        int str_length = strlen(seped);
+        int space_left = (space_in_line-str_length)/2;
+        int space_rigth = (space_in_line-space_left-str_length);
+
+        printN_space(space_left);
+        printf("%s",seped);
+        printN_space(space_rigth);
+        printf("|");
+        }
+        printf("\n");
+    }
+    print_LineTops(space_in_line);
+    
+}
+
+void show(TABLE t){
+    int space_in_line = getBlen_str(t) + MARGIN;
+    print_Table(space_in_line,t);
+    
+
 }
 void toCSV (TABLE x){
     int entries = getEntries(x);

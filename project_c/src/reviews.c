@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 struct reviews{
     char * review_id;
     char * user_id;
@@ -30,7 +31,7 @@ Reviews addReview(Reviews  rev,char * str){
     rev->funny = atoi(strsep(&str,";"));
     rev->cool = atoi(strsep(&str,";"));
     rev->date = strdup(strsep(&str,";"));
-    rev->text = strdup(strsep(&str,";"));
+    rev->text = strdup(strsep(&str,"\n"));
     return rev;
 }
 

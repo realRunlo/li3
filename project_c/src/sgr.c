@@ -685,7 +685,7 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
 }
 
 int wordInString(char *str,char * word){
-    char * buffer = malloc(100);
+    char * buffer = malloc(strlen(str));
     int j=0;
     for(int i=0;str[i]!='\0';i++){
         if((!isspace(str[i]) && !ispunct(str[i])) || str[i] == '\''){
@@ -698,6 +698,7 @@ int wordInString(char *str,char * word){
                 return 1;
             }
             j = 0;
+            
         }
         
     }
@@ -718,12 +719,15 @@ typedef struct query9{
  
 void query9_iterator(gpointer key, gpointer value, gpointer user_data){ 
     Query9 data = (Query9) user_data;
-    char * word = data->word ;
-    char * txt = strdup(r_getText((Reviews) value));
+    char * word = strdup(data->word);
+    char * txt = r_getText((Reviews) value);
     
     if(wordInString(txt,word))
         setNewLine(data->t,r_getReviewId((Reviews) value));
-         
+    
+        
+    
+   
 }
 /**
 \brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
@@ -737,8 +741,11 @@ TABLE reviews_with_word(SGR sgr,char * word){
     Query9 query_data = malloc(sizeof(struct query9));
     query_data->t = init_Sized_Table(max_lines);
     query_data->word = strdup(word);
+ 
+    setNewLine(query_data->t,"review_id");
+    
     
     g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,query_data);
-
+    
     return query_data->t;
 }
