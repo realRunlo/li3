@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define MARGIN 6
+#define MAXTPAGE 10
 
 struct table{
 
@@ -66,12 +67,7 @@ int getBlen_str(TABLE t){
     for(int i=0;i<nEntries;i++){
         if((int) strlen(t->tab[i]) > bigger){
             bigger = strlen(t->tab[i]);
-            //printf("%d------%d: %s\n",bigger,i,get_string_table(t,i));
-            //printf("%d------%s\n",bigger,get_string_table(t,i));
-        }
-            
-        
-            
+        }               
     }
     return bigger;
 }
@@ -85,10 +81,16 @@ void printN_space(int n){
     for(int i=0;i<n;i++)
         printf(" ");
 }
-void print_Table(int space_in_line,TABLE t){
-    
+
+void printPage_table(TABLE t,int current_page){
+    int total_entries = getEntries(t);
+    int total_pages = total_entries/MAXTPAGE;
+    int bottom = current_page*MAXTPAGE;
+    int top = current_page*MAXTPAGE+MAXTPAGE;
+
+    int space_in_line = getBlen_str(t) + MARGIN;
     char * seped;
-    for(int i=0;i<getEntries(t);i++){
+    for(int i=bottom;i<top;i++){
         char * str_zero = strdup(t->tab[i]);
         print_LineTops(space_in_line);
         printf("|");
@@ -105,12 +107,7 @@ void print_Table(int space_in_line,TABLE t){
         printf("\n");
     }
     print_LineTops(space_in_line);
-    
+    printf("Page %d out of %d\n",current_page,total_pages);
 }
 
-void show(TABLE t){
-    int space_in_line = getBlen_str(t) + MARGIN;
-    print_Table(space_in_line,t);
-    
 
-}
