@@ -530,8 +530,7 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    char ind [15] = "user_id;total";
-    setNewLine(pro->t,ind);
+    setNewLine(pro->t,"user_id;total");
     pro->hashT_businesses=sgr->hashT_businesses;
     pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
     pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
