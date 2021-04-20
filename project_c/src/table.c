@@ -151,4 +151,80 @@ TABLE index_table(TABLE t,int line,int col){
     return indexed_table;
 }
 
+/*
+void toCSV (TABLE x,char* delim, char* name){
+    char s[2] = ",";
+    int entries = getEntries(x);
+    char* f_csv = malloc(sizeof(char)*(strlen(name)+4));
+    sprintf(f_csv,"%s%s",name,".csv");
+    FILE* f = fopen(f_csv,"w"); 
+    if(strcmp(delim,s)!=0){
+        for(int i=0; i<entries ; i++){
+            char * str = get_string_table(x,i);  
+            char *token = strtok(str,s);
+            while(token != NULL) {
+                fprintf(f,"%s", token);
+                token = strtok(NULL, s);
+                if (token != NULL) fprintf(f,"%s",delim);// para não colocar no último token
+                
+            }
+            fprintf(f,"\n");
+        }
+    }
+    fclose(f);
+}
 
+
+TABLE fromCSV (char* file, char* delim){
+    TABLE t = init_Sized_Table(1000000);
+    FILE* f = fopen(file,"r");
+    if (f==NULL){
+        printf("ERROR_FILE_readFILE\n");
+    }
+    else{
+        char buffer[1024]; // espaco suficiente para os exemplos do input file
+        
+        int i =0;
+        while(fgets(buffer,1024,f) ){
+            char r [1024] = "\0";
+            char *token = strtok(buffer,delim);
+            while(token != NULL) {                
+                strcat(r,token);
+                token = strtok(NULL, delim);
+                if (token != NULL)  strcat(r,",");// para não colocar no último token
+            }
+            setNewLine(t,r);
+            i++;
+        }
+        fclose(f);
+        printf("Read File.\n");
+    }
+    return t;
+}
+
+
+TABLE proj(TABLE x, char* cols){
+    TABLE r = init_Sized_Table(getEntries(x));
+    char s [2] =";";
+    char * str = get_string_table(x,0);  
+    char *token = strtok(str,s);
+    int col = 0;
+    while(token != NULL && (strcmp(token,cols)!= 0)) {
+        token = strtok(NULL, s);
+        col++;
+    }
+    setNewLine(r,token);
+    
+    for(int j = 1;get_string_table(x,j)!=NULL;j++ ){
+        char * res = get_string_table(x,j);
+        char *aux = strtok(res,s);
+        int t = 0;
+        while(aux != NULL && t<col) {
+            aux = strtok(NULL, s);
+            t++;
+        }
+        setNewLine(r,aux);
+    }
+    return r;
+}
+*/

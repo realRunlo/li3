@@ -27,6 +27,14 @@ int addSpaces(int i,char *comando){
     return i;
 }
 
+TABLE varTable(VARIAVEIS v, char* var){
+    int found = 0,i = 0;
+    for(; i<v->entries && found == 0; i++){
+        if(strcmp(v->variaveis[i]->variavel,var) == 0) found++;
+    }
+    return v->variaveis[i-1]->t;
+}
+
 
 //Recebe o input dado pelo o utilizador a passa-o para um array
 char* getCommand(){
@@ -111,79 +119,6 @@ int executeShow(char *comando,int i, VARIAVEIS v){
     return -1;
 }
 
-void toCSV (TABLE x,char* delim, char* name){
-    char s[2] = ",";
-    int entries = getEntries(x);
-    char* f_csv = malloc(sizeof(char)*(strlen(name)+4));
-    sprintf(f_csv,"%s%s",name,".csv");
-    FILE* f = fopen(f_csv,"w"); 
-    if(strcmp(delim,s)!=0){
-        for(int i=0; i<entries ; i++){
-            char * str = get_string_table(x,i);  
-            char *token = strtok(str,s);
-            while(token != NULL) {
-                fprintf(f,"%s", token);
-                token = strtok(NULL, s);
-                if (token != NULL) fprintf(f,"%s",delim);// para não colocar no último token
-                
-            }
-            fprintf(f,"\n");
-        }
-    }
-    fclose(f);
-}
-
-
-TABLE fromCSV (char* file, char* delim){
-    TABLE t = init_Sized_Table(1000000);
-    FILE* f = fopen(file,"r");
-    if (f==NULL){
-        printf("ERROR_FILE_readFILE\n");
-    }
-    else{
-        char buffer[1024]; // espaco suficiente para os exemplos do input file
-        
-        int i =0;
-        while(fgets(buffer,1024,f) ){
-            char r [1024] = "\0";
-            char *token = strtok(buffer,delim);
-            while(token != NULL) {                
-                strcat(r,token);
-                token = strtok(NULL, delim);
-                if (token != NULL)  strcat(r,",");// para não colocar no último token
-            }
-            setNewLine(t,r);
-            i++;
-        }
-        fclose(f);
-        printf("Read File.\n");
-    }
-    return t;
-}
-TABLE proj(TABLE x, char* cols){
-    TABLE r = init_Sized_Table(getEntries(x));
-    char s [2] =";";
-    char * str = get_string_table(x,0);  
-    char *token = strtok(str,s);
-    int col = 0;
-    while(token != NULL && (strcmp(token,cols)!= 0)) {
-        token = strtok(NULL, s);
-        col++;
-    }
-    setNewLine(r,token);
-    
-    for(int j = 1;get_string_table(x,j)!=NULL;j++ ){
-        char * res = get_string_table(x,j);
-        char *aux = strtok(res,s);
-        int t = 0;
-        while(aux != NULL && t<col) {
-            aux = strtok(NULL, s);
-            t++;
-        }
-        setNewLine(r,aux);
-    }
-    return r;
-}
 
 
 int executeToCSV(char* comando, int i, VARIAVEIS v){
@@ -192,23 +127,23 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
         i += strlen(var);
         int espacos = skipSpaces(comando+i);
         i+= espacos;
-        if(comando[i] == ','){printf("1\n");
+        if(comando[i] == ','){
             i++;
             espacos = skipSpaces(comando+i);
             i+= espacos;
-            if(comando[i] == '\''){ printf("2\n"); //delimitador
+            if(comando[i] == '\''){//delimitador
                 i++;
                 char delim = comando[i];
                 i++;
-                if(comando[i] == '\''){printf("3\n");
+                if(comando[i] == '\''){
                     i++;
                     espacos = skipSpaces(comando+i);
                     i+= espacos;
-                    if(comando[i] == ','){printf("4\n");
+                    if(comando[i] == ','){
                         i++;
                         espacos = skipSpaces(comando+i);
                         i+= espacos;
-                        if(comando[i] == '"'){printf("5\n"); 
+                        if(comando[i] == '"'){
                         //guarda diretorio do ficheiro, usando strsep
                         //precisa de strcat para adicionar " no inicio sem ter espaços
                         char *body =malloc(sizeof(char) * strlen(comando));
@@ -226,13 +161,14 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
                         espacos = skipSpaces(comando+i);
                         i+= espacos;
                         printf("%s\n%c\n",file,comando[i]);
-                        if(comando[i] == ')'){printf("6\n");//encerrar da funçao
+                        if(comando[i] == ')'){//encerrar da funçao
                             i++;
                             espacos = skipSpaces(comando+i);
                             i+= espacos;
-                            if(comando[i] == ';'){printf("7\n");
+                            if(comando[i] == ';'){
                                 //executar toCSV
-                                toCSV(var->t,delim,file);
+                                TABLE t = varTable(v,var);
+                                //toCSV(t,delim,file);
                                 printf("toCSV(%s,'%c',%s)\n",var,delim,file);
                                 return 1;
                             }
@@ -250,6 +186,22 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
     printf("Erro no comando toCSV\n");
     return -1;
 }
+
+
+int functionId(char * function){
+    if(strcmp(function, "fromCSV") == 0) return 0;
+    if(strcmp(function, "filter") == 0) return 1;
+    if(strcmp(function, "businesses_started_by_letter") == 0) return 2;
+    if(strcmp(function, "business_info") == 0) return 3;
+    if(strcmp(function, "businesses_reviewed") == 0) return 4;
+    if(strcmp(function, "businesses_with_stars_and_city") == 0) return 5;
+    if(strcmp(function, "top_businesses_by_city") == 0) return 6;
+    if(strcmp(function, "international_users") == 0) return 7;
+    if(strcmp(function, "top_businesses_with_category") == 0) return 8;
+    if(strcmp(function, "reviews_with_word") == 0) return 9;
+    if(strcmp(function, "proj") == 0) return 10;
+}
+
 /*
 if(comando[i] == '('){
                 i++;
@@ -267,23 +219,6 @@ if(comando[i] == '('){
             }
 */
 
-int functionId(char * function){
-    if(strcmp(function, "fromCSV") == 0) return 0;
-    if(strcmp(function, "filter") == 0) return 1;
-    if(strcmp(function, "businesses_started_by_letter") == 0) return 2;
-    if(strcmp(function, "business_info") == 0) return 3;
-    if(strcmp(function, "businesses_reviewed") == 0) return 4;
-    if(strcmp(function, "businesses_with_stars_and_city") == 0) return 5;
-    if(strcmp(function, "top_businesses_by_city") == 0) return 6;
-    if(strcmp(function, "international_users") == 0) return 7;
-    if(strcmp(function, "top_businesses_with_category") == 0) return 8;
-    if(strcmp(function, "reviews_with_word") == 0) return 9;
-    if(strcmp(function, "proj") == 0) return 10;
-}
-
-//2-3-4-6
-//5-8-9
-//7
 //funcao para executar, caso a sintaxe esteja correta, a funcao dada a uma variavel
 int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS v){
     printf("executar funçao\n");
@@ -295,7 +230,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
         char* arg1 = commandString(comando+i);
         i+= strlen(arg1);
         i = addSpaces(i,comando);
-        if(funcao == 7){  printf("%s   %s\n",comando,arg1);
+        if(funcao == 7){
             if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){printf("1\n");
                 i++;
                 i = addSpaces(i,comando);
@@ -340,7 +275,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 char* arg3 = commandString(comando+i);
                 i+= strlen(arg3);
                 i = addSpaces(i,comando);
-                if(comando[i] == ','){//filter
+                if(comando[i] == ','){
                     i++;
                     i = addSpaces(i,comando);
                     char* arg4 = commandString(comando+i);
@@ -350,7 +285,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                         i++;
                         i = addSpaces(i,comando);
                         if(comando[i] == ';'){
-                            printf("filter\n");
+                            printf("filter(%s,%s,%s,%s)\n",arg1,arg2,arg3,arg4);
                             free(arg1);free(arg2);free(arg3);free(arg4);
                             return 1;
                         }
@@ -400,7 +335,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                     i++;
                     i = addSpaces(i,comando);
                     if(comando[i] == ';'){
-                        printf("proj\n");
+                        printf("proj(%s,%s)\n",arg1,arg2);
                         free(arg1);free(arg2);
                         return 1;
                     }
@@ -411,8 +346,34 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
         }
                             
     }
-    //ainda falta o de associar a uma coluna de uma tabela z = x[1][0]
-    
+    i = addSpaces(i,comando);
+    //associar uma coluna de uma table a uma variavel -  ex: z = x[1][0]
+    if(check_variable(v,function) == 0 && comando[i] == '['){
+        i++;
+        i = addSpaces(i,comando);
+        char *line = commandString(comando+i);
+        i+= strlen(line);
+        i = addSpaces(i,comando);
+        if(comando[i] == ']'){
+        i++;
+        if(comando[i] == '['){
+            i++; 
+            i = addSpaces(i,comando);
+            char *col = commandString(comando+i);
+            i+= strlen(col);
+            i = addSpaces(i,comando);
+            if(comando[i] == ']'){
+                i++;
+                i = addSpaces(i,comando);
+                if(comando[i] == ';'){
+                    printf("%s = %s[%s][%s] ;\n",var,function,line,col);
+                    return 1;
+                }
+            }
+        }
+        }
+        printf("erro\n");
+    }
     return -1;
 
 }
@@ -420,9 +381,6 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
 
 
 //funcao que analisa o comando passado, e caso seja possivel executa-o
-    //provavelmente sera necessario passar uma lista de elementos variaveis
-    //elemento variavel precisara de uma string para guardar o nome da variavel e um parametro para
-    //guardar os dados, por exemplo uma table
 int executeCommand(char *comando,VARIAVEIS v, SGR sgr){ 
     printf("executar: %s\n",comando);
     int len = strlen(comando);
@@ -456,8 +414,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     if(strcmp(buff,"toCSV") == 0){
         if(comando[i + 5] == '('){
         i += 6;
-        espacos = skipSpaces(comando+i);
-        i+= espacos;
+        i = addSpaces(i,comando);
         free(buff);
         return executeToCSV(comando,i,v);
         
@@ -465,8 +422,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     }
 
     i = espacos;
-    //verificar se e variavel, so aceita variaveis com char, digitos ou alfabeticos
-    //falta fazer uma funçao para interpretar se a string function pode ser executada
+    //verificar se e variavel, so aceita variaveis com char, digitos ou letras
     if(isDigitOrLetter(buff[0]) == 0){
         i += strlen(buff);
         i += skipSpaces(comando+i);
