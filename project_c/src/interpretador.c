@@ -150,7 +150,7 @@ TABLE fromCSV (char* file, char* delim){
             while(token != NULL) {                
                 strcat(r,token);
                 token = strtok(NULL, delim);
-                if (token != NULL)  strcat(r,",");//sprintf(r,",");// para não colocar no último token
+                if (token != NULL)  strcat(r,",");// para não colocar no último token
             }
             setNewLine(t,r);
             i++;
@@ -160,7 +160,30 @@ TABLE fromCSV (char* file, char* delim){
     }
     return t;
 }
-
+TABLE proj(TABLE x, char* cols){
+    TABLE r = init_Sized_Table(getEntries(x));
+    char s [2] =";";
+    char * str = get_string_table(x,0);  
+    char *token = strtok(str,s);
+    int col = 0;
+    while(token != NULL && (strcmp(token,cols)!= 0)) {
+        token = strtok(NULL, s);
+        col++;
+    }
+    setNewLine(r,token);
+    
+    for(int j = 1;get_string_table(x,j)!=NULL;j++ ){
+        char * res = get_string_table(x,j);
+        char *aux = strtok(res,s);
+        int t = 0;
+        while(aux != NULL && t<col) {
+            aux = strtok(NULL, s);
+            t++;
+        }
+        setNewLine(r,aux);
+    }
+    return r;
+}
 
 
 int executeToCSV(char* comando, int i, VARIAVEIS v){
@@ -209,6 +232,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
                             i+= espacos;
                             if(comando[i] == ';'){printf("7\n");
                                 //executar toCSV
+                                toCSV(var->t,delim,file);
                                 printf("toCSV(%s,'%c',%s)\n",var,delim,file);
                                 return 1;
                             }
