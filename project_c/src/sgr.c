@@ -123,7 +123,7 @@ void q3_iterator (gpointer key, gpointer value, gpointer user_data){
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
     char indicador [50] = "total;b_id;b_nome;b_city;b_state;b_categories";
-    setNewLine(r,indicador);
+    setNewLine(r,"total;b_id;b_name;b_city;b_state;b_categories");
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));
     char* b_name = get_name(b);
@@ -180,7 +180,7 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
 TABLE businesses_reviewed(SGR sgr, char *user_id){
     int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query4 process = malloc(sizeof(struct query4));
-    char* firstLine = "b_id;b_name";
+    char* firstLine = "business_id;business_name";
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
     process->result[0] = strdup(firstLine);
     process->user_id = strdup(user_id);
@@ -234,8 +234,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     pro->t = init_Sized_Table(max_lines);
-    char ind [16] = "b_id;b_name";
-    setNewLine(pro->t,ind);
+    setNewLine(pro->t,"business_id;business_name");
     pro->city = strdup (city);
     pro->stars = stars;
     pro->hashT_business = sgr->hashT_businesses;

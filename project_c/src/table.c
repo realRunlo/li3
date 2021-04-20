@@ -63,11 +63,17 @@ char * get_string_table(TABLE t,int n){
 
 int getBlen_str(TABLE t){
     int bigger = 0;
+    int size=0;
     int nEntries = getEntries(t);
+    char * seped;
     for(int i=0;i<nEntries;i++){
-        if((int) strlen(t->tab[i]) > bigger){
-            bigger = strlen(t->tab[i]);
-        }               
+        char * str = get_string_table(t,i);
+        while((seped = strsep(&str,";"))){
+            size = strlen(seped);
+            if((int) size> bigger){
+                bigger = size;
+            } 
+        }              
     }
     return bigger;
 }
@@ -75,7 +81,7 @@ int getBlen_str(TABLE t){
 void print_LineTops(int n){
     for(int i=0;i<n;i++)
         printf("-");
-    printf("\n");
+    //printf("\n");
 }
 void printN_space(int n){
     for(int i=0;i<n;i++)
@@ -84,16 +90,36 @@ void printN_space(int n){
 
 void printPage_table(TABLE t,int current_page){
     int total_entries = getEntries(t);
-    int total_pages = total_entries/MAXTPAGE;
-    int bottom = current_page*MAXTPAGE;
-    int top = bottom+MAXTPAGE;
-
+    printf("%d\n",getBlen_str(t));
     int space_in_line = getBlen_str(t) + MARGIN;
+    int total_pages,bottom,top;
+
+    if(total_entries<MAXTPAGE){
+        total_pages = 0;
+        bottom = 0;
+        top = total_entries;
+    }else{
+        total_pages = total_entries/MAXTPAGE;
+        bottom = current_page*MAXTPAGE;
+        top = bottom+MAXTPAGE;
+    }
+
     char * seped;
+    char * str_c =strdup(t->tab[0]); 
+    int countCols = 0;
+    while((seped = strsep(&str_c,";"))){
+            countCols++;
+    }
+
     for(int i=bottom;i<top;i++){
         char * str_zero = strdup(t->tab[i]);
-        print_LineTops(space_in_line);
+       
+        for(int j=0;j<countCols;j++){
+            print_LineTops(space_in_line);
+        }
+        printf("\n");
         printf("|");
+
         while((seped = strsep(&str_zero,";"))){
         int str_length = strlen(seped);
         int space_left = (space_in_line-str_length)/2;
@@ -106,7 +132,11 @@ void printPage_table(TABLE t,int current_page){
         }
         printf("\n");
     }
-    print_LineTops(space_in_line);
+
+    for(int j=0;j<countCols;j++){
+            print_LineTops(space_in_line);
+        }
+    printf("\n");
     printf("Page %d out of %d\n",current_page+1,total_pages+1);
 }
 
