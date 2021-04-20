@@ -181,6 +181,8 @@ TABLE index_table(TABLE t,int line,int col){
     return indexed_table;
 }
 
+
+
 /*
 void toCSV (TABLE x,char* delim, char* name){
     char s[2] = ",";
