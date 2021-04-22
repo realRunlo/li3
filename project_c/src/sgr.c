@@ -18,21 +18,6 @@ GHashTable * getHashT_reviews(SGR sgr){
     return sgr->hashT_reviews;
 }
 
-//free de um elemento da hash_table
-void free_a_hash_table_entry (gpointer key, gpointer value, gpointer user_data)
-{
-    g_free (key);
-    g_free (value);
-}
-
-
-//free de uma hash_table
-void free_all_key_value_entries (GHashTable* table)
-{
-    g_hash_table_foreach (table, free_a_hash_table_entry, NULL);
-    g_hash_table_destroy (table);
-}
-
 
 /**
 \brief Inicializador de dados SGR
@@ -114,6 +99,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     TABLE result = initTable();
     setTab(result,process->result);
     setEntries(result,process->total);
+    //free();
     return result;
 }
 
@@ -137,7 +123,7 @@ void q3_iterator (gpointer key, gpointer value, gpointer user_data){
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
     char indicador [50] = "total;b_id;b_nome;b_city;b_state;b_categories";
-    setNewLine(r,"total;b_id;b_name;b_city;b_state;b_categories");
+    setNewLine(r,indicador);
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));
     char* b_name = get_name(b);
@@ -194,7 +180,7 @@ void query4_iterator(gpointer key, gpointer value, gpointer user_data){
 TABLE businesses_reviewed(SGR sgr, char *user_id){
     int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query4 process = malloc(sizeof(struct query4));
-    char* firstLine = "business_id;business_name";
+    char* firstLine = "b_id;b_name";
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
     process->result[0] = strdup(firstLine);
     process->user_id = strdup(user_id);
@@ -248,7 +234,8 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     pro->t = init_Sized_Table(max_lines);
-    setNewLine(pro->t,"business_id;business_name");
+    char ind [16] = "b_id;b_name";
+    setNewLine(pro->t,ind);
     pro->city = strdup (city);
     pro->stars = stars;
     pro->hashT_business = sgr->hashT_businesses;
@@ -364,7 +351,7 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
         char stars[20]; //string para colocar as estrelas medias
         sprintf(stars,"%.2f",average); //float to string
         char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 3)); //declaracao da string q sera colocada
-        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s;%s;%s",stars,b_id,b_name);
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s,%s,%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(c->entries == 0){
             c->top[0] = result;
@@ -374,54 +361,31 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
         else{
             //verificar se o negocio ja foi adicionado
             i = 0;
-            size_t maxLen = strlen(result);
-            while(i < c->entries){
-                if(strlen(c->top[i]) > maxLen) maxLen = strlen(c->top[i]);
-                i++;
-            }
-            char*buffer = malloc(sizeof(char) * (maxLen + 1));    
-            char *pointer = buffer;
+            char*buffer = malloc(sizeof(char) * 1000);
             int found = 0;
             int i_lowest = 0;
             float lowest;
-            i = 0;
             while(i < c->entries && found !=1){
-                buffer = pointer;
-                buffer[0] = '\0';
                 strcpy(buffer,c->top[i]);
-                lowest = atof(strsep(&buffer,";"));  //torna a string da media de estrelas em um float 
+                lowest = atof(strsep(&buffer,","));  //torna a string da media de estrelas em um float 
                 if (lowest == c->low_score) i_lowest = i; //guarda a posicao do menor score
-                if (strcmp(b_id,strsep(&buffer,";")) == 0) found++;
+                if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
                 i++;
-                
             }
-            free(pointer);
             //se o negocio ainda n foi adicionado(e o seu score e superior ao minimo da cidade) mas o top ja esteja cheio, necessario trocar pelo de menor score
             if(found == 0 && c->entries == data->top && average > c->low_score){
                 i = 0;
-                maxLen = strlen(result);
-                while(i < c->entries){
-                    if(strlen(c->top[i]) > maxLen) maxLen = strlen(c->top[i]);
-                    i++;
-                }
                 c->top[i_lowest] = result;
                 //atualizar score mais baixo
                 float min = 20;
                 float s = 20;
-                char*buffer2 = malloc(sizeof(char) * (maxLen + 1));
-                char *pointer2 = buffer2;
-                i=0;
                 while(i < top){
-                    buffer2 = pointer2;
-                    buffer2[0] = '\0';
-                    strcpy(buffer2,c->top[i]);
-                    s = (float) atof(strsep(&buffer2,";"));
+                    strcpy(buffer,c->top[i]);
+                    s = (float) atof(strsep(&buffer,","));
                     if(s< min) min = s;
                     i++;
-                    
                 }
                 c->low_score = min;
-                free(pointer2);
             }
             //se a cidade ainda nao tem top negocios guardados, adiciona imediatamente numa posicao livre
             if(found == 0 && c->entries < data->top){
@@ -452,15 +416,28 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
     char  buff[length + j + strlen(c->name) + j + 1];
     buff[0] = '\0';
     //concatena os dados dos negocios e coloca-os na table
-    snprintf(buff,strlen(c->name)+2,"%s-",c->name);
+    snprintf(buff,strlen(c->name)+2,"%s;",c->name);
     for(k=0 ; k<j;k++){
         strcat(buff,c->top[k]);
-        strcat(buff,"-");
+        strcat(buff,";");
     }
     setNewLine(result,buff);
+    //printf("%d -> %s\n",getEntries(result),buff);
     }
 }
-
+/*
+3 -> AUSTIN
+4 -> Bee Cave
+5 -> Bowen Island
+6 -> Gresham
+7 -> Cohasset
+8 -> Norwell
+9 -> Maitland
+10 -> Chestnut Hill
+11 -> Pickerington
+12 -> Ridgefield
+13 -> Galloway
+14 -> San Marcos*/
 
 /* query 6 */
 //searches for the top n businesses from each city
@@ -491,14 +468,11 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     TABLE result = initTable();
     setEntries(result,0);
     setTab(result,malloc(sizeof(char*) * (total_cities + 1)));
-    setNewLine(result,"city-stars;b_id;b_name-");
+    setNewLine(result,"city;stars,b_id,b_name;");
     
     printf("Turning data into TABLE structure...\n");
     g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
-    printf("Done!\n"); 
-
-    free_all_key_value_entries(process->b_same);   
-    free_all_key_value_entries(process->cities);  
+    printf("Done!\n");    
     return result;
 }
 
@@ -553,7 +527,8 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    setNewLine(pro->t,"user_id;total");
+    char ind [15] = "user_id;total";
+    setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
     pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
     pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
@@ -639,7 +614,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
         char stars[20]; //string para colocar as estrelas medias
         sprintf(stars,"%.2f",average); //float to string
         char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 3)); //declaracao da string q sera colocada
-        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s;%s;%s",stars,b_id,b_name);
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s,%s,%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(data->entries == 0){
             results[1] = result;
@@ -649,53 +624,31 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
         else{
             //verificar se o negocio ja foi adicionado
             i = 1;
-            size_t maxLen = strlen(result);
-            while(i < data->entries+1){
-                if(strlen(results[i]) > maxLen) maxLen = strlen(results[i]);
-                i++;
-            }
-            i = 1;
-            char*buffer = malloc(sizeof(char) * (maxLen +1));
-            buffer[0] = '\0';
-            char *pointer = buffer;
-
+            char*buffer = malloc(sizeof(char) * 1000);
             int found = 0;
             int i_lowest = 0;
             float lowest;
             while(i < data->entries+1 && found !=1){
-                buffer = pointer;
                 strcpy(buffer,results[i]);
-                lowest = atof(strsep(&buffer,";"));  //torna a string da media de estrelas em um float 
+                lowest = atof(strsep(&buffer,","));  //torna a string da media de estrelas em um float 
                 if (lowest == data->lowScore) i_lowest = i; //guarda a posicao do menor score
-                if (strcmp(b_id,strsep(&buffer,";")) == 0) found++;
+                if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
                 i++;
             }
-            free(pointer);
             //se o negocio ainda n foi adicionado(mas tem score superior ao minimo da categoria) mas o top ja esteja cheio, necessario trocar pelo de menor score
             if(found == 0 && data->entries == top && average > data->lowScore){
                 i = 1;
-                maxLen = strlen(result);
-                while(i < data->entries+1){
-                    if(strlen(results[i]) > maxLen) maxLen = strlen(results[i]);
-                    i++;
-                }
-                i=1;
                 results[i_lowest] = result;
                 //atualizar score mais baixo
                 float min = 20;
                 float s = 20;
-                char*buffer2 = malloc(sizeof(char) * (maxLen + 1));
-                buffer2[0] = '\0';
-                char *pointer2 = buffer2;
                 while(i < data->entries+1){
-                    buffer2 = pointer2;
-                    strcpy(buffer2,results[i]);
-                    s = (float) atof(strsep(&buffer2,";"));
+                    strcpy(buffer,results[i]);
+                    s = (float) atof(strsep(&buffer,","));
                     if(s< min) min = s;
                     i++;
                 }
                 data->lowScore = min;
-                free(pointer2);
                 
             }
             //se a cidade ainda nao tem top negocios guardados, adiciona imediatamente numa posicao livre
