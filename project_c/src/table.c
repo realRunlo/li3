@@ -182,8 +182,6 @@ TABLE index_table(TABLE t,int line,int col){
 }
 
 
-
-/*
 void toCSV (TABLE x,char* delim, char* name){
     char s[2] = ",";
     int entries = getEntries(x);
@@ -223,7 +221,7 @@ TABLE fromCSV (char* file, char* delim){
             while(token != NULL) {                
                 strcat(r,token);
                 token = strtok(NULL, delim);
-                if (token != NULL)  strcat(r,",");// para não colocar no último token
+                if (token != NULL)  strcat(r,";");// para não colocar no último token
             }
             setNewLine(t,r);
             i++;
@@ -259,4 +257,3 @@ TABLE proj(TABLE x, char* cols){
     }
     return r;
 }
-*/
