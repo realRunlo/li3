@@ -61,18 +61,28 @@ char * get_string_table(TABLE t,int n){
     return r;
 }
 
-int getBlen_str(TABLE t){
-    int bigger = 0;
-    int size=0;
+int * getBlen_str(TABLE t){
+    int countCols = 1;
+    int size = 0;
     int nEntries = getEntries(t);
+    char * str_c =strdup(t->tab[0]); 
     char * seped;
-    for(int i=0;i<nEntries;i++){
+    int bigIt;
+    while((seped = strsep(&str_c,";"))){
+            countCols++;
+    }
+    int * bigger = malloc(sizeof(int)*countCols);
+    for(int y=0;y<countCols;y++)
+        bigger[y] = 0;
+     for(int i=0;i<nEntries;i++){
         char * str = get_string_table(t,i);
+        bigIt = 0;
         while((seped = strsep(&str,";"))){
             size = strlen(seped);
-            if((int) size> bigger){
-                bigger = size;
-            } 
+            if((int) size > bigger[bigIt]){
+                bigger[bigIt] = size;
+            }
+            bigIt++; 
         }              
     }
     return bigger;
@@ -81,8 +91,8 @@ int getBlen_str(TABLE t){
 void print_LineTops(int n){
     for(int i=0;i<n;i++)
         printf("-");
-    //printf("\n");
 }
+
 void printN_space(int n){
     for(int i=0;i<n;i++)
         printf(" ");
@@ -90,10 +100,9 @@ void printN_space(int n){
 
 void printPage_table(TABLE t,int current_page){
     int total_entries = getEntries(t);
-    printf("%d\n",getBlen_str(t));
-    int space_in_line = getBlen_str(t) + MARGIN;
     int total_pages,bottom,top;
-
+    int while_Iterator;
+    //tem um problema quando é a ultima pag e essa pag n tem as 10 entradas
     if(total_entries<MAXTPAGE){
         total_pages = 0;
         bottom = 0;
@@ -110,36 +119,40 @@ void printPage_table(TABLE t,int current_page){
     while((seped = strsep(&str_c,";"))){
             countCols++;
     }
-
+    int * biggers = getBlen_str(t);
+    
     for(int i=bottom;i<top;i++){
         char * str_zero = strdup(t->tab[i]);
        
         for(int j=0;j<countCols;j++){
-            print_LineTops(space_in_line);
+            print_LineTops(biggers[j]+MARGIN);
         }
         printf("\n");
         printf("|");
-
+        while_Iterator = 0;
         while((seped = strsep(&str_zero,";"))){
         int str_length = strlen(seped);
-        int space_left = (space_in_line-str_length)/2;
-        int space_rigth = (space_in_line-space_left-str_length);
+        int space_left = (biggers[while_Iterator]+MARGIN-str_length)/2;
+        int space_rigth = (biggers[while_Iterator]+MARGIN-space_left-str_length);
 
         printN_space(space_left);
         printf("%s",seped);
         printN_space(space_rigth);
         printf("|");
+        while_Iterator++;
         }
         printf("\n");
+    
     }
 
     for(int j=0;j<countCols;j++){
-            print_LineTops(space_in_line);
+            print_LineTops(biggers[j]+MARGIN);
         }
     printf("\n");
     printf("Page %d out of %d\n",current_page+1,total_pages+1);
+    
 }
-
+/*
 void print_Table(TABLE t){
     int space_in_line = getBlen_str(t) + MARGIN;
     char * seped;
@@ -161,7 +174,7 @@ void print_Table(TABLE t){
     }
     print_LineTops(space_in_line);
 
-}
+}*/
 
 TABLE index_table(TABLE t,int line,int col){
     TABLE indexed_table = init_Sized_Table(2);
@@ -182,8 +195,6 @@ TABLE index_table(TABLE t,int line,int col){
 }
 
 
-
-/*
 void toCSV (TABLE x,char* delim, char* name){
     char s[2] = ",";
     int entries = getEntries(x);
@@ -223,7 +234,7 @@ TABLE fromCSV (char* file, char* delim){
             while(token != NULL) {                
                 strcat(r,token);
                 token = strtok(NULL, delim);
-                if (token != NULL)  strcat(r,",");// para não colocar no último token
+                if (token != NULL)  strcat(r,";");// para não colocar no último token
             }
             setNewLine(t,r);
             i++;
@@ -259,4 +270,3 @@ TABLE proj(TABLE x, char* cols){
     }
     return r;
 }
-*/

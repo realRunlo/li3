@@ -14,11 +14,11 @@ int getEntries(TABLE t);
 char* get_string_table(TABLE t,int n);
 char** getTab(TABLE t);
 
-int getBlen_str(TABLE t);
+int *getBlen_str(TABLE t);
 void printPage_table(TABLE t,int current_page);
 void print_Table(TABLE t);
 TABLE index_table(TABLE t,int line,int col);
-void toCSV (TABLE x,char delim, char* name);
+void toCSV (TABLE x,char* delim, char* name);
 TABLE fromCSV (char* file, char* delim);
 TABLE proj(TABLE x, char* cols);
 
