@@ -720,7 +720,7 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     process->top = top;
     process->condition = strdup(category);
     process->results = malloc(sizeof(char*) * (top + 1));
-    process->results[0] = strdup("stars;b_id;b_name");
+    process->results[0] = strdup("stars;business_id;business_name");
     process->entries = 0;
 
     //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
