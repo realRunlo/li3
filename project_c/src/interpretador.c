@@ -44,11 +44,12 @@ char* getCommand(){
     input[0] = '\0';
     size_t inputlen = 0, bufflen = 0;
    do {
-       fgets(buff, 200, stdin);
+       if(fgets(buff, 200, stdin)){
        bufflen = strlen(buff);
        input = realloc(input, inputlen+bufflen+1);
        strcat(input, buff);
        inputlen += bufflen;
+       }
     } while (bufflen==200-1 && buff[200-2]!='\n');
     input[inputlen] ='\0';
     return input;

@@ -42,9 +42,9 @@ void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
 
 User createUser(char * buffer){
     User u = malloc(sizeof(struct user));
-    setUserId(u,strsep(&buffer,";"));
-    setName(u,strsep(&buffer,";"));
-    setFriends(u,strsep(&buffer,"\n"));
+    u->user_id = strdup(strsep(&buffer,";"));
+    u->name = strdup(strsep(&buffer,";"));
+    u->friends = strdup(strsep(&buffer,"\n"));
     return u;
 }
 

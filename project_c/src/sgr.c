@@ -63,7 +63,7 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 
     mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
     
-    //readUser(sgr_load->hashT_users,users_file);
+    readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
 

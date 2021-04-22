@@ -35,7 +35,25 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
     
 }
 
-
+/*
+char* getCommand(){
+    char buff[200];
+    buff[0] = '\0';
+    char* input = malloc(sizeof(char) * 200);
+    input[0] = '\0';
+    size_t inputlen = 0, bufflen = 0;
+   do {
+       fgets(buff, 200, stdin);
+       bufflen = strlen(buff);
+       input = realloc(input, inputlen+bufflen+1);
+       strcat(input, buff);
+       inputlen += bufflen;
+    } while (bufflen==200-1 && buff[200-2]!='\n');
+    input[inputlen] ='\0';
+    return input;
+}
+*/
+#define USERS_BUFFER_SIZE 100000
 
 void readUser(GHashTable * table, char * filename){
 
@@ -46,20 +64,38 @@ void readUser(GHashTable * table, char * filename){
     }
     else{
     
-        char buffer[400000]; // espaco suficiente para os exemplos do input file
         User u;
-        int i = 0;
-
-        while(fgets(buffer,400000,f)){
-            //printf("%d : %s",i,buffer);
-            //printf("%d\n",i);
-            u = createUser(buffer);
+        char buff[USERS_BUFFER_SIZE]; // espaco suficiente para os exemplos do input file
+        buff[0] = '\0';
+        size_t inputlen = 0, bufflen = 0;
+        if(fgets(buff,USERS_BUFFER_SIZE,f)){ // ignora primeira linha 
+        int read = 0;
+        while(fgets(buff,USERS_BUFFER_SIZE,f))
+        {
+            inputlen = 0, bufflen = 0;
+            char * line = malloc(sizeof(char) * USERS_BUFFER_SIZE);
+            line[0] = '\0';
+            bufflen = strlen(buff);
+            line = realloc(line, inputlen+bufflen+1);
+            strcat(line, buff);
+            inputlen += bufflen;
+            while(bufflen == USERS_BUFFER_SIZE - 1 && buff[USERS_BUFFER_SIZE-2] != '\n'){
+                if(fgets(buff, USERS_BUFFER_SIZE, f)){
+                bufflen = strlen(buff);
+                line = realloc(line, inputlen+bufflen+1);
+                strcat(line, buff);
+                inputlen += bufflen;
+                }
+            }
+            u = createUser(line);
             addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
-            i++;
+            free(line);
         }
-    }
+        }
+        
     fclose(f);
     printf("Users loaded.\n");
+}
 }
 
 
