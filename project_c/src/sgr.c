@@ -746,7 +746,7 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
 }
 
 int wordInString(char *str,char * word){
-    char * buffer = malloc(strlen(str));
+    char * buffer = malloc(strlen(str) + 1);
     int j=0;
     for(int i=0;str[i]!='\0';i++){
         if((!isspace(str[i]) && !ispunct(str[i])) || str[i] == '\''){
@@ -798,7 +798,7 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 @returns TABLE apontador para struct table
 */
 TABLE reviews_with_word(SGR sgr,char * word){
-    int max_lines = g_hash_table_size(sgr->hashT_reviews);
+    int max_lines = g_hash_table_size(sgr->hashT_reviews) + 1;
     Query9 query_data = malloc(sizeof(struct query9));
     query_data->t = init_Sized_Table(max_lines);
     query_data->word = strdup(word);

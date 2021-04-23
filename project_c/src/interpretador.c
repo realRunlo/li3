@@ -44,24 +44,26 @@ void addVar(VARIAVEIS v, char* var, TABLE t){int i = 0;
         v->variaveis = realloc(v->variaveis,sizeof(struct variavel) * v->max);
     }
     VARIAVEL x = v->variaveis[0];
-    printf("aqui\n");
+    
     //procura por um lugar livre ou por uma variavel com o mesmo nome passado a funcao
-    while(x != NULL && strcmp(x->variavel,var) != 0){
+    while(x != NULL){
         i++;
         x= v->variaveis[i];
     }
-    //caso em que a variavel ja existe
-    if(strcmp(x->variavel,var) == 0){
-        clearTable(x->t);
-        x->t = t;
-    }
+    
+    
     //caso de criar uma variavel nova
-    else{
-        
+    if(x== NULL){printf("aqui\n");
         x = malloc(sizeof(struct variavel));
         x->variavel = var;
         x->t = t;
         v->entries++;
+    }
+    else{//caso em que a variavel ja existe
+        if(strcmp(x->variavel,var) == 0){
+        clearTable(x->t);
+        x->t = t;
+        }
     }
 }
 

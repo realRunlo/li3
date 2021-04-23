@@ -22,8 +22,7 @@ TABLE initTable(){
 }
 TABLE init_Sized_Table(int size){
     TABLE t = malloc(sizeof(struct table));
-    t->tab = (char **) malloc(size);
-    t->tab = NULL;
+    t->tab =  malloc(sizeof(char*) * size);
     t->entries = 0;
     return t;
 }
