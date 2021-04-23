@@ -614,7 +614,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
         char stars[20]; //string para colocar as estrelas medias
         sprintf(stars,"%.2f",average); //float to string
         char * result = malloc(sizeof(char) * (strlen(stars) + strlen(b_name) + strlen(b_id) + 3)); //declaracao da string q sera colocada
-        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s,%s,%s",stars,b_id,b_name);
+        snprintf(result,strlen(stars) + strlen(b_id) + strlen(b_name)+ 3,"%s;%s;%s",stars,b_id,b_name);
         //caso em que ainda nao foram adicionados nenhuns negocios
         if(data->entries == 0){
             results[1] = result;
@@ -630,9 +630,9 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
             float lowest;
             while(i < data->entries+1 && found !=1){
                 strcpy(buffer,results[i]);
-                lowest = atof(strsep(&buffer,","));  //torna a string da media de estrelas em um float 
+                lowest = atof(strsep(&buffer,";"));  //torna a string da media de estrelas em um float 
                 if (lowest == data->lowScore) i_lowest = i; //guarda a posicao do menor score
-                if (strcmp(b_id,strsep(&buffer,",")) == 0) found++;
+                if (strcmp(b_id,strsep(&buffer,";")) == 0) found++;
                 i++;
             }
             //se o negocio ainda n foi adicionado(mas tem score superior ao minimo da categoria) mas o top ja esteja cheio, necessario trocar pelo de menor score
@@ -644,7 +644,7 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
                 float s = 20;
                 while(i < data->entries+1){
                     strcpy(buffer,results[i]);
-                    s = (float) atof(strsep(&buffer,","));
+                    s = (float) atof(strsep(&buffer,";"));
                     if(s< min) min = s;
                     i++;
                 }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #define MARGIN 6
 #define MAXTPAGE 10
 
@@ -22,6 +23,7 @@ TABLE initTable(){
 TABLE init_Sized_Table(int size){
     TABLE t = malloc(sizeof(struct table));
     t->tab = (char **) malloc(size);
+    t->tab = NULL;
     t->entries = 0;
     return t;
 }
@@ -34,6 +36,14 @@ void setEntries(TABLE t,int x){
 }
 void setTab(TABLE t, char** result){
     t->tab = result;
+}
+
+int isEndtable(TABLE t,int i){
+
+    if(t->tab[i] == NULL)
+        return 1;
+    
+    return 0;
 }
 
 void setNewLine(TABLE t,char * line){
@@ -100,15 +110,19 @@ void printN_space(int n){
 
 void printPage_table(TABLE t,int current_page){
     int total_entries = getEntries(t);
-    int total_pages,bottom,top;
-    int while_Iterator;
-    //tem um problema quando é a ultima pag e essa pag n tem as 10 entradas
-    if(total_entries<MAXTPAGE){
-        total_pages = 0;
+    int total_pages,bottom,top,while_Iterator;
+    char * str_zero;
+    total_pages = total_entries/MAXTPAGE + 1;
+
+    if(total_entries<MAXTPAGE){ // quando só tem uma pagina como menos entradas das que é suposto imprimir por pagina
+        total_pages = 1;
         bottom = 0;
         top = total_entries;
-    }else{
-        total_pages = total_entries/MAXTPAGE;
+    }else if(current_page + 1  == total_pages){ // quando estamos na ultima pagina
+        int entriesLeft = total_entries - (total_pages-1)*MAXTPAGE;
+        bottom = current_page*MAXTPAGE;
+        top = bottom + entriesLeft;
+    }else{ //situação normal
         bottom = current_page*MAXTPAGE;
         top = bottom+MAXTPAGE;
     }
@@ -120,9 +134,9 @@ void printPage_table(TABLE t,int current_page){
             countCols++;
     }
     int * biggers = getBlen_str(t);
-    
     for(int i=bottom;i<top;i++){
-        char * str_zero = strdup(t->tab[i]);
+
+        str_zero = strdup(t->tab[i]);
        
         for(int j=0;j<countCols;j++){
             print_LineTops(biggers[j]+MARGIN);
@@ -149,8 +163,7 @@ void printPage_table(TABLE t,int current_page){
             print_LineTops(biggers[j]+MARGIN);
         }
     printf("\n");
-    printf("Page %d out of %d\n",current_page+1,total_pages+1);
-    
+    printf("Page %d out of %d\n",current_page+1,total_pages);    
 }
 /*
 void print_Table(TABLE t){
