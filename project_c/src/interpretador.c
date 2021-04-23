@@ -20,7 +20,6 @@ VARIAVEIS  initVariaveis(){
     v->variaveis = malloc(sizeof(struct variavel) * 20); //apenas 20 variaveis disponiveis
     v->entries = 0;
     v->max = 20;
-    for(int i = 0; i < 20; i++) v->variaveis[i] = NULL;
     return v;
 }
 
@@ -31,11 +30,12 @@ int addSpaces(int i,char *comando){
 }
 
 TABLE varTable(VARIAVEIS v, char* var){
-    int found = 0,i = 0;
-    for(; i<v->entries && found == 0; i++){
-        if(strcmp(v->variaveis[i]->variavel,var) == 0) found++;
+    int j = 0,i = 0;
+    for(; i<v->entries; i++){
+        if(strcmp(v->variaveis[i]->variavel,var) == 0) return v->variaveis[j]->t;
     }
-    return v->variaveis[i-1]->t;
+    
+    return NULL;
 }
 
 void addVar(VARIAVEIS v, char* var, TABLE t){int i = 0;
@@ -46,24 +46,21 @@ void addVar(VARIAVEIS v, char* var, TABLE t){int i = 0;
     VARIAVEL x = v->variaveis[0];
     
     //procura por um lugar livre ou por uma variavel com o mesmo nome passado a funcao
-    while(x != NULL){
+    while(i<v->entries && strcmp(x->variavel,var) != 0){
         i++;
         x= v->variaveis[i];
     }
-    
-    
-    //caso de criar uma variavel nova
-    if(x== NULL){printf("aqui\n");
-        x = malloc(sizeof(struct variavel));
-        x->variavel = var;
-        x->t = t;
-        v->entries++;
-    }
-    else{//caso em que a variavel ja existe
-        if(strcmp(x->variavel,var) == 0){
+    //caso em que a variavel ja existe
+    if(strcmp(x->variavel,var) == 0){printf("entrei\n");
         clearTable(x->t);
         x->t = t;
-        }
+    } 
+    //caso de criar uma variavel nova
+    else{
+        x = malloc(sizeof(struct variavel));
+        x->variavel = strdup(var);
+        x->t = t;
+        v->entries++;
     }
 }
 
@@ -126,28 +123,30 @@ int check_variable(VARIAVEIS v, char* variavel){
 
 
 int executeShow(char *comando,int i, VARIAVEIS v){
-    int espacos = skipSpaces(comando+i);
-    i+= espacos;
-
+    i = addSpaces(i,comando);
     char *buff = commandString(comando+i); //pega na variavel do show
     i += strlen(buff);
-    i += skipSpaces(comando+i);
+    i = addSpaces(i,comando);
     if (comando[i] == ')'){
         i++;
-        i += skipSpaces(comando+i);
+        i = addSpaces(i,comando); 
         if(comando[i] == ';'){
         //verificar se a variavel guardada em buff existe
         //se existir ,executar o comando, caso contrario mostrar mensagem de erro
             if(check_variable(v,buff) == 0){
-                printf("show\n");
-                    return 1;
+                TABLE t = varTable(v,buff);
+                printTable(t);
+                free(buff);
+                return 1;
             }
             else{
                 printf("variavel nao existe\n");
-                    return -1;
+                free(buff);
+                return -1;
             }
         }
     } 
+    free(buff);
     printf("Erro de sintaxe.\n");  
     return -1;
 }
@@ -158,24 +157,20 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
     char* var = commandString(comando+i); //primeira variavel de toCSV
     if(check_variable(v,var) == 0){
         i += strlen(var);
-        int espacos = skipSpaces(comando+i);
-        i+= espacos;
+        i = addSpaces(i,comando);
         if(comando[i] == ','){
             i++;
-            espacos = skipSpaces(comando+i);
-            i+= espacos;
+            i = addSpaces(i,comando);
             if(comando[i] == '\''){//delimitador
                 i++;
                 char delim = comando[i];
                 i++;
                 if(comando[i] == '\''){
                     i++;
-                    espacos = skipSpaces(comando+i);
-                    i+= espacos;
+                    i = addSpaces(i,comando);
                     if(comando[i] == ','){
                         i++;
-                        espacos = skipSpaces(comando+i);
-                        i+= espacos;
+                        i = addSpaces(i,comando);
                         if(comando[i] == '"'){
                         //guarda diretorio do ficheiro, usando strsep
                         //precisa de strcat para adicionar " no inicio sem ter espaços
@@ -191,13 +186,11 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
                         file[lenFile+1] = '\0';
                         lenFile++;
                         i+=lenFile;
-                        espacos = skipSpaces(comando+i);
-                        i+= espacos;
+                        i = addSpaces(i,comando);
                         printf("%s\n%c\n",file,comando[i]);
                         if(comando[i] == ')'){//encerrar da funçao
                             i++;
-                            espacos = skipSpaces(comando+i);
-                            i+= espacos;
+                            i = addSpaces(i,comando);
                             if(comando[i] == ';'){
                                 //executar toCSV
                                 TABLE t = varTable(v,var);
@@ -354,10 +347,10 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 char c;
                                 if(arg2[0] == '\'' && arg2[2] == '\''){
                                     c = arg2[1];
-                                    printf("query2  %c\n",c);
                                     TABLE t = businesses_started_by_letter(sgr, c);
                                     addVar(v,var,t);
-                                    
+                                    printf("Variavel %s guardada!\n",var);
+                                    free(arg1);free(arg2);
                                     return 1;
                                 } 
                                 free(arg1);free(arg2);

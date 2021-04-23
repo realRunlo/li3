@@ -27,8 +27,10 @@ TABLE init_Sized_Table(int size){
     return t;
 }
 void clearTable(TABLE t){
-    for(int i=0;i<t->entries;i++)
-        free(t->tab[i]);
+    if(t){
+        for(int i=0;i<t->entries;i++)
+            free(t->tab[i]);
+    }
 }
 void setEntries(TABLE t,int x){
     t->entries = x;
@@ -286,11 +288,14 @@ TABLE proj(TABLE x, char* cols){
 
 
 void printTable(TABLE t){
-    int entries = getEntries(t);
-    char * r;
-    for(int i = 0; i < entries;i++ ){
-    r = get_string_table(t,i);
-    printf("%d -> %s\n",i,r);
-    free(r);
+    if(t){
+        int entries = getEntries(t);
+        char * r;
+        for(int i = 0; i < entries;i++ ){
+        r = get_string_table(t,i);
+        printf("%d -> %s\n",i,r);
+        free(r);
+        }
     }
+    else printf("Table vazia.\n");
 }

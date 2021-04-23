@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #define BUFFER_SIZE 10000
+#define USERS_BUFFER_SIZE 100000
 
 /**
 \brief Lê informação de um ficheiro de reviews e guarda numa hashtable
@@ -35,28 +36,9 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
     
 }
 
-/*
-char* getCommand(){
-    char buff[200];
-    buff[0] = '\0';
-    char* input = malloc(sizeof(char) * 200);
-    input[0] = '\0';
-    size_t inputlen = 0, bufflen = 0;
-   do {
-       fgets(buff, 200, stdin);
-       bufflen = strlen(buff);
-       input = realloc(input, inputlen+bufflen+1);
-       strcat(input, buff);
-       inputlen += bufflen;
-    } while (bufflen==200-1 && buff[200-2]!='\n');
-    input[inputlen] ='\0';
-    return input;
-}
-*/
-#define USERS_BUFFER_SIZE 100000
+
 
 void readUser(GHashTable * table, char * filename){
-
     FILE* f;
     f = fopen(filename,"r");
     if (f==NULL){
@@ -67,32 +49,37 @@ void readUser(GHashTable * table, char * filename){
         User u;
         char buff[USERS_BUFFER_SIZE]; // espaco suficiente para os exemplos do input file
         buff[0] = '\0';
-        size_t inputlen = 0, bufflen = 0;
+        size_t linelen = USERS_BUFFER_SIZE, bufflen = 0 , maxlen = 0;
+        char * line = malloc(sizeof(char) * USERS_BUFFER_SIZE);
         if(fgets(buff,USERS_BUFFER_SIZE,f)){ // ignora primeira linha 
         int read = 0;
         while(fgets(buff,USERS_BUFFER_SIZE,f))
         {
-            inputlen = 0, bufflen = 0;
-            char * line = malloc(sizeof(char) * USERS_BUFFER_SIZE);
             line[0] = '\0';
             bufflen = strlen(buff);
-            line = realloc(line, inputlen+bufflen+1);
+            maxlen = bufflen;
+            if (linelen <= bufflen){
+                linelen += maxlen + linelen;
+                line = realloc(line, linelen);
+            }
             strcat(line, buff);
-            inputlen += bufflen;
             while(bufflen == USERS_BUFFER_SIZE - 1 && buff[USERS_BUFFER_SIZE-2] != '\n'){
                 if(fgets(buff, USERS_BUFFER_SIZE, f)){
                 bufflen = strlen(buff);
-                line = realloc(line, inputlen+bufflen+1);
+                maxlen += bufflen;
+                if (linelen <= maxlen){
+                linelen += maxlen + linelen;
+                line = realloc(line, linelen);
+                }
                 strcat(line, buff);
-                inputlen += bufflen;
                 }
             }
             u = createUser(line);
             addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
-            free(line);
+            
         }
         }
-        
+        free(line);
     fclose(f);
     printf("Users loaded.\n");
 }
