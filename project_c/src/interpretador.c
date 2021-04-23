@@ -12,12 +12,15 @@ struct variavel{
 struct variaveis{
     VARIAVEL* variaveis;
     int entries;
+    int max;
 };
 
 VARIAVEIS  initVariaveis(){
     VARIAVEIS v = malloc(sizeof(struct variaveis)); 
     v->variaveis = malloc(sizeof(struct variavel) * 20); //apenas 20 variaveis disponiveis
     v->entries = 0;
+    v->max = 20;
+    for(int i = 0; i < 20; i++) v->variaveis[i] = NULL;
     return v;
 }
 
@@ -33,6 +36,33 @@ TABLE varTable(VARIAVEIS v, char* var){
         if(strcmp(v->variaveis[i]->variavel,var) == 0) found++;
     }
     return v->variaveis[i-1]->t;
+}
+
+void addVar(VARIAVEIS v, char* var, TABLE t){int i = 0;
+    if (v->entries == v->max){
+        v->max *= 2;
+        v->variaveis = realloc(v->variaveis,sizeof(struct variavel) * v->max);
+    }
+    VARIAVEL x = v->variaveis[0];
+    printf("aqui\n");
+    //procura por um lugar livre ou por uma variavel com o mesmo nome passado a funcao
+    while(x != NULL && strcmp(x->variavel,var) != 0){
+        i++;
+        x= v->variaveis[i];
+    }
+    //caso em que a variavel ja existe
+    if(strcmp(x->variavel,var) == 0){
+        clearTable(x->t);
+        x->t = t;
+    }
+    //caso de criar uma variavel nova
+    else{
+        
+        x = malloc(sizeof(struct variavel));
+        x->variavel = var;
+        x->t = t;
+        v->entries++;
+    }
 }
 
 
@@ -188,6 +218,22 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
     return -1;
 }
 
+//versao de getcomand com menos restricoes para os argumentos
+char* getVar(char* comando){
+    char *result = malloc(sizeof(char) * strlen(comando));
+    result[0] = '\0';
+    int i = 0, aflag = 0;
+    while((comando[i] != ' ' || aflag != 0) && comando[i] != ')'){
+        if(comando[i] == '"' && aflag ==0 ) aflag++;
+        else if(comando[i] == '"' && aflag ==1 ) aflag--;
+        result[i] = comando[i];
+        i++;
+    }
+    return result;
+
+
+}
+
 
 int functionId(char * function){
     if(strcmp(function, "fromCSV") == 0) return 0;
@@ -219,6 +265,7 @@ if(comando[i] == '('){
                 }
             }
 */
+
 
 //funcao para executar, caso a sintaxe esteja correta, a funcao dada a uma variavel
 int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS v){
@@ -266,7 +313,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 }
                 return -1;
             }
-            char* arg2 = commandString(comando+i);
+            char* arg2 = getVar(comando+i);
             i+= strlen(arg2);
             i = addSpaces(i,comando);
             if(funcao == 1 && check_variable(v,arg1) == 0){//filter
@@ -301,7 +348,19 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                     i = addSpaces(i,comando);
                     if(comando[i] == ';'){
                         switch(funcao){
-                            case(2):{printf("query2\n");free(arg1);free(arg2);return 1;}
+                            case(2):{
+                                char c;
+                                if(arg2[0] == '\'' && arg2[2] == '\''){
+                                    c = arg2[1];
+                                    printf("query2  %c\n",c);
+                                    TABLE t = businesses_started_by_letter(sgr, c);
+                                    addVar(v,var,t);
+                                    
+                                    return 1;
+                                } 
+                                free(arg1);free(arg2);
+                                return -1;
+                                }
                             case(3):{printf("query3\n");free(arg1);free(arg2);return 1;}
                             case(4):{printf("query4\n");free(arg1);free(arg2);return 1;}
                             case(6):{printf("query6\n");free(arg1);free(arg2);return 1;}
@@ -457,7 +516,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
 
 //funcao principal que ira receber os comandos e interpreta-los
 int interpretador(){
-    SGR  sgr = NULL;//= load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
+    SGR  sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
     VARIAVEIS v = initVariaveis();
     v->variaveis[0] = malloc(sizeof(struct variavel));
     v->variaveis[0]->variavel = strdup("x");

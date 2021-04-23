@@ -270,3 +270,15 @@ TABLE proj(TABLE x, char* cols){
     }
     return r;
 }
+
+
+
+void printTable(TABLE t){
+    int entries = getEntries(t);
+    char * r;
+    for(int i = 0; i < entries;i++ ){
+    r = get_string_table(t,i);
+    printf("%d -> %s\n",i,r);
+    free(r);
+    }
+}

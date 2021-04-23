@@ -22,6 +22,7 @@ void toCSV (TABLE x,char* delim, char* name);
 TABLE fromCSV (char* file, char* delim);
 TABLE proj(TABLE x, char* cols);
 
+void printTable(TABLE t);
 
 
 #endif //___TABLE_H___
