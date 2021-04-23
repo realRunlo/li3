@@ -114,6 +114,11 @@ void printPage_table(TABLE t,int current_page){
     int total_pages,bottom,top,while_Iterator;
     char * str_zero;
     total_pages = total_entries/MAXTPAGE + 1;
+    
+    if(current_page+1 > total_pages){
+        printf("ERROR: page not found\n");
+        return;
+    }
 
     if(total_entries<MAXTPAGE){ // quando só tem uma pagina como menos entradas das que é suposto imprimir por pagina
         total_pages = 1;
@@ -135,6 +140,7 @@ void printPage_table(TABLE t,int current_page){
             countCols++;
     }
     int * biggers = getBlen_str(t);
+    printf("%d--%d\n",biggers[0],biggers[1]);
     for(int i=bottom;i<top;i++){
 
         str_zero = strdup(t->tab[i]);
@@ -150,7 +156,7 @@ void printPage_table(TABLE t,int current_page){
         int space_left = (biggers[while_Iterator]+MARGIN-str_length)/2;
         int space_rigth = (biggers[while_Iterator]+MARGIN-space_left-str_length);
 
-        printN_space(space_left);
+        printN_space(space_left-1);
         printf("%s",seped);
         printN_space(space_rigth);
         printf("|");

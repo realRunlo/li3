@@ -797,7 +797,7 @@ void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 @returns TABLE apontador para struct table
 */
 TABLE reviews_with_word(SGR sgr,char * word){
-    int max_lines = g_hash_table_size(sgr->hashT_reviews) + 1;
+    int max_lines = g_hash_table_size(sgr->hashT_reviews);
     Query9 query_data = malloc(sizeof(struct query9));
     query_data->t = init_Sized_Table(max_lines);
     query_data->word = strdup(word);
