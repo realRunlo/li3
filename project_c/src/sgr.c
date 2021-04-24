@@ -85,7 +85,6 @@ typedef struct query7{
     GHashTable * h_user_visitado;
     GHashTable * hashT_businesses;
     char * state_atual;
-    int total;
     GHashTable * h_state;
 }*Query7;
 
@@ -343,7 +342,6 @@ static void check_state_iterator(gpointer key, gpointer value, gpointer user_dat
         }
         if((g_hash_table_size(data->h_state))>=2){
             setNewLine(data->t,key);
-            data->total++;
         }
     } 
 }
@@ -738,21 +736,17 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    char ind [15] = "user_id;total";
+    char ind [15] = "user_id";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
     pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
     pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
-    pro->total = 0;
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query7_iterator,pro);
     g_hash_table_foreach(pro->h_user_visitado, (GHFunc)check_state_iterator,pro);
     g_hash_table_destroy(pro->h_state);
     g_hash_table_destroy(pro->hashT_businesses);
     g_hash_table_foreach(pro->h_user_visitado, destroy, NULL);
     g_hash_table_destroy(pro->h_user_visitado);
-    char total [2];
-    sprintf(total,"%d",pro->total);
-    setNewLine(pro->t,total);
     return pro->t;
 }
 
