@@ -22,6 +22,14 @@ void toCSV (TABLE x,char* delim, char* name);
 TABLE fromCSV (char* file, char* delim);
 TABLE proj(TABLE x, char* cols);
 
+typedef enum oper{
+    LT = -1,
+    EQ = 0,
+    GT = 1,
+}OPERADOR;
+
+TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op);
+
 void printTable(TABLE t);
 
 

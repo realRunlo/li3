@@ -19,8 +19,6 @@ int check_line (char *str);
 
 void add_b (Business *b, char *str,int p);
 
-void read_file (GHashTable * hash, char fic []);
-
 Business create_b (char *str);
 
 #endif //___BUSINESS_H___

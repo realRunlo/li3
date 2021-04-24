@@ -20,7 +20,7 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
         char * buffer = malloc(BUFFER_SIZE);
         fgets(buffer,BUFFER_SIZE,fp);
         Reviews rev;
-        while(fgets(buffer,BUFFER_SIZE,fp)!=NULL){
+        while(fgets(buffer,BUFFER_SIZE,fp)!=NULL ){
             rev = addReview(rev,buffer);
             addToHashT(hTable,r_getReviewId(rev),rev);
         }
@@ -103,10 +103,7 @@ void readBusiness (GHashTable * hash, char fic [] ){
                 i++;
             }
         }
-        //int t = g_hash_table_size(hash);
-        //printf("%d\n",t);
-        //g_hash_table_foreach(hash, (GHFunc)iterator, "%s;%s;%s;%s;%s");
         printf("Business loaded.\n");
     }
-    else printf("ERROR opening file\n");
+    else  perror("ERROR: ");
 }

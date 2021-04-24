@@ -527,11 +527,10 @@ void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
             char* b_state = get_state(b);
             g_hash_table_insert(data->h_state, b_state,"a");
         }
-        if((g_hash_table_size(data->h_state))>=2)
-
-            
+        if((g_hash_table_size(data->h_state))>=2){
             setNewLine(data->t,key);
             data->total++;
+        }
     } 
 }
 

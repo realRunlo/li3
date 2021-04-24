@@ -265,31 +265,84 @@ TABLE fromCSV (char* file, char* delim){
     return t;
 }
 
-
 TABLE proj(TABLE x, char* cols){
-    TABLE r = init_Sized_Table(getEntries(x));
+    TABLE rq = init_Sized_Table(getEntries(x));
     char s [2] =";";
     char * str = get_string_table(x,0);  
     char *token = strtok(str,s);
     int col = 0;
-    while(token != NULL && (strcmp(token,cols)!= 0)) {
+    int r = 0;
+    while(token != NULL && r == 0) {
+        if(strcmp(token,cols)== 0){r = 1;setNewLine(rq,token);break;}
         token = strtok(NULL, s);
         col++;
     }
-    setNewLine(r,token);
-    
-    for(int j = 1;get_string_table(x,j)!=NULL;j++ ){
-        char * res = get_string_table(x,j);
-        char *aux = strtok(res,s);
-        int t = 0;
-        while(aux != NULL && t<col) {
-            aux = strtok(NULL, s);
-            t++;
+    if (r == 1){
+        for(int j = 1;j<getEntries(x);j++ ){
+            char * res = get_string_table(x,j);
+            char *aux = strtok(res,s);
+            int t = 0;
+            while(aux != NULL && t<col) {
+                aux = strtok(NULL, s);
+                t++;
+            }
+            setNewLine(rq,aux);
         }
-        setNewLine(r,aux);
+        clearTable(x);
+        return rq;
+    }else {
+        clearTable(x);
+        clearTable(rq);
+        printf("Coluna inexistente\n");
+        TABLE z = init_Sized_Table(0);
+        return z; 
     }
-    return r;
+        
 }
+
+
+TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
+    TABLE comp = proj(x,column_name);
+    if (getEntries(comp)!=0){
+        TABLE res = init_Sized_Table(getEntries(x));
+        char * r;
+        switch (op){
+        case 0:
+            for(int i = 0; i < getEntries(comp);i++ ){
+                r = get_string_table(comp,i);
+                int c = strcmp (r,value);
+                if (c == op)
+                    setNewLine(res,r);
+                }
+            break;
+        case -1: 
+                for(int i = 0; i < getEntries(comp);i++ ){
+                    r = get_string_table(comp,i);
+                    int c = strcmp (r,value);
+                    if (c <= op)
+                        setNewLine(res,r);
+                }
+                break;
+
+        default:
+                for(int i = 0; i < getEntries(comp);i++ ){
+                    r = get_string_table(comp,i);
+                    int c = strcmp (r,value);
+                    if (c >= op)
+                        setNewLine(res,r);
+                }
+
+            break;
+        }
+        free (r);
+        return res;
+    }else {
+        TABLE z = init_Sized_Table(0);
+        return z; 
+    }
+
+}
+
 
 
 
