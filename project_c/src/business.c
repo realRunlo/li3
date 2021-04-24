@@ -37,7 +37,7 @@ Business create_b (char *str){
     b->name = strdup(strsep(&str,";"));
     b->city = strdup(strsep(&str,";"));
     b->state = strdup(strsep(&str,";"));
-    b->categories = strdup(strsep(&str,";")); 
+    b->categories = strdup(strsep(&str,"\n")); 
     return b;
 }
 char * get_id(Business b){
