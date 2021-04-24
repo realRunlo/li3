@@ -2,7 +2,9 @@
 #define ___READING_H___
 #include "structs.h"
 
-GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * table);
+void  readReviews(GHashTable * table,char * filename);
 
-void readBusiness (GHashTable * hash, char fic [] );
+void readUser(GHashTable * table, char * filename);
+
+void readBusiness (GHashTable * hash, char * filename );
 #endif //___READING_H___

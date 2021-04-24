@@ -18,21 +18,6 @@ GHashTable * getHashT_reviews(SGR sgr){
     return sgr->hashT_reviews;
 }
 
-//free de um elemento da hash_table
-void free_a_hash_table_entry (gpointer key, gpointer value, gpointer user_data)
-{
-    g_free (key);
-    g_free (value);
-}
-
-
-//free de uma hash_table
-void free_all_key_value_entries (GHashTable* table)
-{
-    g_hash_table_foreach (table, free_a_hash_table_entry, NULL);
-    g_hash_table_destroy (table);
-}
-
 
 /**
 \brief Inicializador de dados SGR
@@ -55,13 +40,20 @@ void free_sgr(SGR sgr){
  
 }
 */
+/**
+\brief Carrega ficheiros para uma struct sgr
+@param users_file - nome do ficheiro de users
+@param buinesses_file - nome de ficheiro de businesses
+@param reviews_file - nome de ficheiro de reviews
+@returns sgr_load - stuct sgr
+*/
 SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     
     SGR sgr_load = init_sgr();
 
     printf("Loading...\n");
 
-    mapToHash_ReviewsFile(reviews_file,sgr_load->hashT_reviews);
+    readReviews(sgr_load->hashT_reviews,reviews_file);
     
     readUser(sgr_load->hashT_users,users_file);
 

@@ -12,11 +12,6 @@
 typedef struct sgr * SGR;
 
 
-GHashTable * getHashT_reviews(SGR sgr);
-
-void free_a_hash_table_entry (gpointer key, gpointer value, gpointer user_data);
-
-void free_all_key_value_entries (GHashTable* table);
 
 SGR init_sgr();
 void free_sgr(SGR sgr);

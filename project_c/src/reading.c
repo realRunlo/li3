@@ -9,11 +9,10 @@
 
 /**
 \brief Lê informação de um ficheiro de reviews e guarda numa hashtable
-@param filename string
+@param filename - nome do ficheiro
 @param htable apontador para uma tabela de hash
-@returns hTable apontador para uma tabela de hash
 */
-GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
+void readReviews(GHashTable * hTable,char * filename){
 
     FILE *  fp = fopen(filename,"r");
     if(fp!=NULL){
@@ -28,7 +27,6 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
         free(buffer);
         fclose(fp);
         printf("Reviews loaded.\n");
-        return hTable;
     }else{
         perror("ERROR: ");
     }
@@ -36,8 +34,11 @@ GHashTable *  mapToHash_ReviewsFile(char *filename,GHashTable * hTable){
     
 }
 
-
-
+/**
+\brief Lê informação de um ficheiro de users e guarda numa hashtable
+@param filename - nome do ficheiro
+@param htable apontador para uma tabela de hash
+*/
 void readUser(GHashTable * table, char * filename){
     FILE* f;
     f = fopen(filename,"r");
@@ -82,14 +83,18 @@ void readUser(GHashTable * table, char * filename){
         free(line);
     fclose(f);
     printf("Users loaded.\n");
-}
+    }
 }
 
-
-void readBusiness (GHashTable * hash, char fic [] ){
+/**
+\brief Lê informação de um ficheiro de businesses e guarda numa hashtable
+@param filename - nome do ficheiro
+@param htable apontador para uma tabela de hash
+*/
+void readBusiness (GHashTable * hash, char * filename ){
     char buffer [5000];
     Business b;
-    FILE *f = fopen(fic,"r");
+    FILE *f = fopen(filename,"r");
 
     if(f!=NULL){
         int i=0;

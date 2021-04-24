@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+/*  ----------private----------  */
 struct reviews{
     char * review_id;
     char * user_id;
@@ -15,11 +15,94 @@ struct reviews{
     char * text;
 };
 
+/*  ----------public----------  */
+
 /**
-\brief Mapea dados de uma linha de texto para uma estrutrutua review
+\brief Devolve campo review_id
 @param rev apontador para struct reviews
+@returns char *
+*/
+char * r_getReviewId(Reviews  rev){
+    return strdup(rev->review_id);
+}
+
+/**
+\brief Devolve campo user_id
+@param rev apontador para struct reviews
+@returns char *
+*/
+char * r_getUserId(Reviews  rev){
+    return strdup(rev->user_id);
+}
+
+/**
+\brief Devolve campo business_id
+@param rev apontador para struct reviews
+@returns char *
+*/
+char * r_getBusinessId(Reviews  rev){
+    return strdup(rev->business_id);
+}
+
+/**
+\brief Devolve campo stars
+@param rev apontador para struct reviews
+@returns float
+*/
+float r_getStars(Reviews  rev){
+    return rev->stars;
+}
+
+/**
+\brief Devolve campo useful
+@param rev Apontador para struct reviews
+@returns int
+*/
+int r_getUseful(Reviews  rev){
+    return rev->useful;
+}
+
+/**
+\brief Devolve campo funny
+@param rev Apontador para struct reviews
+@returns int
+*/
+int r_getFunny(Reviews  rev){
+    return rev->funny;
+}
+
+/**
+\brief Devolve campo cool
+@param rev Apontador para struct reviews
+@returns int
+*/
+int r_getCool(Reviews  rev){
+    return rev->cool;
+}
+
+/**
+\brief Devolve campo date
+@param rev Apontador para struct reviews
+@returns char *
+*/
+char *  r_getDate(Reviews  rev){
+    return strdup(rev->date);
+}
+
+/**
+\brief Devolve campo text
+@param rev Apontador para struct reviews
+@returns char *
+*/
+char * r_getText(Reviews rev){
+    return strdup(rev->text);
+}
+
+/**
+\brief Mapea dados para uma struct review
+@param rev Apontador para struct reviews
 @param str string
-@returns rev apontador para struct reviews
+@returns REVIEWS
 */
 Reviews addReview(Reviews  rev,char * str){
     rev = malloc(sizeof(struct reviews));
@@ -33,34 +116,5 @@ Reviews addReview(Reviews  rev,char * str){
     rev->date = strdup(strsep(&str,";"));
     rev->text = strdup(strsep(&str,"\n"));
     return rev;
-}
-
-char * r_getReviewId(Reviews  rev){
-    return strdup(rev->review_id);
-}
-char * r_getUserId(Reviews  rev){
-    return strdup(rev->user_id);
-}
-char * r_getBusinessId(Reviews  rev){
-    return strdup(rev->business_id);
-}
-
-int r_getStars(Reviews  rev){
-    return rev->stars;
-}
-int r_getUseful(Reviews  rev){
-    return rev->useful;
-}
-int r_getFunny(Reviews  rev){
-    return rev->funny;
-}
-int r_getCool(Reviews  rev){
-    return rev->cool;
-}
-char *  r_getDate(Reviews  rev){
-    return strdup(rev->date);
-}
-char * r_getText(Reviews rev){
-    return strdup(rev->text);
 }
 

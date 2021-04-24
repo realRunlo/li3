@@ -1,34 +1,52 @@
 #include "../includes/user.h"
 #include <stdio.h>
 
+
+/*  ----------private----------  */
 struct user{
     char * user_id;
     char * name;
     char * friends;
 };
 
+/*  ----------public----------  */
+
+/**
+\brief Devolve campo user_id
+@param u Apontador para struct user
+@returns char * - string com o user id
+*/
 char * getUserId(User u){
     return strdup(u->user_id);
 }
 
-void setUserId(User u, char* newUserId){
-    //printf("%s\n",newUserId);
-    u->user_id = strdup(newUserId);
-}
-
-
+/**
+\brief Devolve campo name
+@param u Apontador para struct user
+@returns char * - string com o nome
+*/
 char * getUserName(User u){
     return strdup(u->name);
 }
+
+/**
+\brief Devolve campo friend
+@param u Apontador para struct user
+@returns char * - string com os friends
+*/
+char * getFriends(User u){
+    return strdup(u->friends);
+}
+
+void setUserId(User u, char* newUserId){
+    u->user_id = strdup(newUserId);
+}
+
 
 void setName(User u, char* newName){
     u->name = strdup(newName);
 }
 
-char * getFriends(User u){
-
-    return strdup(u->friends);
-}
 
 void setFriends(User u, char* newFriends){
     u->friends = strdup(newFriends);
@@ -40,6 +58,11 @@ void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
  printf(user_data, getUserId((User) value),getUserName((User) value),getFriends((User) value));
 }
 
+/**
+\brief Mapea dados para uma struct user
+@param buffer Buffer com informação
+@returns USER - apontador struct user
+*/
 User createUser(char * buffer){
     User u = malloc(sizeof(struct user));
     u->user_id = strdup(strsep(&buffer,";"));

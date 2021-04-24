@@ -17,3 +17,12 @@ gpointer lookUpHashT(GHashTable * ht,char * tofind){
     return rt;
 }
 
+void free_a_hash_table_entry (gpointer key, gpointer value, gpointer user_data){
+    g_free (key);
+    g_free (value);
+}
+
+void free_all_key_value_entries (GHashTable* table){
+    g_hash_table_foreach (table, free_a_hash_table_entry, NULL);
+    g_hash_table_destroy (table);
+}
