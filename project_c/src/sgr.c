@@ -750,7 +750,6 @@ TABLE international_users (SGR sgr){
     g_hash_table_destroy(pro->hashT_businesses);
     g_hash_table_foreach(pro->h_user_visitado, destroy, NULL);
     g_hash_table_destroy(pro->h_user_visitado);
-    free(pro->state_atual);
     char total [2];
     sprintf(total,"%d",pro->total);
     setNewLine(pro->t,total);
