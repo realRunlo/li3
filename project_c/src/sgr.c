@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-
+/*  ----------private structs----------  */
 struct sgr{
 
     GHashTable * hashT_users;
@@ -13,103 +13,17 @@ struct sgr{
 
 };
 
-
-GHashTable * getHashT_reviews(SGR sgr){
-    return sgr->hashT_reviews;
-}
-
-
 /**
-\brief Inicializador de dados SGR
-@returns new_sgr stuct sgr
+\brief struct query2 para usar no iterator
 */
-SGR init_sgr(){
-
-    SGR new_sgr = malloc(sizeof(struct sgr));
-
-    new_sgr->hashT_users = initHashT();
-    new_sgr->hashT_reviews= initHashT();
-    new_sgr->hashT_businesses = initHashT();
-
-    return new_sgr;
-}
-
-/*
-void free_sgr(SGR sgr){
-    free(sgr);    //not working
- 
-}
-*/
-/**
-\brief Carrega ficheiros para uma struct sgr
-@param users_file - nome do ficheiro de users
-@param buinesses_file - nome de ficheiro de businesses
-@param reviews_file - nome de ficheiro de reviews
-@returns sgr_load - stuct sgr
-*/
-SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
-    
-    SGR sgr_load = init_sgr();
-
-    printf("Loading...\n");
-
-    readReviews(sgr_load->hashT_reviews,reviews_file);
-    
-    readUser(sgr_load->hashT_users,users_file);
-
-    readBusiness(sgr_load->hashT_businesses,buinesses_file);
-    return sgr_load;
-}
-
-
-
-//struct used to store results found by query2_iterator
 typedef struct query2{
-        char** result; //[business1],[business2],[...]
+        char** result;
         char letter;
         int column;
         int total;
 }*Query2;
 
-// Iterator for query2
-void query2_iterator(gpointer key, gpointer value, gpointer user_data){
-    char* name = get_name((Business) value);
-    Query2 data = (Query2) user_data;
-    char letter = data->letter;
-    if(name[0] == letter){ 
-        int col = data->column;
-        data->result[col] = malloc(strlen(name) * sizeof(char));
-        data->result[col] = name;
-        data->column++;
-        data->total++;
-    }
-}
-
-
-/* query 2 */
-//list of businesses whose name starts with char "letter"
-TABLE businesses_started_by_letter(SGR sgr, char letter){
-    int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
-    Query2 process = malloc(sizeof(struct query2));
-    char* firstLine = "business_name";
-    process->letter = letter;
-    process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
-    process->result[0] = strdup(firstLine);
-    process->column = 1;
-    process->total = 0;
-    //search every key in the hash for a business name starting with letter
-    //if one is found, then result and total are updated 
-    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)query2_iterator,process);
-    
-    //turning the results from process into TABLE
-    TABLE result = initTable();
-    setTab(result,process->result);
-    setEntries(result,process->total);
-    //free();
-    return result;
-}
-
-/* query 3 
+/* 
 Dado um id de negócio, determinar a sua informação: nome,
 cidade,estado,stars,e número total reviews
 query 3*/
@@ -118,39 +32,6 @@ typedef struct query3{
         int total;
 }*Query3;
 
-void q3_iterator (gpointer key, gpointer value, gpointer user_data){
-    char* b_id = r_getBusinessId((Reviews) value);
-    Query3 data = (Query3) user_data;
-    char* l = strdup(data->b_id);
-    if(strcmp(b_id,l) == 0)
-        data->total+=1;
-}
-
-TABLE business_info (SGR sgr, char* business_id){
-    TABLE r = init_Sized_Table(2);
-    char indicador [50] = "total;b_id;b_nome;b_city;b_state;b_categories";
-    setNewLine(r,indicador);
-    Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
-                                            GINT_TO_POINTER(business_id));
-    char* b_name = get_name(b);
-    char* b_c = get_city(b);
-    char* b_s = get_state(b);
-    char* b_cat = get_categ(b);
-    
-    Query3 pro = malloc(sizeof(struct query3));
-    pro->b_id = strdup (business_id);
-    pro->total = 0;
-    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)q3_iterator,pro);
-    char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(b_name) + 
-                        strlen(b_cat)+strlen(b_c)+ strlen(b_s)+10));
-    sprintf(res,"%d;%s;%s;%s;%s;%s",pro->total,business_id, b_name,b_c,b_s,b_cat);
-    setNewLine(r,res);
-    free(pro->b_id);   
-
-    return r;
-}
-
-
 typedef struct query4{
         char** result; //[business_id1,business1],[business_id2,business2][...]
         char* user_id;
@@ -158,52 +39,6 @@ typedef struct query4{
         int column;
 }*Query4;
 
-
-// Iterator for query4
-void query4_iterator(gpointer key, gpointer value, gpointer user_data){
-    Reviews r = (Reviews) value;
-    char* user_id = r_getUserId(r);
-    Query4 data = (Query4) user_data;
-
-    if(strcmp(user_id,data->user_id) == 0){
-        //Encontra o business correspondente ao business_id na review
-        int col = data->column;
-        char* b_id = r_getBusinessId(r);
-        Business b = (Business) g_hash_table_lookup(data->hashT_businesses,GINT_TO_POINTER(b_id));
-        char* b_name = get_name(b);
-        char* result = malloc( sizeof(char) * (strlen(b_name) + strlen(b_id) + 1));
-        //result = b_id,b_name
-        snprintf(result,strlen(b_name) + strlen(b_id) + 1,"%s;%s",b_id,b_name);
-        data->result[col] = result;
-        data->column++;
-        
-    }
-}
-
-
-/* query 4 */
-//searches for the business_id and name of every business a certain user has reviewed
-TABLE businesses_reviewed(SGR sgr, char *user_id){
-    int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
-    Query4 process = malloc(sizeof(struct query4));
-    char* firstLine = "b_id;b_name";
-    process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
-    process->result[0] = strdup(firstLine);
-    process->user_id = strdup(user_id);
-    process->hashT_businesses = sgr->hashT_businesses;
-    process->column = 1;
-    
-    //procura o user_id nas reviews
-    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query4_iterator, process);
-    TABLE result = initTable();
-    setTab(result,process->result);
-    setEntries(result,process->column);
-    free(process->user_id);
-    return result;
-}
-
-
-// query 5 
 //Dado um número n de stars e uma cidade, determinar a lista de negócios com n ou mais
 //stars na cidade.A informação associada a cada negócio deve ser o seu id e nome.
 typedef struct query5{
@@ -213,48 +48,6 @@ typedef struct query5{
         GHashTable * hashT_business;
         GHashTable * h_business_visitado;
 }*Query5;
-
-void query5_iterator(gpointer key, gpointer value, gpointer user_data){
-    Reviews r = ((Reviews)value);
-    float b_stars = r_getStars((Reviews) value);
-    Query5 data = (Query5) user_data;
-    char* city_data = strdup(data->city);
-    if(b_stars >= (data->stars)){
-        char* b_id = strdup(r_getBusinessId(r));
-        gboolean r = g_hash_table_insert(data->h_business_visitado,b_id,"a");
-        if(r){
-            Business b = (Business) g_hash_table_lookup(data->hashT_business,
-                                            GINT_TO_POINTER(b_id));
-            char* b_city = get_city(b);
-            if(strcmp(b_city,city_data) == 0){
-                char* b_name = get_name(b);
-                char* a = malloc( sizeof(char) * (strlen(b_id) + strlen(b_name) + 5));
-                sprintf(a,"%s;%s",b_id, b_name);
-                setNewLine(data->t,a);
-            }
-        }
-    }
-}
-
-TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
-    Query5 pro = malloc(sizeof(struct query5));
-    int max_lines = g_hash_table_size(sgr->hashT_businesses);
-    pro->t = init_Sized_Table(max_lines);
-    char ind [16] = "b_id;b_name";
-    setNewLine(pro->t,ind);
-    pro->city = strdup (city);
-    pro->stars = stars;
-    pro->hashT_business = sgr->hashT_businesses;
-    pro->h_business_visitado = g_hash_table_new(g_str_hash, g_str_equal);
-    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query5_iterator,pro);  
-    free(pro->city);
-    g_hash_table_destroy(pro->hashT_business);   
-    g_hash_table_destroy(pro->h_business_visitado);   
-    return pro->t;
-}
-
-
-
 
 //struct para guardar informacoes sobre os top negocios de cada cidade 
 typedef struct city{
@@ -284,11 +77,94 @@ typedef struct b_average_stars{
     float lowScore;
 }*B_AVERAGE_STARS;
 
+//Lista ids de utilizadores e o número total de utilizadores que tenham visitado mais 
+//de um estado,i.e. que tenham feito reviews em negócios de diferentes estados.
+
+typedef struct query7{
+    TABLE t;
+    GHashTable * h_user_visitado;
+    GHashTable * hashT_businesses;
+    char * state_atual;
+    int total;
+    GHashTable * h_state;
+}*Query7;
+
+typedef struct query9{
+        TABLE t;
+        char * word;
+}*Query9;
+
+/*  ----------private functions----------  */
+
+// Iterator for query2
+static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
+    char* name = get_name((Business) value);
+    Query2 data = (Query2) user_data;
+    char letter = data->letter;
+    if(name[0] == letter){ 
+        int col = data->column;
+        data->result[col] = malloc(strlen(name) * sizeof(char));
+        data->result[col] = name;
+        data->column++;
+        data->total++;
+    }
+}
+
+static void q3_iterator (gpointer key, gpointer value, gpointer user_data){
+    char* b_id = r_getBusinessId((Reviews) value);
+    Query3 data = (Query3) user_data;
+    char* l = strdup(data->b_id);
+    if(strcmp(b_id,l) == 0)
+        data->total+=1;
+}
 
 
+// Iterator for query4
+static void query4_iterator(gpointer key, gpointer value, gpointer user_data){
+    Reviews r = (Reviews) value;
+    char* user_id = r_getUserId(r);
+    Query4 data = (Query4) user_data;
+
+    if(strcmp(user_id,data->user_id) == 0){
+        //Encontra o business correspondente ao business_id na review
+        int col = data->column;
+        char* b_id = r_getBusinessId(r);
+        Business b = (Business) g_hash_table_lookup(data->hashT_businesses,GINT_TO_POINTER(b_id));
+        char* b_name = get_name(b);
+        char* result = malloc( sizeof(char) * (strlen(b_name) + strlen(b_id) + 1));
+        //result = b_id,b_name
+        snprintf(result,strlen(b_name) + strlen(b_id) + 1,"%s;%s",b_id,b_name);
+        data->result[col] = result;
+        data->column++;
+        
+    }
+}
+
+
+static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
+    Reviews r = ((Reviews)value);
+    float b_stars = r_getStars((Reviews) value);
+    Query5 data = (Query5) user_data;
+    char* city_data = strdup(data->city);
+    if(b_stars >= (data->stars)){
+        char* b_id = strdup(r_getBusinessId(r));
+        gboolean r = g_hash_table_insert(data->h_business_visitado,b_id,"a");
+        if(r){
+            Business b = (Business) g_hash_table_lookup(data->hashT_business,
+                                            GINT_TO_POINTER(b_id));
+            char* b_city = get_city(b);
+            if(strcmp(b_city,city_data) == 0){
+                char* b_name = get_name(b);
+                char* a = malloc( sizeof(char) * (strlen(b_id) + strlen(b_name) + 5));
+                sprintf(a,"%s;%s",b_id, b_name);
+                setNewLine(data->t,a);
+            }
+        }
+    }
+}
 
 //Cria uma hash com todas as diferentes cidades 
-void city_hash(gpointer key, gpointer value, gpointer user_data){
+static void city_hash(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
 
@@ -305,7 +181,7 @@ void city_hash(gpointer key, gpointer value, gpointer user_data){
 }
 
 //para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
-void b_add_stars(gpointer key, gpointer value, gpointer user_data){
+static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
     char *b_id = r_getBusinessId(r);
@@ -334,7 +210,7 @@ void b_add_stars(gpointer key, gpointer value, gpointer user_data){
 
 
 //verifica a cidade de cada business, e dependendo do seu average score, atualiza o top dessa cidade    
-void top_city(gpointer key, gpointer value, gpointer user_data){
+static void top_city(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
     GHashTable * b_same_name = data->b_same;
@@ -427,7 +303,7 @@ void top_city(gpointer key, gpointer value, gpointer user_data){
 }
 
 //torna os dados de uma cidade em formato de uma linha de TABLE
-void city_to_table(gpointer key, gpointer value, gpointer user_data){
+static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     TABLE result = (TABLE) user_data;
     CITY c = (CITY) value;
     int j = 0 ,k = 0, length = 0 ;
@@ -452,61 +328,7 @@ void city_to_table(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-
-/* query 6 */
-//searches for the top n businesses from each city
-TABLE top_businesses_by_city(SGR sgr, int top){
-    B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
-    process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
-    process->sgr = sgr;
-    process->cities = initHashT(); //hash para descobrir o numero total de cidades diferentes 
-    process->top = top;
-
-    printf("Making city hashTable...");
-    //cria table em q cada elemento e uma cidade distinta
-    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)city_hash, process);
-    printf("Done!\n");
-    int total_cities = g_hash_table_size(process->cities);
-
-    printf("Calculating average stars of each business...");
-    //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
-    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_add_stars, process);
-    printf("Done!\n");
-    
-    printf("Calculating top of each city...");
-    //para cada business verifica a cidade a que pertence e verifica se pertence ao top dessa cidade
-    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)top_city, process);
-    printf("Done!\n");
-    
-
-    TABLE result = initTable();
-    setEntries(result,0);
-    setTab(result,malloc(sizeof(char*) * (total_cities + 1)));
-    setNewLine(result,"city-stars;b_id;b_name-");
-    
-    printf("Turning data into TABLE structure...\n");
-    g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
-     printf("Done!\n"); 
-
-    free_all_key_value_entries(process->b_same);   
-    free_all_key_value_entries(process->cities);     
-    return result;
-}
-
-//query 7
-//Lista ids de utilizadores e o número total de utilizadores que tenham visitado mais 
-//de um estado,i.e. que tenham feito reviews em negócios de diferentes estados.
-
-typedef struct query7{
-    TABLE t;
-    GHashTable * h_user_visitado;
-    GHashTable * hashT_businesses;
-    char * state_atual;
-    int total;
-    GHashTable * h_state;
-}*Query7;
-
-void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
+static void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
     Query7 data = (Query7) user_data;
     data->h_state = g_hash_table_new(g_str_hash, g_str_equal);
     int t = g_slist_length((GSList*)value);
@@ -526,9 +348,7 @@ void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
     } 
 }
 
-
-
-void query7_iterator(gpointer key, gpointer value, gpointer user_data){
+static void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     char* user_id = strdup(r_getUserId((Reviews) value));
     char* b_id =  strdup(r_getBusinessId((Reviews) value));
     Query7 data = (Query7) user_data;
@@ -539,32 +359,7 @@ void destroy(gpointer key, gpointer value, gpointer data) {
  g_slist_free(value);
 }
 
-TABLE international_users (SGR sgr){
-    Query7 pro = malloc(sizeof(struct query7));
-    int max_lines = g_hash_table_size(sgr->hashT_reviews);
-    pro->t = init_Sized_Table(max_lines);
-    char ind [15] = "user_id;total";
-    setNewLine(pro->t,ind);
-    pro->hashT_businesses=sgr->hashT_businesses;
-    pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
-    pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
-    pro->total = 0;
-    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query7_iterator,pro);
-    g_hash_table_foreach(pro->h_user_visitado, (GHFunc)check_state_iterator,pro);
-    g_hash_table_destroy(pro->h_state);
-    g_hash_table_destroy(pro->hashT_businesses);
-    g_hash_table_foreach(pro->h_user_visitado, destroy, NULL);
-    g_hash_table_destroy(pro->h_user_visitado);
-    free(pro->state_atual);
-    char total [2];
-    sprintf(total,"%d",pro->total);
-    setNewLine(pro->t,total);
-    return pro->t;
-}
-
-
-
-int cmp_category(char* c_condition,char* c_comparing){
+static int cmp_category(char* c_condition,char* c_comparing){
     int i = 0, j = 0;
     if(c_condition[0] == '\0' && c_comparing[0] == '\0') return 0;
     for(;c_comparing[j] != '\0' ;j++){
@@ -577,7 +372,7 @@ int cmp_category(char* c_condition,char* c_comparing){
 
 
 //para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
-void b_category(gpointer key, gpointer value, gpointer user_data){
+static void b_category(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
     char *b_id = r_getBusinessId(r);
@@ -609,12 +404,8 @@ void b_category(gpointer key, gpointer value, gpointer user_data){
 
 }
 
-
-
-
-
 //procura dentro da hash, os business com top score 
-void top_category(gpointer key, gpointer value, gpointer user_data){
+static void top_category(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     B_STARS b = (B_STARS) value;
     GHashTable * b_same_name = data->b_same;
@@ -701,9 +492,278 @@ void top_category(gpointer key, gpointer value, gpointer user_data){
     }   
 }
 
+static int wordInString(char *str,char * word){
+    char * buffer = malloc(strlen(str) + 1);
+    int j=0;
+    for(int i=0;str[i]!='\0';i++){
+        if((!isspace(str[i]) && !ispunct(str[i])) || str[i] == '\''){
+            buffer[j++] = str[i];
+        }else{
+            
+            buffer[j] = '\0';
+            if(strcmp(buffer,word)==0){
+                free(buffer);
+                return 1;
+            }
+            j = 0;
+            
+        }
+        
+    }
+     buffer[j] = '\0';
+        if(strcmp(buffer,word)==0){
+            free(buffer);
+            return 1;
+        }
+    free(buffer);
+    return 0;
+}
 
-/* query 8 */
-//calcula os top n negocios de uma dada categoria
+static void query9_iterator(gpointer key, gpointer value, gpointer user_data){ 
+    Query9 data = (Query9) user_data;
+    char * word = strdup(data->word);
+    char * txt = r_getText((Reviews) value);
+    
+    if(wordInString(txt,word))
+        setNewLine(data->t,r_getReviewId((Reviews) value));  
+   
+}
+
+
+/*  ----------public----------  */
+
+/**
+\brief Inicializador de dados SGR
+@returns new_sgr stuct sgr
+*/
+SGR init_sgr(){
+
+    SGR new_sgr = malloc(sizeof(struct sgr));
+
+    new_sgr->hashT_users = initHashT();
+    new_sgr->hashT_reviews= initHashT();
+    new_sgr->hashT_businesses = initHashT();
+
+    return new_sgr;
+}
+
+/**
+\brief Liberta espaço das tabelas de hash da estrutura sgr
+@param sgr - Apontador struct sgr
+@returns new_sgr stuct sgr
+*/
+void free_sgr(SGR sgr){
+    free_all_key_value_entries(sgr->hashT_users);
+    free_all_key_value_entries(sgr->hashT_businesses);
+    free_all_key_value_entries(sgr->hashT_reviews);
+}
+
+
+/**
+\brief QUERY1,carrega ficheiros para uma struct sgr
+@param users_file - nome do ficheiro de users
+@param buinesses_file - nome de ficheiro de businesses
+@param reviews_file - nome de ficheiro de reviews
+@returns sgr_load - stuct sgr
+*/
+SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
+    
+    SGR sgr_load = init_sgr();
+
+    printf("Loading...\n");
+
+    readReviews(sgr_load->hashT_reviews,reviews_file);
+    
+    readUser(sgr_load->hashT_users,users_file);
+
+    readBusiness(sgr_load->hashT_businesses,buinesses_file);
+    return sgr_load;
+}
+
+/**
+\brief QUERY2,procura os negócios cujo o nome começa com uma dada letra
+@param sgr - Apontador struct sgr
+@param letter - Letra
+@returns TABLE - stuct table
+*/
+TABLE businesses_started_by_letter(SGR sgr, char letter){
+    int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
+    Query2 process = malloc(sizeof(struct query2));
+    char* firstLine = "business_name";
+    process->letter = letter;
+    process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
+    process->result[0] = strdup(firstLine);
+    process->column = 1;
+    process->total = 0;
+    //search every key in the hash for a business name starting with letter
+    //if one is found, then result and total are updated 
+    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)query2_iterator,process);
+    
+    //turning the results from process into TABLE
+    TABLE result = initTable();
+    setTab(result,process->result);
+    setEntries(result,process->total);
+    //free();
+    return result;
+}
+/**
+\brief QUERY3,dado um id de negócio determinar sua informação
+@param sgr - Apontador struct sgr
+@param business_id - Id do negócio
+@returns TABLE - stuct table
+*/
+TABLE business_info (SGR sgr, char* business_id){
+    TABLE r = init_Sized_Table(2);
+    char indicador [50] = "total;b_id;b_nome;b_city;b_state;b_categories";
+    setNewLine(r,indicador);
+    Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
+                                            GINT_TO_POINTER(business_id));
+    char* b_name = get_name(b);
+    char* b_c = get_city(b);
+    char* b_s = get_state(b);
+    char* b_cat = get_categ(b);
+    
+    Query3 pro = malloc(sizeof(struct query3));
+    pro->b_id = strdup (business_id);
+    pro->total = 0;
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)q3_iterator,pro);
+    char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(b_name) + 
+                        strlen(b_cat)+strlen(b_c)+ strlen(b_s)+10));
+    sprintf(res,"%d;%s;%s;%s;%s;%s",pro->total,business_id, b_name,b_c,b_s,b_cat);
+    setNewLine(r,res);
+    free(pro->b_id);   
+
+    return r;
+}
+
+/**
+\brief QUERY4,dado um utilizador determina a lista de negócios aos quais fex review
+@param sgr - Apontador struct sgr
+@param user_id - Id do utilizador
+@returns TABLE - stuct table
+*/
+TABLE businesses_reviewed(SGR sgr, char *user_id){
+    int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
+    Query4 process = malloc(sizeof(struct query4));
+    char* firstLine = "b_id;b_name";
+    process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
+    process->result[0] = strdup(firstLine);
+    process->user_id = strdup(user_id);
+    process->hashT_businesses = sgr->hashT_businesses;
+    process->column = 1;
+    
+    //procura o user_id nas reviews
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query4_iterator, process);
+    TABLE result = initTable();
+    setTab(result,process->result);
+    setEntries(result,process->column);
+    free(process->user_id);
+    return result;
+}
+
+/**
+\brief QUERY5,determina a lista de negócios na dada cidade com n ou mais estrelas
+@param sgr - Apontador struct sgr
+@param stars - Estrelas
+@param city - Cidade
+@returns TABLE - stuct table
+*/
+TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
+    Query5 pro = malloc(sizeof(struct query5));
+    int max_lines = g_hash_table_size(sgr->hashT_businesses);
+    pro->t = init_Sized_Table(max_lines);
+    char ind [16] = "b_id;b_name";
+    setNewLine(pro->t,ind);
+    pro->city = strdup (city);
+    pro->stars = stars;
+    pro->hashT_business = sgr->hashT_businesses;
+    pro->h_business_visitado = g_hash_table_new(g_str_hash, g_str_equal);
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query5_iterator,pro);  
+    free(pro->city);
+    g_hash_table_destroy(pro->hashT_business);   
+    g_hash_table_destroy(pro->h_business_visitado);   
+    return pro->t;
+}
+
+/**
+\brief QUERY6,determina os top negócios de cada cidade
+@param sgr - Apontador struct sgr
+@param top - Top
+@returns TABLE - stuct table
+*/
+TABLE top_businesses_by_city(SGR sgr, int top){
+    B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
+    process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
+    process->sgr = sgr;
+    process->cities = initHashT(); //hash para descobrir o numero total de cidades diferentes 
+    process->top = top;
+
+    printf("Making city hashTable...");
+    //cria table em q cada elemento e uma cidade distinta
+    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)city_hash, process);
+    printf("Done!\n");
+    int total_cities = g_hash_table_size(process->cities);
+
+    printf("Calculating average stars of each business...");
+    //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_add_stars, process);
+    printf("Done!\n");
+    
+    printf("Calculating top of each city...");
+    //para cada business verifica a cidade a que pertence e verifica se pertence ao top dessa cidade
+    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)top_city, process);
+    printf("Done!\n");
+    
+
+    TABLE result = initTable();
+    setEntries(result,0);
+    setTab(result,malloc(sizeof(char*) * (total_cities + 1)));
+    setNewLine(result,"city-stars;b_id;b_name-");
+    
+    printf("Turning data into TABLE structure...\n");
+    g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
+     printf("Done!\n"); 
+
+    free_all_key_value_entries(process->b_same);   
+    free_all_key_value_entries(process->cities);     
+    return result;
+}
+
+/**
+\brief QUERY7,determina lista de utilizadores que tenham visitado mais de um estado
+@param sgr - Apontador struct sgr
+@returns TABLE - stuct table
+*/
+TABLE international_users (SGR sgr){
+    Query7 pro = malloc(sizeof(struct query7));
+    int max_lines = g_hash_table_size(sgr->hashT_reviews);
+    pro->t = init_Sized_Table(max_lines);
+    char ind [15] = "user_id;total";
+    setNewLine(pro->t,ind);
+    pro->hashT_businesses=sgr->hashT_businesses;
+    pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
+    pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
+    pro->total = 0;
+    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query7_iterator,pro);
+    g_hash_table_foreach(pro->h_user_visitado, (GHFunc)check_state_iterator,pro);
+    g_hash_table_destroy(pro->h_state);
+    g_hash_table_destroy(pro->hashT_businesses);
+    g_hash_table_foreach(pro->h_user_visitado, destroy, NULL);
+    g_hash_table_destroy(pro->h_user_visitado);
+    free(pro->state_atual);
+    char total [2];
+    sprintf(total,"%d",pro->total);
+    setNewLine(pro->t,total);
+    return pro->t;
+}
+
+/**
+\brief QUERY8,determina lista dos top n negócios que pertencem a uma determianda caegoria
+@param sgr - Apontador struct sgr
+@param top - Top
+@param category - Categoria
+@returns TABLE - stuct table
+*/
 TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
     process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
@@ -735,56 +795,10 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     return result;
 }
 
-int wordInString(char *str,char * word){
-    char * buffer = malloc(strlen(str) + 1);
-    int j=0;
-    for(int i=0;str[i]!='\0';i++){
-        if((!isspace(str[i]) && !ispunct(str[i])) || str[i] == '\''){
-            buffer[j++] = str[i];
-        }else{
-            
-            buffer[j] = '\0';
-            if(strcmp(buffer,word)==0){
-                free(buffer);
-                return 1;
-            }
-            j = 0;
-            
-        }
-        
-    }
-     buffer[j] = '\0';
-        if(strcmp(buffer,word)==0){
-            free(buffer);
-            return 1;
-        }
-    free(buffer);
-    return 0;
-}
-
-typedef struct query9{
-        TABLE t;
-        char * word;
-}*Query9;
-
- 
-void query9_iterator(gpointer key, gpointer value, gpointer user_data){ 
-    Query9 data = (Query9) user_data;
-    char * word = strdup(data->word);
-    char * txt = r_getText((Reviews) value);
-    
-    if(wordInString(txt,word))
-        setNewLine(data->t,r_getReviewId((Reviews) value));
-    
-        
-    
-   
-}
 /**
-\brief QUERY-9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
-@param sgr struct sgr
-@param top int
-@param word string
+\brief QUERY9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
+@param sgr - struct sgr
+@param word - Palavra a procurar
 @returns TABLE apontador para struct table
 */
 TABLE reviews_with_word(SGR sgr,char * word){

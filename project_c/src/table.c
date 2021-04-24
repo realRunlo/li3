@@ -8,6 +8,7 @@
 #define MAXTPAGE 10
 
 
+
 /*  ----------private----------  */
 struct table{
 
@@ -203,7 +204,7 @@ void printPage_table(TABLE t,int current_page){
     }
 
     char * seped;
-    char * str_c =strdup(t->tab[0]); 
+    char * str_c = strdup(t->tab[0]); 
     int countCols = 0;
     while((seped = strsep(&str_c,";"))){
             countCols++;
@@ -236,7 +237,8 @@ void printPage_table(TABLE t,int current_page){
 
     for(int j=0;j<countCols;j++){
             print_LineTops(biggers[j]+MARGIN);
-        }
+            
+    }
     printf("\n");
     printf("Page %d out of %d\n",current_page+1,total_pages);    
 }
