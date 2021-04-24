@@ -305,7 +305,8 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
 static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     TABLE result = (TABLE) user_data;
     CITY c = (CITY) value;
-    int j = 0 ,k = 0, length = 0 ;
+    int j = 0 ,k = 0;
+    size_t maxlength = 0 ;
     
     //printf("city: %s -> entries :%d\n",c->name,c->entries);
     
@@ -313,17 +314,17 @@ static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     //calcula o tamanho necessario para concatenar os dados dos negocios todos da cidade
     for(; j< c->entries;j++){ 
         //printf("%s\n",c->top[0]);
-        length += strlen(c->top[j]) + 2;
+        if (maxlength < strlen(c->top[j])) maxlength = strlen(c->top[j]);
         }
-    char  buff[length + j + strlen(c->name) + j + 1];
-    buff[0] = '\0';
+    char  buff[strlen(c->name) + maxlength + 1];
+    
     //concatena os dados dos negocios e coloca-os na table
-    snprintf(buff,strlen(c->name)+2,"%s-",c->name);
+    
     for(k=0 ; k<j;k++){
-        strcat(buff,c->top[k]);
-        strcat(buff,"-");
+        buff[0] = '\0';
+        snprintf(buff,strlen(c->name)+strlen(c->top[k]) + 2,"%s-%s",c->name,c->top[k]);
+        setNewLine(result,buff);
     }
-    setNewLine(result,buff);
     }
 }
 
@@ -715,7 +716,7 @@ TABLE top_businesses_by_city(SGR sgr, int top){
 
     TABLE result = initTable();
     setEntries(result,0);
-    setTab(result,malloc(sizeof(char*) * (total_cities + 1)));
+    setTab(result,malloc(sizeof(char*) * (total_cities * top + 1)));
     setNewLine(result,"city-stars;b_id;b_name-");
     
     printf("Turning data into TABLE structure...\n");
