@@ -5,3 +5,4 @@ project_c/Makefile
 project_c/exe
 project_c/Makefile
 project_c/Makefile
+project_c/src/main.c

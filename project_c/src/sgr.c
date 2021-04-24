@@ -322,7 +322,7 @@ static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     
     for(k=0 ; k<j;k++){
         buff[0] = '\0';
-        snprintf(buff,strlen(c->name)+strlen(c->top[k]) + 2,"%s-%s",c->name,c->top[k]);
+        snprintf(buff,strlen(c->name)+strlen(c->top[k]) + 2,"%s;%s",c->name,c->top[k]);
         setNewLine(result,buff);
     }
     }
@@ -717,7 +717,7 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     TABLE result = initTable();
     setEntries(result,0);
     setTab(result,malloc(sizeof(char*) * (total_cities * top + 1)));
-    setNewLine(result,"city-stars;b_id;b_name-");
+    setNewLine(result,"city;stars;business id;business name");
     
     printf("Turning data into TABLE structure...\n");
     g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);

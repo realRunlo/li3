@@ -157,9 +157,13 @@ int executeShow(char *comando,int i, VARIAVEIS v){
         //se existir ,executar o comando, caso contrario mostrar mensagem de erro
             if(check_variable(v,buff) == 0){
                 TABLE t = varTable(v,buff);
-                printTable(t);
-                free(buff);
-                return 1;
+                if(t){
+                    printPage_table(t,0);
+                    free(buff);
+                    return 1;
+                }
+                printf("Tabela vazia.\n");
+                return -1;
             }
             else{
                 printf("variavel nao existe\n");
@@ -360,7 +364,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                         switch(funcao){
                             case(2):{
                                 char c;
-                                if(arg2[0] == '\'' && arg2[2] == '\''){printf("6\n");
+                                if(arg2[0] == '\'' && arg2[2] == '\''){
                                     c = arg2[1];
                                     TABLE t = businesses_started_by_letter(sgr, c);
                                     addVar(v,var,t);
