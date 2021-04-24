@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#define MAX_VAR 2
 
 struct variavel{
     char* variavel;
@@ -15,51 +15,72 @@ struct variaveis{
     int max;
 };
 
+//inicia uma struct VARIAVEIS
 VARIAVEIS  initVariaveis(){
     VARIAVEIS v = malloc(sizeof(struct variaveis)); 
-    v->variaveis = malloc(sizeof(struct variavel) * 20); //apenas 20 variaveis disponiveis
+    v->variaveis = malloc(sizeof(struct variavel) * MAX_VAR);
     v->entries = 0;
-    v->max = 20;
+    v->max = MAX_VAR;
     return v;
 }
 
+//adiciona a i o numero de espacos seguidos a partir da posicao inicial
 int addSpaces(int i,char *comando){
     int espacos = skipSpaces(comando+i);
     i+= espacos; 
     return i;
 }
 
+//devolve a table de uma variavel caso ela exista
 TABLE varTable(VARIAVEIS v, char* var){
-    int j = 0,i = 0;
+    int i = 0;
     for(; i<v->entries; i++){
-        if(strcmp(v->variaveis[i]->variavel,var) == 0) return v->variaveis[j]->t;
+        if(strcmp(v->variaveis[i]->variavel,var) == 0) return v->variaveis[i]->t;
     }
     
     return NULL;
 }
 
-void addVar(VARIAVEIS v, char* var, TABLE t){int i = 0;
+//verifica se uma string corresponde a um float
+int isFloat(char* arg){
+    int ponto = 0, erro = 0;
+    if(arg[0] >= 48 && arg[0] <= 57){
+        for(int i = 1; arg[i] != '\0' && erro == 0; i++){
+            if(arg[i] >= 48 && arg[i] <= 57);
+            else if(arg[i] == '.' && (arg[i+1] >= 48 && arg[i+1] <= 57)  && ponto == 0) ponto++;
+                 else erro++;
+        }
+        return erro;
+    }
+    return -1;
+}
+
+//adiciona ou atualiza a variavel passada na lista de variaveis
+void addVar(VARIAVEIS v, char* var, TABLE t){
+    int i = 0, flag = 0;
     if (v->entries == v->max){
         v->max *= 2;
         v->variaveis = realloc(v->variaveis,sizeof(struct variavel) * v->max);
     }
     VARIAVEL x = v->variaveis[0];
-    
     //procura por um lugar livre ou por uma variavel com o mesmo nome passado a funcao
-    while(i<v->entries && strcmp(x->variavel,var) != 0){
+    while(x && flag == 0){
+        if(strcmp(x->variavel, var) == 0) flag++;
+        else{
         i++;
         x= v->variaveis[i];
+        }
     }
     //caso em que a variavel ja existe
-    if(strcmp(x->variavel,var) == 0){printf("entrei\n");
+    if(x != NULL){
         clearTable(x->t);
         x->t = t;
     } 
     //caso de criar uma variavel nova
     else{
-        x = malloc(sizeof(struct variavel));
-        x->variavel = strdup(var);
-        x->t = t;
+        v->variaveis[i] = malloc(sizeof(struct variavel));
+        v->variaveis[i]->variavel = strdup(var);
+        v->variaveis[i]->t = t;
         v->entries++;
     }
 }
@@ -115,7 +136,8 @@ char* commandString(char* c){
 int check_variable(VARIAVEIS v, char* variavel){
     int entries = v->entries;
     VARIAVEL * lista = v->variaveis;
-    for(int i = 0; i<entries; i++){
+    for(int i = 0; lista[i]; i++){
+        
         if(strcmp(lista[i]->variavel,variavel) == 0) return 0;
     }
     return 1;
@@ -217,13 +239,19 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
 char* getVar(char* comando){
     char *result = malloc(sizeof(char) * strlen(comando));
     result[0] = '\0';
-    int i = 0, aflag = 0;
-    while((comando[i] != ' ' || aflag != 0) && comando[i] != ')'){
+    int i = 0, aflag = 0, fim = 0;
+    while((comando[i] != ' ' || aflag != 0) && comando[i] != ')' && fim == 0&& comando[i] != '\0'){
         if(comando[i] == '"' && aflag ==0 ) aflag++;
         else if(comando[i] == '"' && aflag ==1 ) aflag--;
+        if(comando[i] == ',' && aflag == 0){//caso de virgula fora de ""
+            fim++;
+            i--;
+        }
         result[i] = comando[i];
         i++;
-    }
+        
+    } 
+    result[i] ='\0';
     return result;
 
 
@@ -242,29 +270,14 @@ int functionId(char * function){
     if(strcmp(function, "top_businesses_with_category") == 0) return 8;
     if(strcmp(function, "reviews_with_word") == 0) return 9;
     if(strcmp(function, "proj") == 0) return 10;
+    return -1;
 }
 
-/*
-if(comando[i] == '('){
-                i++;
-                i+=skipSpaces(comando+i);
-                if(comando[i] == ';'){
-                int k = v->entries;
-                v->variaveis[k] = malloc(sizeof(struct variavel));
-                v->variaveis[k]->variavel = strdup(buff);
-                v->variaveis[k]->t = initTable();
-                v->variaveis[k]->t = NULL;
-                v->entries++;
-                printf("variavel guardada\n");
-                return 1;
-                }
-            }
-*/
+
 
 
 //funcao para executar, caso a sintaxe esteja correta, a funcao dada a uma variavel
 int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS v){
-    printf("executar funçao\n");
     int funcao = functionId(function);
     int espacos = 0 , i = 0;
     if(comando[i] == '('){// 1ºargumento
@@ -274,11 +287,13 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
         i+= strlen(arg1);
         i = addSpaces(i,comando);
         if(funcao == 7){
-            if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){printf("1\n");
+            if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){
                 i++;
                 i = addSpaces(i,comando);
                 if(comando[i] == ';'){
-                    printf("query7\n");
+                    printf("variavel %s guardada!\n",var);
+                    TABLE t = international_users(sgr);
+                    addVar(v,var,t);
                     free(arg1);
                     return 1;
                 }
@@ -312,32 +327,32 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
             i+= strlen(arg2);
             i = addSpaces(i,comando);
             if(funcao == 1 && check_variable(v,arg1) == 0){//filter
-            if(comando[i] == ','){
-                i++;
-                i = addSpaces(i,comando);
-                char* arg3 = commandString(comando+i);
-                i+= strlen(arg3);
-                i = addSpaces(i,comando);
                 if(comando[i] == ','){
                     i++;
                     i = addSpaces(i,comando);
-                    char* arg4 = commandString(comando+i);
-                    i+= strlen(arg4);
+                    char* arg3 = commandString(comando+i);
+                    i+= strlen(arg3);
                     i = addSpaces(i,comando);
-                    if(comando[i] == ')'){
+                    if(comando[i] == ','){
                         i++;
                         i = addSpaces(i,comando);
-                        if(comando[i] == ';'){
-                            printf("filter(%s,%s,%s,%s)\n",arg1,arg2,arg3,arg4);
-                            free(arg1);free(arg2);free(arg3);free(arg4);
-                            return 1;
+                        char* arg4 = commandString(comando+i);
+                        i+= strlen(arg4);
+                        i = addSpaces(i,comando);
+                        if(comando[i] == ')'){
+                            i++;
+                            i = addSpaces(i,comando);
+                            if(comando[i] == ';'){
+                                printf("filter(%s,%s,%s,%s)\n",arg1,arg2,arg3,arg4);
+                                free(arg1);free(arg2);free(arg3);free(arg4);
+                                return 1;
+                            }
                         }
                     }
                 }
-             }
                 return -1;
             }
-            if(funcao == 2 || funcao == 3 || funcao == 4 || funcao == 6){//query de 2 argumentos
+            if(funcao == 2 || funcao == 3 || funcao == 4 || funcao == 6 || funcao == 9 ){//query de 2 argumentos
                 if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){
                     i++;
                     i = addSpaces(i,comando);
@@ -345,20 +360,54 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                         switch(funcao){
                             case(2):{
                                 char c;
-                                if(arg2[0] == '\'' && arg2[2] == '\''){
+                                if(arg2[0] == '\'' && arg2[2] == '\''){printf("6\n");
                                     c = arg2[1];
                                     TABLE t = businesses_started_by_letter(sgr, c);
                                     addVar(v,var,t);
-                                    printf("Variavel %s guardada!\n",var);
+                                    printf("variavel %s guardada!\n",var);
                                     free(arg1);free(arg2);
                                     return 1;
                                 } 
                                 free(arg1);free(arg2);
                                 return -1;
                                 }
-                            case(3):{printf("query3\n");free(arg1);free(arg2);return 1;}
-                            case(4):{printf("query4\n");free(arg1);free(arg2);return 1;}
-                            case(6):{printf("query6\n");free(arg1);free(arg2);return 1;}
+                            case(6):{
+                                int isDigit = 0;
+                                for(int i = 0; arg2[i] != '\0' && isDigit == 0; i++){
+                                    if(arg2[i] >= 48 && arg2[i] <= 57);
+                                    else isDigit++;
+                                }
+                                if(isDigit == 0){
+                                    int top = atoi(arg2);
+                                    if(top > 0){
+                                        TABLE t = top_businesses_by_city(sgr,top);
+                                        addVar(v,var,t);
+                                        printf("variavel %s guardada!\n",var);
+                                        free(arg1);free(arg2);
+                                        return 1;
+                                    }
+                                    printf("Utilize um valor maior que 0.\n");
+                                    free(arg1);free(arg2);
+                                    return 1;
+                                }
+                                free(arg1);free(arg2);
+                                return -1;
+                                }
+                            default:{ //query 3, 4 e 9
+                                if(arg2[0] == '"' && arg2[strlen(arg2)-1] == '"'){
+                                char* search = arg2+1;
+                                TABLE t;
+                                if(funcao == 3) t = business_info(sgr,strsep(&search,"\""));
+                                if(funcao == 4) t = businesses_reviewed(sgr,strsep(&search,"\""));
+                                if(funcao == 9) t = reviews_with_word(sgr,strsep(&search,"\""));
+                                addVar(v,var,t);
+                                printf("variavel %s guardada!\n",var);
+                                free(arg1);free(arg2);
+                                return 1;
+                                }
+                                free(arg1);free(arg2);
+                                return -1;
+                            }
                         }
                     }
                 }
@@ -368,21 +417,30 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 if(comando[i] == ',' && strcmp(arg1,"sgr") == 0){
                     i++;
                     i = addSpaces(i,comando);
-                    char* arg3 = commandString(comando+i);
+                    char* arg3 = getVar(comando+i);
                     i+= strlen(arg3);
                     i = addSpaces(i,comando);
                     if(comando[i] == ')'){
                         i++;
                         i = addSpaces(i,comando);
                         if(comando[i] == ';'){
-                            switch(funcao){
-                            case(5):{printf("query5\n");free(arg1);free(arg2);free(arg3);return 1;}
-                            case(8):{printf("query8\n");free(arg1);free(arg2);free(arg3);return 1;}
-                            case(9):{printf("query9\n");free(arg1);free(arg2);free(arg3);return 1;}
-                            }
+                            if(isFloat(arg2) == 0 && arg3[0] == '"' && arg3[strlen(arg3)-1] == '"'){
+                                float stars = atof(arg2);
+                                char* search = arg3+1;
+                                TABLE t;
+                                if(funcao == 5) t = businesses_with_stars_and_city(sgr,stars,strsep(&search,"\""));
+                                if(funcao == 8) t = top_businesses_with_category(sgr,stars,strsep(&search,"\""));
+                                addVar(v,var,t);
+                                printf("variavel %s guardada!\n",var);
+                                free(arg1);free(arg2);free(arg3);
+                                return 1;
+                                }
+                                printf("Insira argumentos validos.\n");
+                                free(arg1);free(arg2);free(arg3);
+                                return -1;
+                                }
                         }
                     }
-                }
                 return -1;
             }
             if(funcao == 10 && check_variable(v,arg1) == 0){//proj
