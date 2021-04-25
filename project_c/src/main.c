@@ -33,6 +33,7 @@ int main(){
     TABLE t = international_users(sgr);                                //teste query 7
     
     //toCSV(t,";","file");
+    //TABLE t = fromCSV("file",";");
     //TABLE t = fromCSV("file.csv",";");
    // TABLE a = proj( t, "b_id");
     char * r;

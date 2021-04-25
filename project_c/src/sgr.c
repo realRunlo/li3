@@ -147,7 +147,7 @@ static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
     char* city_data = strdup(data->city);
     if(b_stars >= (data->stars)){
         char* b_id = strdup(r_getBusinessId(r));
-        gboolean r = g_hash_table_insert(data->h_business_visitado,b_id,"a");
+        gboolean r = g_hash_table_insert(data->h_business_visitado,b_id,NULL);
         if(r){
             Business b = (Business) g_hash_table_lookup(data->hashT_business,
                                             GINT_TO_POINTER(b_id));
@@ -339,7 +339,7 @@ static void check_state_iterator(gpointer key, gpointer value, gpointer user_dat
             Business b = (Business) g_hash_table_lookup(data->hashT_businesses,
                                             GINT_TO_POINTER(b_id));
             char* b_state = get_state(b);
-            g_hash_table_insert(data->h_state, b_state,"a");
+            g_hash_table_insert(data->h_state, b_state,NULL);
         }
         if((g_hash_table_size(data->h_state))>=2){
             setNewLine(data->t,key);
@@ -630,7 +630,6 @@ TABLE business_info (SGR sgr, char* business_id){
                         strlen(b_cat)+strlen(b_c)+ strlen(b_s)+10));
     sprintf(res,"%d;%s;%s;%s;%s;%s",pro->total,business_id, b_name,b_c,b_s,b_cat);
     setNewLine(r,res);
-    free(pro->b_id);   
 
     return r;
 }
@@ -737,7 +736,7 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    char ind [15] = "user_id";
+    char ind [9] = "user_id";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
     pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);

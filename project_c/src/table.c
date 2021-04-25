@@ -270,7 +270,7 @@ TABLE index_table(TABLE t,int line,int col){
 
 /**
 \brief Converte uma TABLE para ficheiro csv
-@param t TABLE
+@param x TABLE
 @param delim Delimitador de campos
 @param name Nome do ficheiro
 @returns void
@@ -278,9 +278,9 @@ TABLE index_table(TABLE t,int line,int col){
 void toCSV (TABLE x,char* delim, char* name){
     char s[2] = ",";
     int entries = getEntries(x);
-    char* f_csv = malloc(sizeof(char)*(strlen(name)+4));
-    sprintf(f_csv,"%s%s",name,".csv");
-    FILE* f = fopen(f_csv,"w"); 
+    //char* f_csv = malloc(sizeof(char)*(strlen(name)+4));
+    //sprintf(f_csv,"%s%s",name,".csv");
+    FILE* f = fopen(name,"w"); 
     if(strcmp(delim,s)!=0){
         for(int i=0; i<entries ; i++){
             char * str = get_string_table(x,i);  
@@ -298,21 +298,44 @@ void toCSV (TABLE x,char* delim, char* name){
 }
 
 /**
+\brief Dá o número de linhas de um ficheiro, é necessária para a fromCSV
+@param file Nome do ficheiro
+@returns int
+*/
+
+int nLinhas (char* file){
+    FILE *fp;
+    int count = 0; 
+    char c;  // To store a character read from file
+    fp = fopen(file, "r");
+  
+    for (c = getc(fp); c != EOF; c = getc(fp))
+        if (c == '\n')
+            count = count + 1;
+
+    // Close the file
+    fclose(fp);
+    return count;
+}
+/**
 \brief Converte de um ficheiro csv para TABLE
 @param delim Delimitador de campos
 @param file Nome do ficheiro
 @returns TABLE
 */
 TABLE fromCSV (char* file, char* delim){
-    TABLE t = init_Sized_Table(1000000);
     FILE* f = fopen(file,"r");
     if (f==NULL){
         printf("ERROR_FILE_readFILE\n");
+        TABLE z = init_Sized_Table(0);
+        return z;
     }
     else{
+        int n_lin = nLinhas(file);
+        printf("%d\n",n_lin);
+        TABLE t = init_Sized_Table(n_lin);
         char buffer[1024]; // espaco suficiente para os exemplos do input file
         
-        int i =0;
         while(fgets(buffer,1024,f) ){
             char r [1024] = "\0";
             char *token = strtok(buffer,delim);
@@ -322,23 +345,28 @@ TABLE fromCSV (char* file, char* delim){
                 if (token != NULL)  strcat(r,";");// para não colocar no último token
             }
             setNewLine(t,r);
-            i++;
         }
         fclose(f);
         printf("Read File.\n");
+        return t;
     }
-    return t;
+    
 }
-
+/**
+\brief Projeta determinada coluna da TABLE recebida
+@param x TABLE 
+@param cols Nome da coluna a projetar
+@returns TABLE
+*/
 TABLE proj(TABLE x, char* cols){
-    TABLE rq = init_Sized_Table(getEntries(x));
+    TABLE t = init_Sized_Table(getEntries(x));
     char s [2] =";";
     char * str = get_string_table(x,0);  
     char *token = strtok(str,s);
     int col = 0;
     int r = 0;
     while(token != NULL && r == 0) {
-        if(strcmp(token,cols)== 0){r = 1;setNewLine(rq,token);break;}
+        if(strcmp(token,cols)== 0){r = 1;setNewLine(t,token);break;}
         token = strtok(NULL, s);
         col++;
     }
@@ -346,25 +374,30 @@ TABLE proj(TABLE x, char* cols){
         for(int j = 1;j<getEntries(x);j++ ){
             char * res = get_string_table(x,j);
             char *aux = strtok(res,s);
-            int t = 0;
-            while(aux != NULL && t<col) {
+            int tam = 0;
+            while(aux != NULL && tam<col) {
                 aux = strtok(NULL, s);
-                t++;
+                tam++;
             }
-            setNewLine(rq,aux);
+            setNewLine(t,aux);
         }
-        clearTable(x);
-        return rq;
+        return t;
     }else {
-        clearTable(x);
-        clearTable(rq);
+        clearTable(t);
         printf("Coluna inexistente\n");
         TABLE z = init_Sized_Table(0);
         return z; 
     }
         
 }
-
+/**
+\brief Filtra determinada coluna da TABLE recebida
+@param x TABLE 
+@param column_name Nome da coluna que será analizada
+@param value Palavra utilizada na comparação
+@param op Operador a aplicar na comparação
+@returns TABLE
+*/
 
 TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
     TABLE comp = proj(x,column_name);
@@ -407,8 +440,6 @@ TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
     }
 
 }
-
-
 
 
 void printTable(TABLE t){
