@@ -1,4 +1,5 @@
 #include "../includes/interpretador.h"
+#include "../includes/show.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -173,7 +174,7 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                     int q = 0, page = 0;
                     while(q == 0){
                         printf("\e[1;1H\e[2J");
-                        printPage_table(t,page);
+                        show_pagedTable(t,page);
                         printf("r -> return; p -> previous page; n -> next page\n");
                         char *c = getCommand();
                         c[strlen(c)-1] = '\0';
@@ -298,6 +299,37 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
     int funcao = functionId(function);
     int espacos = 0 , i = 0;
     if(comando[i] == '('){// 1ºargumento
+        if(funcao == 0){//fromCSV (segundo elemento delimitador
+                        //primeiro argumento sendo um diretorio tem de se usar getVar
+            i++;
+            i = addSpaces(i,comando);
+            char* arg1 = getVar(comando+i);
+            i+= strlen(arg1);
+            i = addSpaces(i,comando);
+            if(comando[i] == ','){// 2ºargumento
+            i++;
+            i = addSpaces(i,comando);
+            if(funcao == 0){ 
+                if(comando[i] == '"'){  //delimitador
+                    i++;
+                    char* delim = getVar(comando+i);
+                    i+= strlen(delim) + 1;
+                    if(comando[i] == '"'){
+                        i++;
+                        i = addSpaces(i,comando);    
+                        if(comando[i] == ')'){
+                            i++;
+                            i = addSpaces(i,comando);
+                            if(comando[i] == ';')
+                                printf("fromCSV\n");
+                                free(arg1);
+                                return 0;
+                        }
+                    }
+                }
+                return -1;
+            }
+        }
         i++;
         i = addSpaces(i,comando);
         char* arg1 = commandString(comando+i);
@@ -317,29 +349,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
             }
             return -1;
         }
-        if(comando[i] == ','){// 2ºargumento
-            i++;
-            i = addSpaces(i,comando);
-            if(funcao == 0){ //fromCSV (segundo elemento delimitador)
-                if(comando[i] == '\''){  //delimitador
-                    i++;
-                    char delim = comando[i];
-                    i++;
-                    if(comando[i] == '\''){
-                        i++;
-                        i = addSpaces(i,comando);    
-                        if(comando[i] == ')'){
-                            i++;
-                            i = addSpaces(i,comando);
-                            if(comando[i] == ';')
-                                printf("fromCSV\n");
-                                free(arg1);
-                                return 0;
-                        }
-                    }
-                }
-                return -1;
-            }
+        
             char* arg2 = getVar(comando+i);
             i+= strlen(arg2);
             i = addSpaces(i,comando);
