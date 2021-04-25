@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define MAX_VAR 2
+#define clrscr() printf("\e[1;1H\e[2J")
 
 struct variavel{
     char* variavel;
@@ -40,6 +41,11 @@ TABLE varTable(VARIAVEIS v, char* var){
     }
     
     return NULL;
+}
+
+int isOperator(char* arg){
+    if(strcmp(arg,"-1") == 0 || strcmp(arg,"0") == 0 || strcmp(arg,"1") == 0) return 0;
+    return 1;
 }
 
 int isNumber(char* arg){
@@ -173,7 +179,7 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                 if(t){
                     int q = 0, page = 0;
                     while(q == 0){
-                        printf("\e[1;1H\e[2J");
+                        clrscr();
                         show_pagedTable(t,page);
                         printf("r -> return; p -> previous page; n -> next page\n");
                         char *c = getCommand();
@@ -183,6 +189,7 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                         else if(strcmp(c,"n") == 0) page++;
                         else if(isNumber(c) == 0) page = atoi(c);
                     }
+                    clrscr();
                     free(buff);
                     return 1;
                 }
@@ -215,7 +222,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
             if(comando[i] == '"'){erro++;//delimitador  3
                 i++;
                 char *delim = commandString(comando + i);
-                i+= strlen(delim) + 1;
+                i+= strlen(delim);
                 if(comando[i] == '"'){erro++;//4
                     i++;
                     i = addSpaces(i,comando);
@@ -303,32 +310,33 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                         //primeiro argumento sendo um diretorio tem de se usar getVar
             i++;
             i = addSpaces(i,comando);
-            char* arg1 = getVar(comando+i);
-            i+= strlen(arg1);
+            char* dir = getVar(comando+i);
+            i+= strlen(dir);
             i = addSpaces(i,comando);
-            if(comando[i] == ','){// 2ºargumento
-            i++;
-            i = addSpaces(i,comando);
-            if(funcao == 0){ 
-                if(comando[i] == '"'){  //delimitador
-                    i++;
-                    char* delim = getVar(comando+i);
-                    i+= strlen(delim) + 1;
-                    if(comando[i] == '"'){
+            if(comando[i] == ',' && dir[0] == '"' && dir[strlen(dir)-1] == '"'){// 2ºargumento delimitador
+                i++;
+                i = addSpaces(i,comando);
+                char* delim = getVar(comando+i);
+                i+= strlen(delim);
+                if(delim[0] == '"' && delim[strlen(delim) -1] == '"'){
+                    i = addSpaces(i,comando);    
+                    if(comando[i] == ')'){
                         i++;
-                        i = addSpaces(i,comando);    
-                        if(comando[i] == ')'){
-                            i++;
-                            i = addSpaces(i,comando);
-                            if(comando[i] == ';')
-                                printf("fromCSV\n");
-                                free(arg1);
-                                return 0;
+                        i = addSpaces(i,comando);
+                        if(comando[i] == ';'){
+                            char* body = dir+1;
+                            char* d = delim+1;
+                            TABLE t = fromCSV(strsep(&body,"\""),strsep(&d,"\""));
+                            addVar(v,var,t);
+                            free(dir);free(delim);
+                            return 0;
                         }
                     }
                 }
-                return -1;
+                free(delim);
             }
+            free(dir);
+            return -1;
         }
         i++;
         i = addSpaces(i,comando);
@@ -349,34 +357,43 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
             }
             return -1;
         }
-        
+        if(comando[i] == ','){// 2ºargumento
+            i++;
+            i = addSpaces(i,comando);
             char* arg2 = getVar(comando+i);
             i+= strlen(arg2);
             i = addSpaces(i,comando);
             if(funcao == 1 && check_variable(v,arg1) == 0){//filter
-                if(comando[i] == ','){
+                if(comando[i] == ','){//valor
                     i++;
                     i = addSpaces(i,comando);
-                    char* arg3 = commandString(comando+i);
+                    char* arg3 = getVar(comando+i);
                     i+= strlen(arg3);
                     i = addSpaces(i,comando);
-                    if(comando[i] == ','){
+                    if(comando[i] == ','){//operador
                         i++;
                         i = addSpaces(i,comando);
-                        char* arg4 = commandString(comando+i);
+                        char* arg4 = getVar(comando+i);
                         i+= strlen(arg4);
                         i = addSpaces(i,comando);
-                        if(comando[i] == ')'){
+                        if(comando[i] == ')' && isOperator(arg4) == 0){
                             i++;
                             i = addSpaces(i,comando);
                             if(comando[i] == ';'){
+                                TABLE t1 = varTable(v,arg1);
+                                TABLE t2 = filter(t1,arg1,arg2,atoi(arg4));
+                                addVar(v,var,t2);
                                 printf("filter(%s,%s,%s,%s)\n",arg1,arg2,arg3,arg4);
+                                printf("variavel %s guardada!\n",var);
                                 free(arg1);free(arg2);free(arg3);free(arg4);
                                 return 1;
                             }
                         }
+                        free(arg4);
                     }
+                    free(arg3);
                 }
+                free(arg1);free(arg2);
                 return -1;
             }
             if(funcao == 2 || funcao == 3 || funcao == 4 || funcao == 6 || funcao == 9 ){//query de 2 argumentos
@@ -440,7 +457,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 }
                 return -1;
             }
-            if(funcao == 5 || funcao == 8 || funcao == 9){//query de 3 argumentos
+            if(funcao == 5 || funcao == 8){//query de 3 argumentos
                 if(comando[i] == ',' && strcmp(arg1,"sgr") == 0){
                     i++;
                     i = addSpaces(i,comando);
@@ -454,7 +471,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             if(isFloat(arg2) == 0 && arg3[0] == '"' && arg3[strlen(arg3)-1] == '"'){
                                 float stars = atof(arg2);
                                 char* search = arg3+1;
-                                TABLE t;
+                                TABLE t = NULL;
                                 if(funcao == 5) t = businesses_with_stars_and_city(sgr,stars,strsep(&search,"\""));
                                 if(funcao == 8) t = top_businesses_with_category(sgr,stars,strsep(&search,"\""));
                                 addVar(v,var,t);
@@ -471,30 +488,33 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 return -1;
             }
             if(funcao == 10 && check_variable(v,arg1) == 0){//proj
-            if(comando[i] == ')'){
-                    i++;
-                    i = addSpaces(i,comando);
-                    if(comando[i] == ';'){
-                        printf("proj(%s,%s)\n",arg1,arg2);
-                        free(arg1);free(arg2);
-                        return 1;
-                    }
-            }
-            return -1;
-                
+                if(comando[i] == ')'){
+                        i++;
+                        i = addSpaces(i,comando);
+                        if(comando[i] == ';'){
+                            TABLE t1 = varTable(v,arg1);
+                            TABLE t2 = proj(t1,arg2);
+                            addVar(v,var,t2);
+                            printf("variavel %s guardada!\n",var);
+                            free(arg1);free(arg2);
+                            return 1;
+                        }
+                }
+                free(arg1);free(arg2);
+                return -1;
             }
         }
                             
     }
     i = addSpaces(i,comando);
-    //associar uma coluna de uma table a uma variavel -  ex: z = x[1][0]
     if(check_variable(v,function) == 0 && comando[i] == '['){
+    //associar uma coluna de uma table a uma variavel -  ex: z = x[1][0]
         i++;
         i = addSpaces(i,comando);
         char *line = commandString(comando+i);
         i+= strlen(line);
         i = addSpaces(i,comando);
-        if(comando[i] == ']'){
+        if(comando[i] == ']' && isNumber(line) == 0){
         i++;
         if(comando[i] == '['){
             i++; 
@@ -502,18 +522,24 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
             char *col = commandString(comando+i);
             i+= strlen(col);
             i = addSpaces(i,comando);
-            if(comando[i] == ']'){
+            if(comando[i] == ']' && isNumber(col) == 0){
                 i++;
                 i = addSpaces(i,comando);
                 if(comando[i] == ';'){
-                    printf("%s = %s[%s][%s] ;\n",var,function,line,col);
+                    TABLE t1 = varTable(v,function);
+                    TABLE t2 = index_table(t1,atoi(line),atoi(col));
+                    addVar(v,var,t2);
+                    printf("variavel %s guardada!\n",var);
                     return 1;
                 }
             }
+            free(col);
         }
         }
-        printf("erro\n");
+        free(line);
+        return -1;
     }
+    printf("Erro na inicializacao de variavel\n");
     return -1;
 
 }
@@ -522,7 +548,6 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
 
 //funcao que analisa o comando passado, e caso seja possivel executa-o
 int executeCommand(char *comando,VARIAVEIS v, SGR sgr){ 
-    printf("executar: %s\n",comando);
     int len = strlen(comando);
     int i = 0, espacos = 0;
     
