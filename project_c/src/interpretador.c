@@ -158,7 +158,17 @@ int executeShow(char *comando,int i, VARIAVEIS v){
             if(check_variable(v,buff) == 0){
                 TABLE t = varTable(v,buff);
                 if(t){
-                    printPage_table(t,0);
+                    char c;
+                    int q = 0, page = 0;
+                    while(q == 0){
+                        printf("\e[1;1H\e[2J");
+                        printPage_table(t,page);
+                        printf("q -> quit; p -> previous page; n -> next page\n");
+                        scanf("%c",&c);
+                        if( c == 'q') q++;
+                        if( c == 'p') page--;
+                        if( c == 'n') page++;
+                    }
                     free(buff);
                     return 1;
                 }

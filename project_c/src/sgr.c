@@ -132,7 +132,7 @@ static void query4_iterator(gpointer key, gpointer value, gpointer user_data){
         char* b_name = get_name(b);
         char* result = malloc( sizeof(char) * (strlen(b_name) + strlen(b_id) + 1));
         //result = b_id,b_name
-        snprintf(result,strlen(b_name) + strlen(b_id) + 1,"%s;%s",b_id,b_name);
+        snprintf(result,strlen(b_name) + strlen(b_id) + 2,"%s;%s",b_id,b_name);
         data->result[col] = result;
         data->column++;
         
