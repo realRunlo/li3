@@ -13,6 +13,7 @@ void setNewLine(TABLE t,char * line);
 int getEntries(TABLE t);
 char* get_string_table(TABLE t,int n);
 char** getTab(TABLE t);
+int getTotalPages(TABLE t);
 
 int *getBlen_str(TABLE t);
 void printPage_table(TABLE t,int current_page);
