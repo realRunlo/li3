@@ -282,24 +282,21 @@ TABLE index_table(TABLE t,int line,int col){
 @returns void
 */
 void toCSV (TABLE x,char* delim, char* name){
-    char s[2] = ",";
+    char s[2] =";";
     int entries = getEntries(x);
-    //char* f_csv = malloc(sizeof(char)*(strlen(name)+4));
-    //sprintf(f_csv,"%s%s",name,".csv");
     FILE* f = fopen(name,"w"); 
-    if(strcmp(delim,s)!=0){
-        for(int i=0; i<entries ; i++){
-            char * str = get_string_table(x,i);  
-            char *token = strtok(str,s);
-            while(token != NULL) {
-                fprintf(f,"%s", token);
-                token = strtok(NULL, s);
-                if (token != NULL) fprintf(f,"%s",delim);// para não colocar no último token
-                
-            }
-            fprintf(f,"\n");
+    for(int i=0; i<entries ; i++){
+        char * r = get_string_table(x,i);  
+        char *tok = r, *end = r;
+        while (tok != NULL) {
+            strsep(&end, s);
+            fprintf(f,"%s", tok);
+            tok = end;
+            if (tok != NULL) fprintf(f,"%s",delim); // para não colocar no último token
         }
+        fprintf(f,"\n");
     }
+    
     fclose(f);
 }
 
@@ -337,27 +334,30 @@ TABLE fromCSV (char* file, char* delim){
         return z;
     }
     else{
+        char s [2]=";";
         int n_lin = nLinhas(file);
         printf("%d\n",n_lin);
         TABLE t = init_Sized_Table(n_lin);
         char buffer[1024]; // espaco suficiente para os exemplos do input file
         
         while(fgets(buffer,1024,f) ){
-            char r [1024] = "\0";
-            char *token = strtok(buffer,delim);
-            while(token != NULL) {                
-                strcat(r,token);
-                token = strtok(NULL, delim);
-                if (token != NULL)  strcat(r,";");// para não colocar no último token
+            char aux[1024] = "\0";
+            char *tok = buffer, *end = buffer;
+            while (tok != NULL) {
+                strsep(&end, delim);
+                strcat(aux,tok);
+                tok = end;
+                if (tok != NULL && aux[strlen(aux)-1]!= ';')  strcat(aux,s); // para não colocar no último token
             }
-            int size = strlen(r);
-            r[size-1] = '\0';
-            setNewLine(t,r);
+            int size = strlen(aux);
+            aux[size-1] = '\0';
+            setNewLine(t,aux);
         }
         fclose(f);
         printf("Read File.\n");
         return t;
-    } 
+    }
+    
 }
 
 /**
