@@ -344,6 +344,9 @@ TABLE fromCSV (char* file, char* delim){
                 token = strtok(NULL, delim);
                 if (token != NULL)  strcat(r,";");// para não colocar no último token
             }
+            int size = strlen(r);
+            r[size-1] = '\0';
+            setNewLine(t,r);
             setNewLine(t,r);
         }
         fclose(f);
