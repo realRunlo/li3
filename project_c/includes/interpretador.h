@@ -20,6 +20,9 @@ TABLE varTable(VARIAVEIS v, char* var);
 //funcao q recebe os inputs no terminal
 char* getCommand();
 
+//versao de getcomand com menos restricoes para os argumentos
+char* getVar(char* comando);
+
 //conta o numero de espacos entre a posicao atual e a proxima que n seja espaco
 int skipSpaces(char* str);
 
