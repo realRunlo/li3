@@ -258,6 +258,7 @@ void printPage_table(TABLE t,int current_page){
 */
 TABLE index_table(TABLE t,int line,int col){
     TABLE indexed_table = init_Sized_Table(2);
+
     char * headLine = get_string_table(t,0);
     char * seped;
     for(int i=0;i<col+1;i++){
@@ -267,7 +268,7 @@ TABLE index_table(TABLE t,int line,int col){
 
     char * strLine = get_string_table(t,line+1);
      for(int i=0;i<col+1;i++){
-        seped=strsep(&strLine,",");
+        seped=strsep(&strLine,";");
     }
     setNewLine(indexed_table,strdup(seped));
 
