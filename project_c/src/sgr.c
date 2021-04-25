@@ -354,6 +354,7 @@ static void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     g_hash_table_insert(data->h_user_visitado, user_id,
         g_slist_append(g_hash_table_lookup(data->h_user_visitado, user_id),b_id));
 }
+
 void destroy(gpointer key, gpointer value, gpointer data) {
  g_slist_free(value);
 }
@@ -613,7 +614,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
 */
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
-    char indicador [50] = "total;b_id;b_nome;b_city;b_state;b_categories";
+    char* indicador = "total;b_id;b_nome;b_city;b_state;b_categories";
     setNewLine(r,indicador);
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));
@@ -670,7 +671,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     pro->t = init_Sized_Table(max_lines);
-    char ind [16] = "b_id;b_name";
+    char* ind = "b_id;b_name";
     setNewLine(pro->t,ind);
     pro->city = strdup (city);
     pro->stars = stars;
@@ -736,7 +737,7 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    char ind [9] = "user_id";
+    char* ind = "user_id";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
     pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
