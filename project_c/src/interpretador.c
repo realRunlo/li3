@@ -41,6 +41,18 @@ TABLE varTable(VARIAVEIS v, char* var){
     return NULL;
 }
 
+int isNumber(char* arg){
+    int erro = 0;
+    if(arg[0] >= 48 && arg[0] <= 57){
+        for(int i = 1; arg[i] != '\0' && erro == 0; i++){
+            if(arg[i] >= 48 && arg[i] <= 57);
+            else erro++;
+        }
+        return erro;
+    }
+    return -1;
+}
+
 //verifica se uma string corresponde a um float
 int isFloat(char* arg){
     int ponto = 0, erro = 0;
@@ -158,16 +170,17 @@ int executeShow(char *comando,int i, VARIAVEIS v){
             if(check_variable(v,buff) == 0){
                 TABLE t = varTable(v,buff);
                 if(t){
-                    char c;
                     int q = 0, page = 0;
                     while(q == 0){
                         printf("\e[1;1H\e[2J");
                         printPage_table(t,page);
-                        printf("q -> quit; p -> previous page; n -> next page\n");
-                        scanf("%c",&c);
-                        if( c == 'q') q++;
-                        if( c == 'p') page--;
-                        if( c == 'n') page++;
+                        printf("r -> return; p -> previous page; n -> next page\n");
+                        char *c = getCommand();
+                        c[strlen(c)-1] = '\0';
+                        if(strcmp(c,"r") == 0) q++;
+                        else if(strcmp(c,"p") == 0) page--;
+                        else if(strcmp(c,"n") == 0) page++;
+                        else if(isNumber(c) == 0) page = atoi(c);
                     }
                     free(buff);
                     return 1;
@@ -191,48 +204,38 @@ int executeShow(char *comando,int i, VARIAVEIS v){
 
 int executeToCSV(char* comando, int i, VARIAVEIS v){
     char* var = commandString(comando+i); //primeira variavel de toCSV
-    if(check_variable(v,var) == 0){
+    int erro = 0;
+    if(check_variable(v,var) == 0){erro++;//verifica se variavel existe 1
         i += strlen(var);
         i = addSpaces(i,comando);
-        if(comando[i] == ','){
+        if(comando[i] == ','){erro++;//2
             i++;
             i = addSpaces(i,comando);
-            if(comando[i] == '\''){//delimitador
+            if(comando[i] == '"'){erro++;//delimitador  3
                 i++;
-                char delim = comando[i];
-                i++;
-                if(comando[i] == '\''){
+                char *delim = commandString(comando + i);
+                i+= strlen(delim) + 1;
+                if(comando[i] == '"'){erro++;//4
                     i++;
                     i = addSpaces(i,comando);
-                    if(comando[i] == ','){
+                    if(comando[i] == ','){erro++;//5
                         i++;
                         i = addSpaces(i,comando);
-                        if(comando[i] == '"'){
-                        //guarda diretorio do ficheiro, usando strsep
-                        //precisa de strcat para adicionar " no inicio sem ter espaços
-                        char *body =malloc(sizeof(char) * strlen(comando));
-                        strcpy(body,comando+i+1);
-                        body = strsep(&(body),"\"");
-                        char * file = malloc(sizeof(char) * (strlen(body) + 2)); 
-                        file[0] = '"';
-                        file[1] = '\0';
-                        strcat(file,body);
-                        int lenFile = strlen(file);
-                        file[lenFile] = '"';
-                        file[lenFile+1] = '\0';
-                        lenFile++;
-                        i+=lenFile;
+                        if(comando[i] == '"'){erro++;//guardar nome do ficheiro6
                         i = addSpaces(i,comando);
-                        printf("%s\n%c\n",file,comando[i]);
-                        if(comando[i] == ')'){//encerrar da funçao
+                        char* file = getVar(comando+i);
+                        i+= strlen(file);
+                        i = addSpaces(i,comando);
+                        if(file[0] == '"' && file[strlen(file)-1] == '"'){erro++;//7
+                            char* dir = file+1;  
+                        if(comando[i] == ')'){erro++;// 8
                             i++;
                             i = addSpaces(i,comando);
-                            if(comando[i] == ';'){
-                                //executar toCSV
+                            if(comando[i] == ';'){erro++; //9
                                 TABLE t = varTable(v,var);
-                                //toCSV(t,delim,file);
-                                printf("toCSV(%s,'%c',%s)\n",var,delim,file);
+                                toCSV(t,delim,strsep(&dir,"\""));
                                 return 1;
+                            }
                             }
                         }
                     }
@@ -245,7 +248,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
         printf("variavel nao existe\n");
         return -1;
     }
-    printf("Erro no comando toCSV\n");
+    printf("Erro no comando toCSV %d\n",erro);
     return -1;
 }
 
@@ -305,9 +308,9 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 i++;
                 i = addSpaces(i,comando);
                 if(comando[i] == ';'){
-                    printf("variavel %s guardada!\n",var);
                     TABLE t = international_users(sgr);
                     addVar(v,var,t);
+                    printf("variavel %s guardada!\n",var);
                     free(arg1);
                     return 1;
                 }
