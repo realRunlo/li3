@@ -174,6 +174,12 @@ void printN_space(int n){
         printf(" ");
 }
 
+int getTotalPages(TABLE t){
+    int total_entries = getEntries(t);
+    int total_pages = total_entries/MAXTPAGE + 1;
+    return total_pages;
+}
+
 /**
 \brief Imprime uma página da TABLE
 @param current_page Página a imprimir
@@ -347,14 +353,13 @@ TABLE fromCSV (char* file, char* delim){
             int size = strlen(r);
             r[size-1] = '\0';
             setNewLine(t,r);
-            setNewLine(t,r);
         }
         fclose(f);
         printf("Read File.\n");
         return t;
-    }
-    
+    } 
 }
+
 /**
 \brief Projeta determinada coluna da TABLE recebida
 @param x TABLE 
