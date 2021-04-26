@@ -421,22 +421,24 @@ int valid_column_name(TABLE t, char* column_name){
 
 TABLE filterNumber(TABLE x,TABLE comp,char* value, OPERADOR op, int type){
     TABLE res = init_Sized_Table(getEntries(x));
+    setNewLine(res,get_string_table(x,0));
     char * r = get_string_table(comp,1);
+    int entries = getEntries(comp);
     if(type == FLOAT){ //valor e um float
         float v = atof(value);
-        for(int i = 2; i < getEntries(comp);i++ ){
-            if(op == 0 && v == atof(r)) setNewLine(res,r);
-            else if(op == -1 && v > atof(r)) setNewLine(res,r);
-                else if(op == 1 && v < atof(r)) setNewLine(res,r);
+        for(int i = 2; i < entries;i++ ){
+            if(op == 0 && v == atof(r)) setNewLine(res,get_string_table(x,i));
+            else if(op == -1 && v > atof(r)) setNewLine(res,get_string_table(x,i));
+                else if(op == 1 && v < atof(r)) setNewLine(res,get_string_table(x,i));
             r = get_string_table(comp,i);     
         }
     }
     else{// valor e um int
         int v = atoi(value);
-        for(int i = 2; i < getEntries(comp);i++ ){
-            if(op == 0 && v == atoi(r)) setNewLine(res,r);
-            else if(op == -1 && v > atoi(r)) setNewLine(res,r);
-                else if(op == 1 && v < atoi(r)) setNewLine(res,r);
+        for(int i = 2; i < entries;i++ ){
+            if(op == 0 && v == atoi(r)) setNewLine(res,get_string_table(x,i));
+            else if(op == -1 && v > atoi(r)) setNewLine(res,get_string_table(x,i));
+                else if(op == 1 && v < atoi(r)) setNewLine(res,get_string_table(x,i));
             r = get_string_table(comp,i);     
         }
     }
@@ -466,12 +468,14 @@ TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){printf(".%s. .
         }
             else if (getEntries(comp)!=0){
                     TABLE res = init_Sized_Table(getEntries(x));
+                    setNewLine(res,get_string_table(x,0));
                     char * r = get_string_table(comp,1);//vai buscar linha 1 porque 
                     int c = 0;                          // a linha 0 e o formato da table
-                    for(int i = 2; i < getEntries(comp);i++ ){
+                    int entries = getEntries(comp);
+                    for(int i = 2; i < entries;i++ ){
                         c = strcmp (r,value);
                         if (c == op)
-                            setNewLine(res,r);
+                            setNewLine(res,get_string_table(x,i));
                         r = get_string_table(comp,i);
                     }
                     free (r);
