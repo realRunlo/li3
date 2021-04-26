@@ -187,7 +187,7 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                         if(strcmp(c,"r") == 0) q++;
                         else if(strcmp(c,"p") == 0) page--;
                         else if(strcmp(c,"n") == 0) page++;
-                        else if(isNumber(c) == 0) page = atoi(c);
+                        else if(isNumber(c) == 0) page = atoi(c)-1;
                     }
                     clrscr();
                     free(buff);
