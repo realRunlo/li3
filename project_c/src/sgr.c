@@ -86,6 +86,7 @@ typedef struct query7{
     GHashTable * hashT_businesses;
     char * state_atual;
     GHashTable * h_state;
+    int total;
 }*Query7;
 
 typedef struct query9{
@@ -343,6 +344,7 @@ static void check_state_iterator(gpointer key, gpointer value, gpointer user_dat
         }
         if((g_hash_table_size(data->h_state))>=2){
             setNewLine(data->t,key);
+            data->total++;
         }
     } 
 }
@@ -574,7 +576,7 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 
     readReviews(sgr_load->hashT_reviews,reviews_file);
     
-    readUser(sgr_load->hashT_users,users_file);
+    //readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
     return sgr_load;
@@ -737,6 +739,7 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
+    pro->total = 0;
     char* ind = "user_id";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
@@ -748,6 +751,7 @@ TABLE international_users (SGR sgr){
     g_hash_table_destroy(pro->hashT_businesses);
     g_hash_table_foreach(pro->h_user_visitado, destroy, NULL);
     g_hash_table_destroy(pro->h_user_visitado);
+    setEntries(pro->t,pro->total);
     return pro->t;
 }
 
