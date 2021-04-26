@@ -4,7 +4,7 @@
 #include "../includes/business.h"
 #include <stdio.h>
 #include <string.h>
-#define BUFFER_SIZE 10000
+#define REV_BUFFER_SIZE 10000
 #define USERS_BUFFER_SIZE 100000
 
 /**
@@ -15,25 +15,46 @@
 void readReviews(GHashTable * hTable,char * filename){
 
     FILE *  fp = fopen(filename,"r");
-    if(fp!=NULL){
-        char * buffer = malloc(BUFFER_SIZE);
-        fgets(buffer,BUFFER_SIZE,fp);
-        Reviews rev;
-        while(fgets(buffer,BUFFER_SIZE,fp)!=NULL ){
-            rev = addReview(rev,buffer);
-            addToHashT(hTable,r_getReviewId(rev),rev);
-        }
-
-        free(buffer);
-        fclose(fp);
-        printf("Reviews loaded.\n");
-    }else{
+    if (fp==NULL){
         perror("ERROR: ");
+        return;
+    } else{
+        Reviews rev;
+        char buff[REV_BUFFER_SIZE]; 
+        buff[0] = '\0';
+        size_t linelen = USERS_BUFFER_SIZE, bufflen = 0 , maxlen = 0;
+        char * line = malloc(sizeof(char) * REV_BUFFER_SIZE);
+        fgets(buff,REV_BUFFER_SIZE,fp); // ignora primeira linha 
+        int read = 0;
+        while(fgets(buff,REV_BUFFER_SIZE,fp)){
+            line[0] = '\0';
+            bufflen = strlen(buff);
+            maxlen = bufflen;
+            if (linelen <= bufflen){
+                linelen += maxlen + linelen;
+                line = realloc(line, linelen);
+            }
+            strcat(line, buff);
+            while(bufflen == REV_BUFFER_SIZE - 1 && buff[REV_BUFFER_SIZE-2] != '\n'){
+                if(fgets(buff, REV_BUFFER_SIZE,fp)){
+                bufflen = strlen(buff);
+                maxlen += bufflen;
+                if (linelen <= maxlen){
+                linelen += maxlen + linelen;
+                line = realloc(line, linelen);
+                }
+                strcat(line, buff);
+                }
+            }
+           rev = addReview(rev,line);
+           addToHashT(hTable,r_getReviewId(rev),rev);
+        }
+        free(line);
     }
+    fclose(fp);
 
-    
+    printf("Reviews loaded.\n");
 }
-
 /**
 \brief Lê informação de um ficheiro de users e guarda numa hashtable
 @param filename - nome do ficheiro
