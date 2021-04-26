@@ -1,4 +1,5 @@
 #include "../includes/table.h"
+#include "../includes/interpretador.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -6,7 +7,8 @@
 #include <math.h>
 #define MARGIN 6
 #define MAXTPAGE 10
-
+#define FLOAT 1
+#define INT 0
 
 
 /*  ----------private----------  */
@@ -399,6 +401,52 @@ TABLE proj(TABLE x, char* cols){
     }
         
 }
+
+int valid_column_name(TABLE t, char* column_name){
+    if(t){
+        char *line = strdup(t->tab[0]);
+        char * buff = malloc(sizeof(char) * strlen(line));
+        char * pointer = buff;
+        buff = strsep(&line,";");
+        while(buff != NULL){
+            if(strcmp(buff,column_name) == 0){
+                free(pointer); return 0;
+                }
+            buff = strsep(&line,";");
+        }
+        free(pointer);
+    }
+    return -1;
+}
+
+TABLE filterNumber(TABLE x,TABLE comp,char* value, OPERADOR op, int type){
+    TABLE res = init_Sized_Table(getEntries(x));
+    setNewLine(res,get_string_table(x,0));
+    char * r = get_string_table(comp,1);
+    int entries = getEntries(comp);
+    if(type == FLOAT){ //valor e um float
+        float v = atof(value);
+        for(int i = 1; i < entries;i++ ){
+            r = get_string_table(comp,i); 
+            if(op == 0 && v == atof(r)) setNewLine(res,get_string_table(x,i));
+            else if(op == -1 && v > atof(r)) setNewLine(res,get_string_table(x,i));
+                else if(op == 1 && v < atof(r)) setNewLine(res,get_string_table(x,i));
+        }
+    }
+    else{// valor e um int
+        int v = atoi(value);
+        for(int i = 1; i < entries;i++ ){
+            r = get_string_table(comp,i); 
+            if(op == 0 && v == atoi(r)) setNewLine(res,get_string_table(x,i));
+            else if(op == -1 && v > atoi(r)) setNewLine(res,get_string_table(x,i));
+                else if(op == 1 && v < atoi(r)) setNewLine(res,get_string_table(x,i));
+        }
+    }
+    free (r);
+    return res;
+}
+
+
 /**
 \brief Filtra determinada coluna da TABLE recebida
 @param x TABLE 
@@ -408,46 +456,34 @@ TABLE proj(TABLE x, char* cols){
 @returns TABLE
 */
 
-TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
-    TABLE comp = proj(x,column_name);
-    if (getEntries(comp)!=0){
-        TABLE res = init_Sized_Table(getEntries(x));
-        char * r;
-        switch (op){
-        case 0:
-            for(int i = 0; i < getEntries(comp);i++ ){
-                r = get_string_table(comp,i);
-                int c = strcmp (r,value);
-                if (c == op)
-                    setNewLine(res,r);
-                }
-            break;
-        case -1: 
-                for(int i = 0; i < getEntries(comp);i++ ){
-                    r = get_string_table(comp,i);
-                    int c = strcmp (r,value);
-                    if (c <= op)
-                        setNewLine(res,r);
-                }
-                break;
-
-        default:
-                for(int i = 0; i < getEntries(comp);i++ ){
-                    r = get_string_table(comp,i);
-                    int c = strcmp (r,value);
-                    if (c >= op)
-                        setNewLine(res,r);
-                }
-
-            break;
+TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){printf(".%s. .%s.\n",column_name,value);
+    if(valid_column_name(x,column_name) == 0){ 
+        TABLE comp = proj(x,column_name);
+        //filtra ints
+        if(isNumber(value) == 0 && getEntries(comp)!=0){
+            return filterNumber(x,comp,value,op,INT);
         }
-        free (r);
-        return res;
-    }else {
-        TABLE z = init_Sized_Table(0);
-        return z; 
+        else if(isFloat(value) == 0 && getEntries(comp)!=0){printf("entrei\n");
+            return filterNumber(x,comp,value,op,FLOAT);
+        }
+            else if (getEntries(comp)!=0){
+                    TABLE res = init_Sized_Table(getEntries(x));
+                    setNewLine(res,get_string_table(x,0));
+                    char * r = get_string_table(comp,1);//vai buscar linha 1 porque 
+                    int c = 0;                          // a linha 0 e o formato da table
+                    int entries = getEntries(comp);
+                    for(int i = 1; i < entries;i++ ){
+                        r = get_string_table(comp,i);
+                        c = strcmp (r,value);
+                        if (0 == op && c == 0) setNewLine(res,get_string_table(x,i));
+                            else if (1 == op && c<0) setNewLine(res,get_string_table(x,i));
+                                else if (-1 == op && c>0) setNewLine(res,get_string_table(x,i));
+                    }
+                    free (r);
+                    return res;
+                }
     }
-
+    return NULL;
 }
 
 
