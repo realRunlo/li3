@@ -163,13 +163,27 @@ static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
+//funcao q torna todos os char numa string em minusculas
+char * turn_lowerCases(char* s){
+    int i = 0;
+    char *lower = strdup(s);
+    while(s[i] != '\0'){
+        lower[i] = tolower(s[i]);
+        i++;
+    }
+    lower[i] = '\0';
+    return lower;
+}
+
 //Cria uma hash com todas as diferentes cidades 
 static void city_hash(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
 
     //verifica se ja foi adicionada a cidade na table
-    char* city = get_city(b);
+    char* city_name = get_city(b);
+    char* city = turn_lowerCases(city_name);
+    city[0] = toupper(city[0]);
     if(g_hash_table_lookup(data->cities,GINT_TO_POINTER(city)) == NULL){
         CITY c = malloc(sizeof(struct city));
         c->entries = 0;
@@ -217,10 +231,11 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
     GHashTable * cities = data->cities;
     char* b_name    = get_name(b);
     char* b_id      = get_id(b);
-    char* city_name = get_city(b);
+    char* city      = get_city(b);
+    char* city_name = turn_lowerCases(city);
+    city_name[0]    = toupper(city_name[0]);
     B_STARS bStar   = g_hash_table_lookup(b_same_name,GINT_TO_POINTER(b_id));
     CITY c          = g_hash_table_lookup(cities,GINT_TO_POINTER(city_name));
-    
     //verifica se houve reviews para o negocio em questao
     if(bStar != NULL){
     float average   = bStar->total / bStar->n_reviews;
@@ -783,7 +798,6 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     printf("Done!\n");
     
     //tornar a matriz em forma TABLE
-    printf("entries = %d\n",process->entries);
     printf("Turning data into TABLE structure...\n");
     TABLE result = initTable();
     setEntries(result,process->entries+1);
