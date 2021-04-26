@@ -381,7 +381,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             i = addSpaces(i,comando);
                             if(comando[i] == ';'){
                                 TABLE t1 = varTable(v,arg1);
-                                TABLE t2 = filter(t1,arg1,arg2,atoi(arg4));
+                                TABLE t2 = filter(t1,arg2,arg3,atoi(arg4));
                                 addVar(v,var,t2);
                                 printf("filter(%s,%s,%s,%s)\n",arg1,arg2,arg3,arg4);
                                 printf("variavel %s guardada!\n",var);

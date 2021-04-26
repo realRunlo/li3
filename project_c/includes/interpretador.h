@@ -17,6 +17,12 @@ int addSpaces(int i,char *comando);
 //retorna a table de uma dada variavel
 TABLE varTable(VARIAVEIS v, char* var);
 
+//funcao q verifica se uma string representa um numero int
+int isNumber(char* arg);
+
+//funcao q verifica se uma string representa um float
+int isFloat(char* arg);
+
 //funcao q recebe os inputs no terminal
 char* getCommand();
 

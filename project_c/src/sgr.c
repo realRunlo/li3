@@ -614,7 +614,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
 */
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
-    char* indicador = "total;b_id;b_nome;b_city;b_state;b_categories";
+    char* indicador = "total;business_id;business_nome;business_city;business_state;business_categories";
     setNewLine(r,indicador);
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));
@@ -644,7 +644,7 @@ TABLE business_info (SGR sgr, char* business_id){
 TABLE businesses_reviewed(SGR sgr, char *user_id){
     int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query4 process = malloc(sizeof(struct query4));
-    char* firstLine = "b_id;b_name";
+    char* firstLine = "business_id;business_name";
     process->result = (char ** ) malloc(max_lines * sizeof(*process->result));
     process->result[0] = strdup(firstLine);
     process->user_id = strdup(user_id);
@@ -671,7 +671,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     pro->t = init_Sized_Table(max_lines);
-    char* ind = "b_id;b_name";
+    char* ind = "business_id;business_name";
     setNewLine(pro->t,ind);
     pro->city = strdup (city);
     pro->stars = stars;
@@ -717,11 +717,11 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     TABLE result = initTable();
     setEntries(result,0);
     setTab(result,malloc(sizeof(char*) * (total_cities * top + 1)));
-    setNewLine(result,"city;stars;business id;business name");
+    setNewLine(result,"city;stars;business_id;business_name");
     
     printf("Turning data into TABLE structure...\n");
     g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
-     printf("Done!\n"); 
+    printf("Done!\n"); 
 
     free_all_key_value_entries(process->b_same);   
     free_all_key_value_entries(process->cities);     
@@ -765,7 +765,7 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     process->top = top;
     process->condition = strdup(category);
     process->results = malloc(sizeof(char*) * (top + 1));
-    process->results[0] = strdup("stars;b_id;b_name");
+    process->results[0] = strdup("stars;business_id;business_name");
     process->entries = 0;
 
     //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
