@@ -181,6 +181,29 @@ int getTotalPages(TABLE t){
     int total_pages = total_entries/MAXTPAGE + 1;
     return total_pages;
 }
+void printHeader(char * str,int *biggers,int cols){
+    char * seped;
+
+    for(int j=0;j<cols;j++){
+        print_LineTops(biggers[j]+MARGIN);
+    }
+        printf("\n");
+        printf("|");
+        int while_Iterator = 0;
+        while((seped = strsep(&str,";"))){
+        int str_length = strlen(seped);
+        int space_left = (biggers[while_Iterator]+MARGIN-str_length)/2;
+        int space_rigth = (biggers[while_Iterator]+MARGIN-space_left-str_length);
+
+        printN_space(space_left-1);
+        printf("%s",seped);
+        printN_space(space_rigth);
+        printf("|");
+        while_Iterator++;
+
+        }
+        printf("\n");
+}
 
 /**
 \brief Imprime uma página da TABLE
@@ -193,11 +216,6 @@ void printPage_table(TABLE t,int current_page){
     char * str_zero;
     total_pages = total_entries/MAXTPAGE + 1;
     
-    if(current_page+1 > total_pages){
-        printf("ERROR: page not found\n");
-        return;
-    }
-
     if(total_entries<MAXTPAGE){ // quando só tem uma pagina como menos entradas das que é suposto imprimir por pagina
         total_pages = 1;
         bottom = 0;
@@ -218,7 +236,10 @@ void printPage_table(TABLE t,int current_page){
             countCols++;
     }
     int * biggers = getBlen_str(t);
-    for(int i=bottom;i<top;i++){
+
+    printHeader(strdup(t->tab[0]),biggers,countCols);
+
+    for(int i=bottom+1;i<top;i++){
 
         str_zero = strdup(t->tab[i]);
        
