@@ -220,11 +220,11 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
             i++;
             i = addSpaces(i,comando);
             if(comando[i] == '"'){erro++;//delimitador  3
-                i++;
-                char *delim = commandString(comando + i);
+                char *delim = getVar(comando + i);
                 i+= strlen(delim);
-                if(comando[i] == '"'){erro++;//4
-                    i++;
+                printf(".%s.%s.\n",var,delim);
+                if(comando[i-1] == '"'){erro++;//4
+                    char *del_body = delim+1;
                     i = addSpaces(i,comando);
                     if(comando[i] == ','){erro++;//5
                         i++;
@@ -234,22 +234,23 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
                         char* file = getVar(comando+i);
                         i+= strlen(file);
                         i = addSpaces(i,comando);
-                        if(file[0] == '"' && file[strlen(file)-1] == '"'){erro++;//7
-                            char* dir = file+1;  
-                        if(comando[i] == ')'){erro++;// 8
-                            i++;
-                            i = addSpaces(i,comando);
-                            if(comando[i] == ';'){erro++; //9
-                                TABLE t = varTable(v,var);
-                                toCSV(t,delim,strsep(&dir,"\""));
-                                return 1;
+                            if(file[0] == '"' && file[strlen(file)-1] == '"'){erro++;//7
+                                char* dir = file+1;  
+                            if(comando[i] == ')'){erro++;// 8
+                                i++;
+                                i = addSpaces(i,comando);
+                                if(comando[i] == ';'){erro++; //9
+                                    TABLE t = varTable(v,var);
+                                    toCSV(t,strsep(&del_body,"\""),strsep(&dir,"\""));
+                                    free(delim);free(file);
+                                    return 1;
+                                }
                             }
-                            }
+                            }free(file);
                         }
                     }
-                }
+                }free(delim);
             }
-        }
         }
     }
     else{
@@ -265,7 +266,7 @@ char* getVar(char* comando){
     char *result = malloc(sizeof(char) * strlen(comando));
     result[0] = '\0';
     int i = 0, aflag = 0, fim = 0;
-    while((comando[i] != ' ' || aflag != 0) && comando[i] != ')' && fim == 0&& comando[i] != '\0'){
+    while((comando[i] != ' ' || aflag != 0) && (comando[i] != ')' || aflag != 0) && fim == 0 && comando[i] != '\0' && comando[i] != '\n'){
         if(comando[i] == '"' && aflag ==0 ) aflag++;
         else if(comando[i] == '"' && aflag ==1 ) aflag--;
         if(comando[i] == ',' && aflag == 0){//caso de virgula fora de ""
@@ -329,9 +330,8 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             TABLE t = fromCSV(strsep(&body,"\""),strsep(&d,"\""));
                             addVar(v,var,t);
                         }
-                    }
-                free(delim);
-                }            
+                    }free(delim);    
+                }        
             }    
             free(dir);
             return erro;

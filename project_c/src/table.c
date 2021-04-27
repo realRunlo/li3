@@ -325,6 +325,7 @@ void toCSV (TABLE x,char* delim, char* name){
             if (tok != NULL) fprintf(f,"%s",delim); // para não colocar no último token
         }
         fprintf(f,"\n");
+        free(r);
     }
     
     fclose(f);
