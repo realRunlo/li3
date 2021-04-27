@@ -30,7 +30,7 @@ void show_pagedTable(TABLE t ,int page){
         printPage_table(t,0);
     }else if(page<0){
         printPage_table(t,totalPages + page);
-    }else if(page>totalPages){
+    }else if(page>=totalPages){
         printPage_table(t,page - totalPages );
     }else{
         printPage_table(t,page);

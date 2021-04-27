@@ -179,6 +179,9 @@ void printN_space(int n){
 int getTotalPages(TABLE t){
     int total_entries = getEntries(t);
     int total_pages = total_entries/MAXTPAGE + 1;
+    if(total_pages%2==0)
+        total_pages = total_entries/MAXTPAGE;
+
     return total_pages;
 }
 void printHeader(char * str,int *biggers,int cols){
@@ -214,8 +217,11 @@ void printPage_table(TABLE t,int current_page){
     int total_entries = getEntries(t);
     int total_pages,bottom,top,while_Iterator;
     char * str_zero;
-    total_pages = total_entries/MAXTPAGE + 1;
     
+    total_pages = total_entries/MAXTPAGE + 1;
+    if(total_pages%2==0)
+        total_pages = total_entries/MAXTPAGE;
+
     if(total_entries<MAXTPAGE){ // quando só tem uma pagina como menos entradas das que é suposto imprimir por pagina
         total_pages = 1;
         bottom = 0;
