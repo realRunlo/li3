@@ -9,7 +9,7 @@
 #define MAXTPAGE 10
 #define FLOAT 1
 #define INT 0
-
+#define FROMCSV_BUFFER_SIZE 2000
 
 /*  ----------private----------  */
 struct table{
@@ -324,6 +324,26 @@ void toCSV (TABLE x,char* delim, char* name){
     fclose(f);
 }
 
+//Recebe o input dado pelo o utilizador a passa-o para um array
+char* getLine_file(FILE *f){
+    char buff[2000];
+    buff[0] = '\0';
+    char* input = malloc(sizeof(char) * 2000);
+    input[0] = '\0';
+    size_t inputlen = 0, bufflen = 0;
+   do {
+       if(fgets(buff, 2000, f)){
+       bufflen = strlen(buff);
+       input = realloc(input, inputlen+bufflen+1);
+       strcat(input, buff);
+       inputlen += bufflen;
+       }
+    } while (bufflen==2000-1 && buff[2000-2]!='\n');
+    input[inputlen] ='\0';
+    return input;
+}
+
+
 /**
 \brief Dá o número de linhas de um ficheiro, é necessária para a fromCSV
 @param file Nome do ficheiro
@@ -333,13 +353,13 @@ void toCSV (TABLE x,char* delim, char* name){
 int nLinhas (char* file){
     FILE *fp;
     int count = 0; 
-    char c;  // To store a character read from file
     fp = fopen(file, "r");
-  
-    for (c = getc(fp); c != EOF; c = getc(fp))
-        if (c == '\n')
-            count = count + 1;
-
+    char* buff = getLine_file(fp);
+    while(strlen(buff) != 0){
+        count++;
+        buff = getLine_file(fp);
+    }
+    free(buff);
     // Close the file
     fclose(fp);
     return count;
@@ -358,25 +378,28 @@ TABLE fromCSV (char* file, char* delim){
         return z;
     }
     else{
-        char s [2]=";";
         int n_lin = nLinhas(file);
-        printf("%d\n",n_lin);
         TABLE t = init_Sized_Table(n_lin);
-        char buffer[1024]; // espaco suficiente para os exemplos do input file
-        
-        while(fgets(buffer,1024,f) ){
-            char aux[1024] = "\0";
-            char *tok = buffer, *end = buffer;
-            while (tok != NULL) {
-                strsep(&end, delim);
-                strcat(aux,tok);
-                tok = end;
-                if (tok != NULL && aux[strlen(aux)-1]!= ';')  strcat(aux,s); // para não colocar no último token
+        char* buffer = getLine_file(f); 
+        char* pointer = buffer;
+        char *aux = malloc(sizeof(char) * FROMCSV_BUFFER_SIZE);
+        size_t auxlen = FROMCSV_BUFFER_SIZE, bufflen = strlen(buffer);
+        while( bufflen != 0){
+            aux[0] ='\0';
+            if(auxlen < bufflen){
+                auxlen = (auxlen + bufflen )*2;
+                aux = realloc(aux,auxlen);
             }
-            int size = strlen(aux);
-            aux[size-1] = '\0';
+            while (buffer != NULL) {
+                strcat(aux,strsep(&buffer, delim));
+                if (buffer != NULL && aux[strlen(aux)-1]!= ';')  strcat(aux,";"); // para não colocar no último token
+            }
             setNewLine(t,aux);
+            buffer = getLine_file(f);
+            bufflen = strlen(buffer);
         }
+        free(pointer);
+        free(aux);
         fclose(f);
         printf("Read File.\n");
         return t;

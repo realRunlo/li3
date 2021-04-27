@@ -126,7 +126,6 @@ void readBusiness (GHashTable * hash, char * filename ){
             strcpy(cpy,buffer);
             r = check_line(cpy);
             if(r == 1){
-                printf("%s\n",buffer);
                 b = create_b(buffer);
                 addToHashT(hash,GINT_TO_POINTER(get_id(b)),b);
             }

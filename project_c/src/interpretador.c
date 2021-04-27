@@ -304,39 +304,37 @@ int functionId(char * function){
 //funcao para executar, caso a sintaxe esteja correta, a funcao dada a uma variavel
 int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS v){
     int funcao = functionId(function);
-    int espacos = 0 , i = 0;
+    int espacos = 0 , i = 0 , erro = 0;
     if(comando[i] == '('){// 1ºargumento
         if(funcao == 0){//fromCSV (segundo elemento delimitador
                         //primeiro argumento sendo um diretorio tem de se usar getVar
-            i++;
+            i++;erro++;
             i = addSpaces(i,comando);
             char* dir = getVar(comando+i);
             i+= strlen(dir);
             i = addSpaces(i,comando);
             if(comando[i] == ',' && dir[0] == '"' && dir[strlen(dir)-1] == '"'){// 2ºargumento delimitador
-                i++;
+                i++;erro++;
                 i = addSpaces(i,comando);
                 char* delim = getVar(comando+i);
                 i+= strlen(delim);
                 if(delim[0] == '"' && delim[strlen(delim) -1] == '"'){
-                    i = addSpaces(i,comando);    
+                    i = addSpaces(i,comando);erro++;    
                     if(comando[i] == ')'){
-                        i++;
+                        i++;erro++;
                         i = addSpaces(i,comando);
-                        if(comando[i] == ';'){
+                        if(comando[i] == ';'){erro = 0;
                             char* body = dir+1;
                             char* d = delim+1;
                             TABLE t = fromCSV(strsep(&body,"\""),strsep(&d,"\""));
                             addVar(v,var,t);
-                            free(dir);free(delim);
-                            return 0;
                         }
                     }
-                }
                 free(delim);
-            }
+                }            
+            }    
             free(dir);
-            return -1;
+            return erro;
         }
         i++;
         i = addSpaces(i,comando);
