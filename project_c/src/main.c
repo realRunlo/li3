@@ -30,7 +30,7 @@ int main(){
 
     //int f = interpretador();
 
-    TABLE t = international_users(sgr);                                //teste query 7
+   TABLE t = international_users(sgr);                                //teste query 7
     
     //toCSV(t,";","file");
     //TABLE t = fromCSV("file",";");

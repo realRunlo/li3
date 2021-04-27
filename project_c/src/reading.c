@@ -4,6 +4,7 @@
 #include "../includes/business.h"
 #include <stdio.h>
 #include <string.h>
+#define BUS_BUFFER_SIZE 10000
 #define REV_BUFFER_SIZE 10000
 #define USERS_BUFFER_SIZE 100000
 
@@ -113,20 +114,21 @@ void readUser(GHashTable * table, char * filename){
 @param htable apontador para uma tabela de hash
 */
 void readBusiness (GHashTable * hash, char * filename ){
-    char buffer [5000];
+    char buffer [BUS_BUFFER_SIZE];
     Business b;
     FILE *f = fopen(filename,"r");
 
     if(f!=NULL){
-        int i=0;
-        while(fgets(buffer,1024,f)){
-            char dest [5000];
-            strcpy(dest,buffer);
-            int r = check_line(dest);
+        int r =0;
+        fgets(buffer,BUS_BUFFER_SIZE,f);
+        while(fgets(buffer,BUS_BUFFER_SIZE,f)){
+            char cpy [BUS_BUFFER_SIZE];
+            strcpy(cpy,buffer);
+            r = check_line(cpy);
             if(r == 1){
+                printf("%s\n",buffer);
                 b = create_b(buffer);
                 addToHashT(hash,GINT_TO_POINTER(get_id(b)),b);
-                i++;
             }
         }
         printf("Business loaded.\n");

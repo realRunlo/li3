@@ -14,17 +14,16 @@ struct business{
 
 //Verifica se cada linha tem todos os campos corretamente
 int check_line (char *str){
-    char * a[5];
-    for(int i=0; i<5;i++)
+    char * a[4];
+    for(int i=0; i<4;i++)
             a[i] =NULL;
     a[0] = strdup(strsep(&str,";"));
     a[1] = strdup(strsep(&str,";"));
     a[2] = strdup(strsep(&str,";"));
     a[3] = strdup(strsep(&str,";"));
-    a[4] = strdup(strsep(&str,";"));
     char v [3] ="";
     int r = 1;
-    for(int i=0;i<5;i++){
+    for(int i=0;i<4;i++){
         if((strcmp(a[i],v)) == 0) return 0;
     }
     return r;

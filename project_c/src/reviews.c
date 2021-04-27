@@ -101,7 +101,7 @@ char * r_getText(Reviews rev){
 int r_checkNewLine(char * str){
     char * test = strdup(str);
     char * seped;
-    while((seped = strsep(&test,";")!=NULL)){
+    while((seped =strsep(&test,";"))!=NULL){
         if(strcmp(seped,"")==0)
             return 0;
     }
