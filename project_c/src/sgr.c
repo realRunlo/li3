@@ -96,7 +96,13 @@ typedef struct query9{
 
 /*  ----------private functions----------  */
 
-// Iterator for query2
+/**
+ * @brief iterator da query2 que coloca na table os business comecados com uma letra dada como argumento
+ * 
+ * @param key business_id
+ * @param value business struct
+ * @param user_data process, query2 struct onde esta guardado a letra para comparacao, a table e os numeros totais de entradas
+ */
 static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
     char* name = get_name((Business) value);
     Query2 data = (Query2) user_data;
@@ -130,7 +136,13 @@ static void reviews3_info(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-// Iterator for query4
+/**
+ * @brief iterador da query4 procura na hash das reviews, reviews feitas por um user_id e guarda o business correspondente na table
+ * 
+ * @param key review_id
+ * @param value review struct
+ * @param user_data process, struct query4 que guarda a table, o apontador da hash dos businesses, o user_id em questao e o numero total de entries
+ */
 static void query4_iterator(gpointer key, gpointer value, gpointer user_data){
     Reviews r = (Reviews) value;
     char* user_id = r_getUserId(r);
@@ -188,7 +200,13 @@ static void reviews5_info(gpointer key, gpointer value, gpointer user_data){
         update->total += r_getStars(r);
     }
 }
-//funcao q torna todos os char numa string em minusculas
+
+/**
+ * @brief torna todos os elementos de uma string em minusculas
+ * 
+ * @param s string a modificar
+ * @return char* 
+ */
 char * turn_lowerCases(char* s){
     int i = 0;
     char *lower = strdup(s);
@@ -200,7 +218,13 @@ char * turn_lowerCases(char* s){
     return lower;
 }
 
-//Cria uma hash com todas as diferentes cidades 
+/**
+ * @brief auxiliar da query6 que cria uma hash das diferentes cidades
+ * 
+ * @param key business_id
+ * @param value business struct
+ * @param user_data process, struct auxiliar da query 6 onde se vai guardar a hash das cidades
+ */
 static void city_hash(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
@@ -219,7 +243,15 @@ static void city_hash(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-//para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
+
+/**
+ * @brief percorre cada review para calcular a media de estrelas de cada negocio, guardando/atualizando
+ *      numa nova hash de negocios (unindo os de mesmo id) onde guarda o numero total de estrelas e de reviews
+ * 
+ * @param key review_id
+ * @param value review struct
+ * @param user_data process, auxiliar da query 6 onde se vai guardar a nova hash de negocios com os dados das estrelas
+ */
 static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
@@ -248,7 +280,14 @@ static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
 }
 
 
-//verifica a cidade de cada business, e dependendo do seu average score, atualiza o top dessa cidade    
+/**
+ * @brief guarda/atualiza a matriz de cada struct de cidade da hash das cidades, os top negocios 
+ *      
+ * @param key business_id
+ * @param value business struct
+ * @param user_data process, struct auxiliar da query 6, onde tem a hash das cidades para guardar os tops
+ *      de cada cidade, e a hash das estrelas de cada negocio(para comparar os negocios de uma cidade com o top do momento)
+ */
 static void top_city(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
@@ -342,15 +381,19 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-//torna os dados de uma cidade em formato de uma linha de TABLE
+
+/**
+ * @brief transfere a matriz do top guardada em cada struct de city para a table
+ * 
+ * @param key city_name
+ * @param value city struct (struct auxiliar da query 6)
+ * @param user_data table onde se guardara os tops de cada cidade
+ */
 static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     TABLE result = (TABLE) user_data;
     CITY c = (CITY) value;
     int j = 0 ,k = 0;
     size_t maxlength = 0 ;
-    
-    //printf("city: %s -> entries :%d\n",c->name,c->entries);
-    
     if(c->entries > 0){
     //calcula o tamanho necessario para concatenar os dados dos negocios todos da cidade
     for(; j< c->entries;j++){ 
@@ -401,6 +444,14 @@ void destroy(gpointer key, gpointer value, gpointer data) {
  g_slist_free(value);
 }
 
+/**
+ * @brief auxiliar da query 8, verifica se a categoria procura na query8 se encontra na lista de categorias 
+ *      do negocio analisado no momento
+ * 
+ * @param c_condition categoria procura na query8
+ * @param c_comparing lista de categorias de um negocio
+ * @return int 
+ */
 static int cmp_category(char* c_condition,char* c_comparing){
     int i = 0, j = 0;
     if(c_condition[0] == '\0' && c_comparing[0] == '\0') return 0;
@@ -414,6 +465,15 @@ static int cmp_category(char* c_condition,char* c_comparing){
 
 
 //para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
+/**
+ * @brief auxiliar da query8, similar ao da query6, calcula o numero de estrelas medias de cada negocio,
+ *      neste caso que tenham a categoria procurada
+ * 
+ * @param key reviews_id
+ * @param value reviews struct
+ * @param user_data struct auxiliar da query8, onde se vai guardar uma hash de negocios da categoria procurada
+ *             com o respetivo numero de estrelas e reviews
+ */
 static void b_category(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
@@ -447,6 +507,13 @@ static void b_category(gpointer key, gpointer value, gpointer user_data){
 }
 
 //procura dentro da hash, os business com top score 
+/**
+ * @brief auxiliar da query8, similar ao da query6, guarda/atualiza o top negocios de uma dada categoria
+ *      
+ * @param key business_id
+ * @param value B_STARS struct, onde se guarda os negocios com as respetivas estrelas e reviews
+ * @param user_data B_AVERAGE_STARS struct, onde se guarda os resultados para a table
+ */
 static void top_category(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     B_STARS b = (B_STARS) value;

@@ -332,6 +332,12 @@ void toCSV (TABLE x,char* delim, char* name){
 }
 
 //Recebe o input dado pelo o utilizador a passa-o para um array
+/**
+ * @brief le uma linha de um ficheiro utilizando um buffer dinamico
+ * 
+ * @param f ficheiro
+ * @return char* 
+ */
 char* getLine_file(FILE *f){
     char buff[2000];
     buff[0] = '\0';
@@ -453,6 +459,13 @@ TABLE proj(TABLE x, char* cols){
         
 }
 
+/**
+ * @brief verifica se uma coluna existe na table
+ * 
+ * @param t table
+ * @param column_name nome da coluna a procurar
+ * @return int 
+ */
 int valid_column_name(TABLE t, char* column_name){
     if(t){
         char *line = strdup(t->tab[0]);
