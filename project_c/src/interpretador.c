@@ -17,7 +17,12 @@ struct variaveis{
     int max;
 };
 
-//inicia uma struct VARIAVEIS
+
+/**
+ * @brief inicia a struct variaveis com dois espacos para variaveis
+ * 
+ * @return VARIAVEIS 
+ */
 VARIAVEIS  initVariaveis(){
     VARIAVEIS v = malloc(sizeof(struct variaveis)); 
     v->variaveis = malloc(sizeof(struct variavel) * MAX_VAR);
@@ -26,7 +31,13 @@ VARIAVEIS  initVariaveis(){
     return v;
 }
 
-//adiciona a i o numero de espacos seguidos a partir da posicao inicial
+/**
+ * @brief Adiciona ao argumento i, o numero de espacos consecutivos lidos a partir de (comando+i)
+ * 
+ * @param i posicao atual a ser lida na string comando
+ * @param comando string a ser lida
+ * @return int 
+ */
 int addSpaces(int i,char *comando){
     int espacos = skipSpaces(comando+i);
     i+= espacos; 
@@ -34,6 +45,13 @@ int addSpaces(int i,char *comando){
 }
 
 //devolve a table de uma variavel caso ela exista
+/**
+ * @brief dado o nome de uma variavel, retorna caso exista a table correspondente
+ * 
+ * @param v lista das variaveis
+ * @param var nome da variavel cuja table se pretende devolver
+ * @return TABLE 
+ */
 TABLE varTable(VARIAVEIS v, char* var){
     int i = 0;
     for(; i<v->entries; i++){
@@ -43,11 +61,23 @@ TABLE varTable(VARIAVEIS v, char* var){
     return NULL;
 }
 
+/**
+ * @brief verifica se uma string dada corresponde a um operador 
+ * 
+ * @param arg string a analisar
+ * @return int 
+ */
 int isOperator(char* arg){
     if(strcmp(arg,"-1") == 0 || strcmp(arg,"0") == 0 || strcmp(arg,"1") == 0) return 0;
     return 1;
 }
 
+/**
+ * @brief verifica se uma string dada corresponde a um int
+ * 
+ * @param arg string a analisar
+ * @return int 
+ */
 int isNumber(char* arg){
     int erro = 0;
     if(arg[0] >= 48 && arg[0] <= 57){
@@ -60,7 +90,13 @@ int isNumber(char* arg){
     return -1;
 }
 
-//verifica se uma string corresponde a um float
+
+/**
+ * @brief verifica se uma string dada corresponde a um float
+ * 
+ * @param arg string a analisar
+ * @return int 
+ */
 int isFloat(char* arg){
     int ponto = 0, erro = 0;
     if(arg[0] >= 48 && arg[0] <= 57){
@@ -74,7 +110,14 @@ int isFloat(char* arg){
     return -1;
 }
 
-//adiciona ou atualiza a variavel passada na lista de variaveis
+
+/**
+ * @brief adiciona ou atualiza uma variavel na lista de variaveis
+ * 
+ * @param v lista de variaveis
+ * @param var nome da variavel a adicionar
+ * @param t table correspondente a variavel var
+ */
 void addVar(VARIAVEIS v, char* var, TABLE t){
     int i = 0, flag = 0;
     if (v->entries == v->max){
@@ -105,7 +148,11 @@ void addVar(VARIAVEIS v, char* var, TABLE t){
 }
 
 
-//Recebe o input dado pelo o utilizador a passa-o para um array
+/**
+ * @brief guarda o input de uma linha no terminal na string "input" 
+ * 
+ * @return char* 
+ */
 char* getCommand(){
     char buff[200];
     buff[0] = '\0';
@@ -124,7 +171,13 @@ char* getCommand(){
     return input;
 }
 
-//conta o numero de espacos consecutivos a partir da posicao inicial
+
+/**
+ * @brief conta o numero de espacos consecutivos a partir da posicao inicial de uma string
+ * 
+ * @param str string a analisar
+ * @return int 
+ */
 int skipSpaces(char* str){
     if(strlen(str) == 0) return 0;
     int i = 0;
@@ -133,12 +186,26 @@ int skipSpaces(char* str){
 }
 
 //Verifica se o caractere c pode pertencer ao nome de um comando ou variavel
+/**
+ * @brief verifica se um char se trata de uma letra, numero ou '_' (devido ao nome de algumas querys)
+ *      funcao utilizada para verificar nomes de funcoes passadas ao interpretador
+ * 
+ * @param c char a analisar
+ * @return int 
+ */
 int isDigitOrLetter(char c){    
     //  digito              maiscula            minuscula            nome de query 
     if((c>=48 && c<=57) || (c>=65 && c<=90) || (c>=97 && c<=122) || c == '_') return 0;
     return 1;
 }
 
+/**
+ * @brief a partir da string c retira a primeira string cujos chars validem a "isDigitOrLetter"
+ *      utilizado para retirar nomes de funcoes e de alguns argumentos simples do input  
+ * 
+ * @param c input do utilizador
+ * @return char* 
+ */
 char* commandString(char* c){
     char* buff = malloc(sizeof(char) * strlen(c));
     int i =0;
@@ -151,7 +218,13 @@ char* commandString(char* c){
 }
 
 
-//funcao que verifica se a variavel existe
+/**
+ * @brief verifica se uma variavel ja foi iniciada
+ * 
+ * @param v lista das variaveis iniciadas
+ * @param variavel nome da variavel em questao
+ * @return int 
+ */
 int check_variable(VARIAVEIS v, char* variavel){
     int entries = v->entries;
     VARIAVEL * lista = v->variaveis;
@@ -162,7 +235,14 @@ int check_variable(VARIAVEIS v, char* variavel){
     return 1;
 }
 
-
+/**
+ * @brief execucao do comando show
+ * 
+ * @param comando input do utilizador
+ * @param i posicao a usar para ler o input
+ * @param v lista das variaveis iniciadas
+ * @return int 
+ */
 int executeShow(char *comando,int i, VARIAVEIS v){
     i = addSpaces(i,comando);
     char *buff = commandString(comando+i); //pega na variavel do show
@@ -209,7 +289,14 @@ int executeShow(char *comando,int i, VARIAVEIS v){
 }
 
 
-
+/**
+ * @brief execucao do comando toCSV
+ * 
+ * @param comando input do utilizador
+ * @param i posicao a usar para ler o input
+ * @param v lista das variaveis iniciadas
+ * @return int 
+ */
 int executeToCSV(char* comando, int i, VARIAVEIS v){
     char* var = commandString(comando+i); //primeira variavel de toCSV
     int erro = 0;
@@ -261,7 +348,14 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
     return -1;
 }
 
-//versao de getcomand com menos restricoes para os argumentos
+
+/**
+ * @brief versao de getcomand com menos restricoes para os argumentos(ex.: diretorios)
+ *      a funcao tem em atencao que nao podem ser usados carecteres especiais do 
+ *      interpretador como ';' e ')' fora de ""
+ * @param comando input do utilizador
+ * @return char* 
+ */
 char* getVar(char* comando){
     char *result = malloc(sizeof(char) * strlen(comando));
     result[0] = '\0';
@@ -283,7 +377,12 @@ char* getVar(char* comando){
 
 }
 
-
+/**
+ * @brief analisa uma string e devolve um int identificante do tipo de comando reconhecido pelo interpretador
+ * 
+ * @param function comando a ser analisado
+ * @return int 
+ */
 int functionId(char * function){
     if(strcmp(function, "fromCSV") == 0) return 0;
     if(strcmp(function, "filter") == 0) return 1;
@@ -301,8 +400,17 @@ int functionId(char * function){
 
 
 
-
-//funcao para executar, caso a sintaxe esteja correta, a funcao dada a uma variavel
+/**
+ * @brief executa as querys, filter, fromCSV, proj 
+ *      e inicializacao de variaveis como colunas da table de outra variavel(ex.:z = x[0][0])
+ * 
+ * @param comando input do utilizador
+ * @param var variavel a inicializar/atualizar
+ * @param function funcao pedida pelo utilizador
+ * @param sgr data dos ficheiros lidos ao iniciar o programa
+ * @param v lista das variaveis iniciadas
+ * @return int 
+ */
 int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS v){
     int funcao = functionId(function);
     int espacos = 0 , i = 0 , erro = 0;
@@ -544,7 +652,15 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
 
 
 
-//funcao que analisa o comando passado, e caso seja possivel executa-o
+
+/**
+ * @brief analisa o input dado pelo utilizador, separando a funcao a executar
+ * 
+ * @param comando input do utilizador
+ * @param v lista das variaveis iniciadas
+ * @param sgr data dos ficheiros lidos ao iniciar o programa
+ * @return int 
+ */
 int executeCommand(char *comando,VARIAVEIS v, SGR sgr){ 
     int len = strlen(comando);
     int i = 0, espacos = 0;
@@ -606,11 +722,6 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
         }
         
     }
-
-
-    //cuidar do espacos ate encontrar um char(e sempre entre cada conjunto de char)
-    //verificar se se trata de um comando ou de uma variavel
-    //executar comando ou iniciar variavel dependendo do caso
     free(buff);
     
 }
@@ -618,6 +729,15 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
 
 
 //funcao principal que ira receber os comandos e interpreta-los
+/**
+ * @brief le o input de um utilizador e separa a linha em diferentes comandos, 
+ *      executando de forma sequencial, caso mais do que um comando sejam dados.
+ *      Antes de passar um comando para outras funcoes o processarem, verifica se 
+ *      este segue uma sintaxe basica de comandos (ex.: termina o comando com ;, nao abre parenteses
+ *      sem os fechar, sem ser fora de aspas,etc)
+ * 
+ * @return int 
+ */
 int interpretador(){
     SGR  sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
     VARIAVEIS v = initVariaveis();

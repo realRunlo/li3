@@ -470,32 +470,6 @@ int valid_column_name(TABLE t, char* column_name){
     return -1;
 }
 
-TABLE filterNumber(TABLE x,TABLE comp,char* value, OPERADOR op, int type){
-    TABLE res = init_Sized_Table(getEntries(x));
-    setNewLine(res,get_string_table(x,0));
-    char * r = get_string_table(comp,1);
-    int entries = getEntries(comp);
-    if(type == FLOAT){ //valor e um float
-        float v = atof(value);
-        for(int i = 1; i < entries;i++ ){
-            r = get_string_table(comp,i); 
-            if(op == 0 && v == atof(r)) setNewLine(res,get_string_table(x,i));
-            else if(op == -1 && v > atof(r)) setNewLine(res,get_string_table(x,i));
-                else if(op == 1 && v < atof(r)) setNewLine(res,get_string_table(x,i));
-        }
-    }
-    else{// valor e um int
-        int v = atoi(value);
-        for(int i = 1; i < entries;i++ ){
-            r = get_string_table(comp,i); 
-            if(op == 0 && v == atoi(r)) setNewLine(res,get_string_table(x,i));
-            else if(op == -1 && v > atoi(r)) setNewLine(res,get_string_table(x,i));
-                else if(op == 1 && v < atoi(r)) setNewLine(res,get_string_table(x,i));
-        }
-    }
-    free (r);
-    return res;
-}
 
 
 /**
@@ -510,29 +484,34 @@ TABLE filterNumber(TABLE x,TABLE comp,char* value, OPERADOR op, int type){
 TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){printf(".%s. .%s.\n",column_name,value);
     if(valid_column_name(x,column_name) == 0){ 
         TABLE comp = proj(x,column_name);
+        int entries = getEntries(comp);
         //filtra ints
-        if(isNumber(value) == 0 && getEntries(comp)!=0){
-            return filterNumber(x,comp,value,op,INT);
-        }
-        else if(isFloat(value) == 0 && getEntries(comp)!=0){printf("entrei\n");
-            return filterNumber(x,comp,value,op,FLOAT);
-        }
-            else if (getEntries(comp)!=0){
-                    TABLE res = init_Sized_Table(getEntries(x));
-                    setNewLine(res,get_string_table(x,0));
-                    char * r = get_string_table(comp,1);//vai buscar linha 1 porque 
-                    int c = 0;                          // a linha 0 e o formato da table
-                    int entries = getEntries(comp);
-                    for(int i = 1; i < entries;i++ ){
-                        r = get_string_table(comp,i);
-                        c = strcmp (r,value);
-                        if (0 == op && c == 0) setNewLine(res,get_string_table(x,i));
-                            else if (1 == op && c<0) setNewLine(res,get_string_table(x,i));
-                                else if (-1 == op && c>0) setNewLine(res,get_string_table(x,i));
-                    }
-                    free (r);
-                    return res;
+       if (entries!=0){
+            TABLE res = init_Sized_Table(getEntries(x));
+            setNewLine(res,get_string_table(x,0));
+            char * r = get_string_table(comp,1);//vai buscar linha 1 porque 
+            int c = 0;                          // a linha 0 e o formato da table
+            if (isNumber(value)==0 || isFloat(value) == 0){ //filter para numeros
+                for(int i = 1; i < entries;i++ ){
+                    r = get_string_table(comp,i);
+                    c = strcmp (r, value);
+                    if (0 == op && c == 0) setNewLine(res,get_string_table(x,i));
+                        else if (1 == op && c>0) setNewLine(res,get_string_table(x,i));
+                            else if (-1 == op && c<0) setNewLine(res,get_string_table(x,i));
                 }
+            }
+            else{ //filter para palavras
+                for(int i = 1; i < entries;i++ ){
+                    r = get_string_table(comp,i);
+                    c = strcmp (r, value);
+                    if (0 == op && c == 0) setNewLine(res,get_string_table(x,i));
+                        else if (1 == op && c<0) setNewLine(res,get_string_table(x,i));
+                            else if (-1 == op && c>0) setNewLine(res,get_string_table(x,i));
+                }
+            }
+            free (r);
+            return res;
+        }
     }
     return NULL;
 }
