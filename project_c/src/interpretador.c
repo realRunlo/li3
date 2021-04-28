@@ -599,10 +599,13 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                         i = addSpaces(i,comando);
                         if(comando[i] == ';'){
                             TABLE t1 = varTable(v,arg1);
-                            TABLE t2 = proj(t1,arg2);
+                            char * seped;
+                            seped = strsep(&arg2,"\"");
+                            seped = strdup(strsep(&arg2,"\""));
+                            TABLE t2 = proj(t1,seped);
                             addVar(v,var,t2);
                             printf("variavel %s guardada!\n",var);
-                            free(arg1);free(arg2);
+                            free(arg1);//free(arg2);
                             return 1;
                         }
                 }
@@ -672,8 +675,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     //verificar comando quit;
     if(strcmp(buff,"quit") == 0){
         if(comando[i + 4 + skipSpaces(comando + i + 4)] == ';'){
-            //terminar programa
-            printf("Terminar programa!\n");
+            show_exit();
             exit(0);
         }
     }
@@ -739,6 +741,10 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
  * @return int 
  */
 int interpretador(){
+    show_welcome();
+    printf("Press any key to start...");
+    getchar();
+    clrscr();
     SGR  sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
     VARIAVEIS v = initVariaveis();
     v->variaveis[0] = malloc(sizeof(struct variavel));
@@ -774,6 +780,7 @@ int interpretador(){
         }
         free(s);
         free(buff);
+        
     }
     
     return 0;

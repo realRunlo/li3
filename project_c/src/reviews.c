@@ -101,12 +101,37 @@ char * r_getText(Reviews rev){
 int r_checkNewLine(char * str){
     char * test = strdup(str);
     char * seped;
-    while((seped =strsep(&test,";"))!=NULL){
-        if(strcmp(seped,"")==0)
+    int i = 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,";");
+    if(strcmp(seped,"")==0) return 0;
+    seped = strsep(&test,"\n");
+    if(strcmp(seped,"")==0) return 0;
+
+    /*
+        if(i!=8 & strcmp(seped,"")==0) //test empty fieds except text
             return 0;
-    }
+
+       if((i==3 || i==4 || i==5 ||i==6) && atoi(seped)>5) //test invalid stars,funny,cool
+            return 0;
+        i++;*/
     return 1;
 }
+   
+
 
 /**
 \brief Mapea dados para uma struct review

@@ -5,15 +5,18 @@
 /* -----public----- */
 
 void show_welcome(){
-    printf("----------------------------------------\n");
-    printf("            Hello!,welcome              \n");
-    printf("----------------------------------------\n");
+    printf("********************************************************\n");
+    printf("            Welcome to Management system               \n\n");
+    printf("Developed by: Gonçalo Braz,Gonçalo Pereira,Maria Sofia  \n");
+    printf("                                                        \n");
+    printf("                  Copyrigth (c)                         \n");
+    printf("********************************************************\n");
 }
 
 void show_exit(){
-    printf("----------------------------------------\n");
-    printf("         Bye!,see you next time.        \n");
-    printf("----------------------------------------\n");
+    
+    printf("\nThat's all,folks!\n");
+
 }
 
 void show_error(char * str_err){
