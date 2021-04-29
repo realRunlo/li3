@@ -329,6 +329,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
                                 if(comando[i] == ';'){erro++; //9
                                     TABLE t = varTable(v,var);
                                     toCSV(t,strsep(&del_body,"\""),strsep(&dir,"\""));
+                                    printf("File saved.\n");
                                     free(delim);free(file);
                                     return 1;
                                 }
@@ -742,8 +743,9 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
  */
 int interpretador(){
     show_welcome();
-    printf("Press any key to start...");
-    getchar();
+    printf("Enter any key to start...");
+    char c[200];
+    while(fgets(c,200,stdin) == 0);
     clrscr();
     SGR  sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
     VARIAVEIS v = initVariaveis();
