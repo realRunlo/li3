@@ -22,6 +22,7 @@ char* getVar(char* comando);
 int functionId(char * function);
 int variable_command(char *comando,char *var,char *function,SGR sgr,VARIAVEIS v);
 int executeCommand(char *comando,VARIAVEIS v,SGR sgr);
+SGR initial_load_sgr();
 int interpretador();
 
 
