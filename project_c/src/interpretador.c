@@ -5,6 +5,7 @@
 #include <string.h>
 #define MAX_VAR 2
 #define clrscr() printf("\e[1;1H\e[2J")
+#include <unistd.h>
 
 struct variavel{
     char* variavel;
@@ -788,11 +789,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
 }
 
 
-/**
- * @brief load inicial do sgr, default ou costumizado pelo utilizador
- * 
- * @return SGR 
- */
+/*
 SGR initial_load_sgr(){
     SGR sgr;
     char choice, check = 0;
@@ -828,8 +825,36 @@ SGR initial_load_sgr(){
        }
     }
     return sgr;
+}*/
+SGR load_costume_sgr(){
+    SGR sgr;
+    int j = 0, i; int length = 0;
+    char * dir = getCommand();
+    char * buff = dir;
+    char** files = malloc(sizeof(char*) * 3);
+    for(i = 0;buff[j] != '\0' && buff[j] != '\n'; i++){
+    j = addSpaces(j,buff);
+    files[i] = getVar(buff+j); //ignora a primeira "
+    length = strlen(files[i]);
+    j += length;
+    j = addSpaces(j,buff)+1;
+    }
+    j = addSpaces(j,buff);
+    if(i != 3 && (buff[j] != ';' || buff[j] != '\n' || buff[j] != '\0')) printf("Insert a valid SGR to load.\n");
+    else{
+    char *file1 = files[0] + 1;char *file2 = files[1] + 1; char *file3 = files[2] + 1; 
+    sgr = load_sgr(strsep(&(file1),"\""),strsep(&(file2),"\""),strsep(&(file3),"\""));
+    free(files[0]);free(files[1]);free(files[2]);
+     }
+    return sgr;
 }
-
+int menu_handler(){
+    int choise;
+    show_menu();
+    printf("Enter choice [1-5]:");
+    scanf("%d",&choise);
+    return choise;
+}
 
 //funcao principal que ira receber os comandos e interpreta-los
 /**
@@ -843,45 +868,84 @@ SGR initial_load_sgr(){
  */
 int interpretador(){
     clrscr();
-    char c[200];int check = 0, quit = 0, choice = 0;
+    char c[200];
+    int running = 1,process = 1,choice = 0,loaded = 0;
     VARIAVEIS v = initVariaveis();
     show_welcome();
-    printf("Enter any key to start...");
+    printf("Press ENTER to start...");
     while(fgets(c,200,stdin) == 0);
-    SGR sgr = initial_load_sgr();
+    clrscr();
+    SGR sgr;
     int q = 0;
-    while(q == 0){
-        printf("Type a command: ");
-        char *s = getCommand();
-        //interpretar comandos
-        char *buff = malloc(sizeof(char) * strlen(s));
-        size_t commandlen = 0;
-        int pflag = 0, cflag = 0 , dflag = 0, perro = 0; //flags para deteçao de parenteses, delimitadores, e erros
-        int j = 0;
-        for(int i =0; perro == 0 && s[i] != '\n'; i++){
-            buff[j] = s[i];
-            j++;
-            if(s[i] == '(') pflag++; 
-            if(s[i] == ')') pflag--;
-            if(s[i] == '\'' || s[i] == '"'){
+    while(running){
+        switch (process)
+        {
+        case 1://menu
+            choice = menu_handler();
+            if(choice==1){//default load
+                printf("Loading...\n");
+                sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
+                clrscr();
+                loaded = 1;
+            }else if (choice==2){//costum load
+                printf("Loading...\n");
+                sgr = load_costume_sgr();
+                clrscr();
+                loaded = 1;
+            }else if(choice==3){//sgr terminal
+                if(loaded==1)
+                     process = 2;
+                else{
+                    clrscr();
+                    printf(RED"Load sgr before proceeding!\n"RESET);   
+                } 
+            }else if(choice==4){//help
+                show_help();
+                while(fgets(c,200,stdin) == 0);
+                while(fgets(c,200,stdin) == 0);
+            } else if(choice==5){
+               show_exit();
+               running = 0;
+            }
+            break;
+        
+        case 2://sgr terminal
+            while(q == 0){
+                clrscr();
+                printf(".>$ ");
+                char *s = getCommand();
+            //interpretar comandos
+                char *buff = malloc(sizeof(char) * strlen(s));
+                size_t commandlen = 0;
+                int pflag = 0, cflag = 0 , dflag = 0, perro = 0; //flags para deteçao de parenteses, delimitadores, e erros
+                int j = 0;
+            for(int i =0; perro == 0 && s[i] != '\n'; i++){
+                buff[j] = s[i];
+                j++;
+                if(s[i] == '(') pflag++; 
+                if(s[i] == ')') pflag--;
+                if(s[i] == '\'' || s[i] == '"'){
                 if(dflag == 1) dflag--;
                 else dflag++;
+                }
+                if(s[i] == ';' && pflag == 0){
+                    buff[j] = '\0';
+                    executeCommand(buff,v,sgr);
+                    j = 0;
+                }
+                if(s[i] == ';' && pflag != 0 && dflag == 0){
+                    printf("Syntaxe error.\n");
+                    perro++;
+                 }
             }
-            if(s[i] == ';' && pflag == 0){
-                buff[j] = '\0';
-                executeCommand(buff,v,sgr);
-                j = 0;
-            }
-            if(s[i] == ';' && pflag != 0 && dflag == 0){
-                printf("Syntaxe error.\n");
-                perro++;
-            }
-        }
-        free(s);
-        free(buff);
+            free(s);
+            free(buff);
         
+            }
+            break;
+        }
+
     }
-    
     return 0;
 }
 
