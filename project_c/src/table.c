@@ -289,7 +289,7 @@ void printPage_table(TABLE t,int current_page){
             
     }
     printf("\n");
-    printf("Page %d out of %d || Total entries: %d\n",current_page+1,total_pages,total_entries-1);    
+    printf("Page %d out of %d || Total entries: %d\n",current_page+1,total_pages,total_entries-total_pages);    
 }
 /**
 \brief Indexa uma TABLE dado indices de linha e coluna atribui essa entrada numa nova variável TABLE

@@ -285,7 +285,7 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                         else if(strcmp(c,"n") == 0) page++;
                         else {
                             tmp = executePagGoto(c);
-                            if(tmp!=-1)
+                            if(tmp!=-1 && tmp <= getTotalPages(t))
                                 page = tmp - 1;
                             
                         }
