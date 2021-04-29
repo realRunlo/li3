@@ -86,7 +86,6 @@ typedef struct query7{
     GHashTable * hashT_businesses;
     char * state_atual;
     GHashTable * h_state;
-    int total;
 }*Query7;
 
 typedef struct query9{
@@ -162,7 +161,22 @@ static void query4_iterator(gpointer key, gpointer value, gpointer user_data){
         
     }
 }
-
+/**
+ * @brief torna todos os elementos de uma string em minusculas
+ * 
+ * @param s string a modificar
+ * @return char* 
+ */
+char * turn_lowerCases(char* s){
+    int i = 0;
+    char *lower = strdup(s);
+    while(s[i] != '\0'){
+        lower[i] = tolower(s[i]);
+        i++;
+    }
+    lower[i] = '\0';
+    return lower;
+}
 // Iterator for query5
 static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
     float b_stars = (((B_STARS) value)->total)/(((B_STARS) value)->n_reviews);
@@ -172,8 +186,10 @@ static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
         char* b_id = strdup(((B_STARS) value)->b_id);
         Business b = (Business) g_hash_table_lookup(data->hashT_business,
                                         GINT_TO_POINTER(b_id));
-        char* b_city = get_city(b);
-        if(strcmp(b_city,city_data) == 0){
+    
+        char* city_name = get_city(b);
+        char* city = turn_lowerCases(city_name);
+        if(strcmp(city,city_data) == 0){
             char* b_name = get_name(b);
             char* a = malloc( sizeof(char) * (strlen(b_id) + strlen(b_name) + 5));
             sprintf(a,"%s;%s",b_id, b_name);
@@ -201,22 +217,7 @@ static void reviews5_info(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-/**
- * @brief torna todos os elementos de uma string em minusculas
- * 
- * @param s string a modificar
- * @return char* 
- */
-char * turn_lowerCases(char* s){
-    int i = 0;
-    char *lower = strdup(s);
-    while(s[i] != '\0'){
-        lower[i] = tolower(s[i]);
-        i++;
-    }
-    lower[i] = '\0';
-    return lower;
-}
+
 
 /**
  * @brief auxiliar da query6 que cria uma hash das diferentes cidades
@@ -427,7 +428,6 @@ static void check_state_iterator(gpointer key, gpointer value, gpointer user_dat
         }
         if((g_hash_table_size(data->h_state))>=2){
             setNewLine(data->t,key);
-            data->total++;
         }
     } 
 }
@@ -438,10 +438,6 @@ static void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     Query7 data = (Query7) user_data;
     g_hash_table_insert(data->h_user_visitado, user_id,
         g_slist_append(g_hash_table_lookup(data->h_user_visitado, user_id),b_id));
-}
-
-void destroy(gpointer key, gpointer value, gpointer data) {
- g_slist_free(value);
 }
 
 /**
@@ -786,7 +782,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     pro->t = init_Sized_Table(max_lines);
     char* ind = "business_id;business_name";
     setNewLine(pro->t,ind);
-    pro->city = strdup (city);
+    pro->city = turn_lowerCases(city);
     pro->stars = stars;
     pro->hashT_business = sgr->hashT_businesses;
     pro->h_business_visitado = g_hash_table_new(g_str_hash, g_str_equal);
@@ -795,10 +791,7 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)reviews5_info,pro);  
     
-    g_hash_table_foreach(pro->h_reviews_info, (GHFunc)query5_iterator,pro);
-
-    g_hash_table_destroy(pro->hashT_business);   
-    g_hash_table_destroy(pro->h_business_visitado);   
+    g_hash_table_foreach(pro->h_reviews_info, (GHFunc)query5_iterator,pro); 
     return pro->t;
 }
 
@@ -855,7 +848,6 @@ TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     pro->t = init_Sized_Table(max_lines);
-    pro->total = 0;
     char* ind = "user_id";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
@@ -863,11 +855,6 @@ TABLE international_users (SGR sgr){
     pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query7_iterator,pro);
     g_hash_table_foreach(pro->h_user_visitado, (GHFunc)check_state_iterator,pro);
-    g_hash_table_destroy(pro->h_state);
-    g_hash_table_destroy(pro->hashT_businesses);
-    g_hash_table_foreach(pro->h_user_visitado, destroy, NULL);
-    g_hash_table_destroy(pro->h_user_visitado);
-    setEntries(pro->t,pro->total);
     return pro->t;
 }
 
