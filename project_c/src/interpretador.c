@@ -260,7 +260,7 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                     int q = 0, page = 0;
                     while(q == 0){
                         clrscr();
-                        show_pagedTable(t,page);
+                        page = show_pagedTable(t,page);
                         printf("r -> return; p -> previous page; n -> next page\n");
                         char *c = getCommand();
                         c[strlen(c)-1] = '\0';
@@ -273,18 +273,18 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                     free(buff);
                     return 1;
                 }
-                printf("Tabela vazia.\n");
+                printf("Empty table.\n");
                 return -1;
             }
             else{
-                printf("variavel nao existe\n");
+                printf("Variable not inicialize.\n");
                 free(buff);
                 return -1;
             }
         }
     } 
     free(buff);
-    printf("Erro de sintaxe.\n");  
+    printf("Syntaxe error.\n");  
     return -1;
 }
 
@@ -342,7 +342,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
         }
     }
     else{
-        printf("variavel nao existe\n");
+        printf("Variable not inicialize.\n");
         return -1;
     }
     printf("Erro no comando toCSV %d\n",erro);
@@ -457,7 +457,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 if(comando[i] == ';'){
                     TABLE t = international_users(sgr);
                     addVar(v,var,t);
-                    printf("variavel %s guardada!\n",var);
+                    printf("Variable %s stored!\n",var);
                     free(arg1);
                     return 1;
                 }
@@ -491,7 +491,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 TABLE t2 = filter(t1,arg2,arg3,atoi(arg4));
                                 addVar(v,var,t2);
                                 printf("filter(%s,%s,%s,%s)\n",arg1,arg2,arg3,arg4);
-                                printf("variavel %s guardada!\n",var);
+                                printf("Variable %s stored!\n",var);
                                 free(arg1);free(arg2);free(arg3);free(arg4);
                                 return 1;
                             }
@@ -515,7 +515,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                     c = arg2[1];
                                     TABLE t = businesses_started_by_letter(sgr, c);
                                     addVar(v,var,t);
-                                    printf("variavel %s guardada!\n",var);
+                                    printf("Variable %s stored!\n",var);
                                     free(arg1);free(arg2);
                                     return 1;
                                 } 
@@ -533,7 +533,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                     if(top > 0){
                                         TABLE t = top_businesses_by_city(sgr,top);
                                         addVar(v,var,t);
-                                        printf("variavel %s guardada!\n",var);
+                                        printf("Variable %s stored!\n",var);
                                         free(arg1);free(arg2);
                                         return 1;
                                     }
@@ -552,7 +552,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 if(funcao == 4) t = businesses_reviewed(sgr,strsep(&search,"\""));
                                 if(funcao == 9) t = reviews_with_word(sgr,strsep(&search,"\""));
                                 addVar(v,var,t);
-                                printf("variavel %s guardada!\n",var);
+                                printf("Variable %s stored!\n",var);
                                 free(arg1);free(arg2);
                                 return 1;
                                 }
@@ -582,11 +582,11 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 if(funcao == 5) t = businesses_with_stars_and_city(sgr,stars,strsep(&search,"\""));
                                 if(funcao == 8) t = top_businesses_with_category(sgr,stars,strsep(&search,"\""));
                                 addVar(v,var,t);
-                                printf("variavel %s guardada!\n",var);
+                                printf("Variable %s stored!\n",var);
                                 free(arg1);free(arg2);free(arg3);
                                 return 1;
                                 }
-                                printf("Insira argumentos validos.\n");
+                                printf("Invalid arguments.\n");
                                 free(arg1);free(arg2);free(arg3);
                                 return -1;
                                 }
@@ -605,7 +605,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             seped = strdup(strsep(&arg2,"\""));
                             TABLE t2 = proj(t1,seped);
                             addVar(v,var,t2);
-                            printf("variavel %s guardada!\n",var);
+                            printf("Variable %s stored!\n",var);
                             free(arg1);//free(arg2);
                             return 1;
                         }
@@ -639,7 +639,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                     TABLE t1 = varTable(v,function);
                     TABLE t2 = index_table(t1,atoi(line),atoi(col));
                     addVar(v,var,t2);
-                    printf("variavel %s guardada!\n",var);
+                    printf("Variable %s stored!\n",var);
                     return 1;
                 }
             }
@@ -776,7 +776,7 @@ int interpretador(){
                 j = 0;
             }
             if(s[i] == ';' && pflag != 0 && dflag == 0){
-                printf("Erro de sintaxe.\n");
+                printf("Syntaxe error.\n");
                 perro++;
             }
         }
