@@ -97,9 +97,10 @@ void readUser(GHashTable * table, char * filename){
                 strcat(line, buff);
                 }
             }
-            u = createUser(line);
-            addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
-            
+            if(u_checkNewLine(line) == 0){
+                u = createUser(line);
+                addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
+            }
         }
         }
         free(line);

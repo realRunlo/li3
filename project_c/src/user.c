@@ -81,6 +81,25 @@ void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
 }
 
 /**
+ * @brief verifica se o user lido e valido, se tem user_id e user_name, o campo dos friends pode estar vazio
+ * 
+ * @param str 
+ * @return int 
+ */
+int u_checkNewLine(char * str){
+    char * test = strdup(str);
+    char* pointer = test;
+    char * seped;
+    int i = 0 , empty = 0;
+    seped = strsep(&test,";"); // user_id
+    if(strcmp(seped,"")==0) empty++;
+    seped = strsep(&test,";"); // user_name
+    if(strcmp(seped,"")==0) empty++;
+    free (pointer);
+    return empty;
+}
+
+/**
 \brief Mapea dados para uma struct user
 @param buffer Buffer com informação
 @returns USER - apontador struct user

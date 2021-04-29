@@ -26,11 +26,9 @@ void setFriends(User u, char* newFriends);
 
 void print_user_iterator(gpointer key, gpointer value, gpointer user_data);
 
+int u_checkNewLine(char * str)
 
 User createUser(char * buffer);
-
-
-void readUser(GHashTable * table, char * filename);
 
 
 #endif //___USER_H___
