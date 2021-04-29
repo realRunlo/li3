@@ -748,6 +748,46 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     
 }
 
+
+
+SGR initial_load_sgr(){
+    SGR sgr;
+    char choice, check = 0;
+    while(check == 0){
+       clrscr();
+       show_sgr_options();//show que mostre as opçoes de load de sgr
+       choice = getchar();getchar();
+       switch(choice){
+           case '0':{ sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
+                    check++; break;}
+           case '1':{ //show das regras de load do sgr
+                    int j = 0, i; int length = 0;
+                    char * dir = getCommand();
+                    char * buff = dir;
+                    char** files = malloc(sizeof(char*) * 3);
+                    for(i = 0;buff[j] != '\0' && buff[j] != '\n'; i++){
+                        j = addSpaces(j,buff);
+                        files[i] = getVar(buff+j); //ignora a primeira "
+                        length = strlen(files[i]);
+                        j += length;
+                        j = addSpaces(j,buff)+1;
+                    }
+                    j = addSpaces;
+                    if(i != 3 && (buff[j] != ';' || buff[j] != '\n' || buff[j] != '\0')) printf("Insert a valid SGR to load.\n");
+                    else{
+                        char *file1 = files[0] + 1;char *file2 = files[1] + 1; char *file3 = files[2] + 1; 
+                        sgr = load_sgr(strsep(&(file1),"\""),strsep(&(file2),"\""),strsep(&(file3),"\""));
+                        check++;
+                        free(files[0]);free(files[1]);free(files[2]);
+                    }
+                    break;}
+            default: break;
+       }
+    }
+    return sgr;
+}
+
+
 //funcao principal que ira receber os comandos e interpreta-los
 /**
  * @brief le o input de um utilizador e separa a linha em diferentes comandos, 
@@ -759,19 +799,16 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
  * @return int 
  */
 int interpretador(){
+    clrscr();
+    char c[200];int check = 0, quit = 0, choice = 0;
+    VARIAVEIS v = initVariaveis();
     show_welcome();
     printf("Enter any key to start...");
-    char c[200];
     while(fgets(c,200,stdin) == 0);
-    clrscr();
-    SGR  sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
-    VARIAVEIS v = initVariaveis();
-    v->variaveis[0] = malloc(sizeof(struct variavel));
-    v->variaveis[0]->variavel = strdup("x");
-    v->entries++;
+    SGR sgr = initial_load_sgr();
     int q = 0;
     while(q == 0){
-        printf("Digite o seu comando: ");
+        printf("Type a command: ");
         char *s = getCommand();
         //interpretar comandos
         char *buff = malloc(sizeof(char) * strlen(s));

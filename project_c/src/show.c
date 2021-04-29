@@ -52,6 +52,12 @@ void show_exit(){
 
 }
 
+void show_sgr_options(){
+    printf("LOAD SGR\n");
+    printf("[0] -> Load default sgr\n");
+    printf("[1] -> Costumize a sgr\n");
+}
+
 int show_pagedTable(TABLE t ,int page){
     int totalPages = getTotalPages(t);
     int r = 0;
