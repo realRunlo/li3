@@ -176,6 +176,12 @@ void printN_space(int n){
         printf(" ");
 }
 
+
+/**
+\brief Retorna o número total de páginas
+@param t - Table
+@returns int
+*/
 int getTotalPages(TABLE t){
     int total_entries = getEntries(t);
     int total_pages = total_entries/MAXTPAGE + 1;
@@ -184,6 +190,14 @@ int getTotalPages(TABLE t){
 
     return total_pages;
 }
+
+/**
+\brief Imprime uma header da TABLE,indentificando as colunas
+@param str - Header a imprimir
+@param biggers - Array de inteiros que guarda o tamanho da maior string de cada coluna
+@param cols - Número de colunas
+@returns void
+*/
 void printHeader(char * str,int *biggers,int cols){
     char * seped;
 
@@ -275,9 +289,8 @@ void printPage_table(TABLE t,int current_page){
             
     }
     printf("\n");
-    printf("Page %d out of %d\n",current_page+1,total_pages);    
+    printf("Page %d out of %d || Total entries: %d\n",current_page+1,total_pages,total_entries-1);    
 }
-
 /**
 \brief Indexa uma TABLE dado indices de linha e coluna atribui essa entrada numa nova variável TABLE
 @param t TABLE
@@ -493,7 +506,6 @@ int valid_column_name(TABLE t, char* column_name){
 @param op Operador a aplicar na comparação
 @returns TABLE
 */
-
 TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){printf(".%s. .%s.\n",column_name,value);
     if(valid_column_name(x,column_name) == 0){ 
         TABLE comp = proj(x,column_name);

@@ -18,24 +18,21 @@ void show_exit(){
     printf("\nThat's all,folks!\n");
 
 }
-
-void show_error(char * str_err){
-    printf("ERROR: %s",str_err);
-}
-
-void show_options(char *options){
-    printf("Type: %s",options);
-}
-
-void show_pagedTable(TABLE t ,int page){
+int show_pagedTable(TABLE t ,int page){
     int totalPages = getTotalPages(t);
+    int r = 0;
     if(totalPages==1){
         printPage_table(t,0);
     }else if(page<0){
-        printPage_table(t,totalPages + page);
+        r = totalPages + page;
+        printPage_table(t,r);
     }else if(page>=totalPages){
-        printPage_table(t,page - totalPages );
+        r = page - totalPages ;
+        printPage_table(t,r);
     }else{
-        printPage_table(t,page);
+        r = page;
+        printPage_table(t,r);
     }
+
+    return r;
 }

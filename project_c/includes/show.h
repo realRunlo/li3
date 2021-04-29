@@ -14,11 +14,7 @@ void show_welcome();
 
 void show_exit();
 
-void show_error(char * str_err);
-
-void show_options(char *options);
-
-void show_pagedTable(TABLE t ,int page);
+int show_pagedTable(TABLE t ,int page);
 
 
 
