@@ -235,6 +235,22 @@ int check_variable(VARIAVEIS v, char* variavel){
     return 1;
 }
 
+int executePagGoto(char * line){
+    int i=0;
+    i = addSpaces(i,line);
+    char * command = commandString(line+i);
+    if(strcmp(command,"goto")==0){
+        i += strlen(command);
+        i = addSpaces(i,line);
+        command = commandString(line+i);
+        if(isNumber(command)==0)
+            return atoi(command);
+        
+    } 
+
+    return -1;  
+}
+
 /**
  * @brief execucao do comando show
  * 
@@ -257,17 +273,22 @@ int executeShow(char *comando,int i, VARIAVEIS v){
             if(check_variable(v,buff) == 0){
                 TABLE t = varTable(v,buff);
                 if(t){
-                    int q = 0, page = 0;
+                    int q = 0, page = 0,tmp=0;
                     while(q == 0){
                         clrscr();
                         page = show_pagedTable(t,page);
-                        printf("r -> return; p -> previous page; n -> next page\n");
+                        printf("[r] -> return; [p] -> previous page; [n] -> next page;[goto] -> goto page \n");
                         char *c = getCommand();
                         c[strlen(c)-1] = '\0';
                         if(strcmp(c,"r") == 0) q++;
                         else if(strcmp(c,"p") == 0) page--;
                         else if(strcmp(c,"n") == 0) page++;
-                        else if(isNumber(c) == 0) page = atoi(c)-1;
+                        else {
+                            tmp = executePagGoto(c);
+                            if(tmp!=-1)
+                                page = tmp - 1;
+                            
+                        }
                     }
                     clrscr();
                     free(buff);
@@ -398,8 +419,6 @@ int functionId(char * function){
     if(strcmp(function, "proj") == 0) return 10;
     return -1;
 }
-
-
 
 /**
  * @brief executa as querys, filter, fromCSV, proj 
@@ -728,6 +747,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     free(buff);
     
 }
+
 
 
 SGR initial_load_sgr(){
