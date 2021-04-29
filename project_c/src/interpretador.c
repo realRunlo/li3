@@ -788,7 +788,11 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
 }
 
 
-
+/**
+ * @brief load inicial do sgr, default ou costumizado pelo utilizador
+ * 
+ * @return SGR 
+ */
 SGR initial_load_sgr(){
     SGR sgr;
     char choice, check = 0;
