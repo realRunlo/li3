@@ -53,8 +53,6 @@ void readReviews(GHashTable * hTable,char * filename){
         free(line);
     }
     fclose(fp);
-
-    printf("Reviews loaded.\n");
 }
 /**
 \brief Lê informação de um ficheiro de users e guarda numa hashtable
@@ -104,7 +102,6 @@ void readUser(GHashTable * table, char * filename){
         }
         free(line);
     fclose(f);
-    printf("Users loaded.\n");
     }
 }
 
@@ -130,7 +127,6 @@ void readBusiness (GHashTable * hash, char * filename ){
                 addToHashT(hash,GINT_TO_POINTER(get_id(b)),b);
             }
         }
-        printf("Business loaded.\n");
     }
     else  perror("ERROR: ");
 }

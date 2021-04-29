@@ -706,8 +706,6 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     
     SGR sgr_load = init_sgr();
 
-    printf("Loading...\n");
-
     readReviews(sgr_load->hashT_reviews,reviews_file);
     
     //readUser(sgr_load->hashT_users,users_file);

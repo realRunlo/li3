@@ -52,11 +52,21 @@ void show_exit(){
 
 }
 
-void show_sgr_options(){
-    printf("LOAD SGR\n");
-    printf("[0] -> Load default sgr\n");
-    printf("[1] -> Costumize a sgr\n");
+void show_menu(){
+    show_banner();
+    printf("\n");
+    printf("[1] -> Load default sgr\n");
+    printf("[2] -> Costumize a sgr\n");
+    printf("[3] -> Go to sgr terminal\n");
+    printf("[4] -> Help\n");
+    printf("[5] -> Quit\n");
 }
+
+void show_help(){
+    printf("             Welcome to sgr guide      \n");
+   
+}
+
 
 int show_pagedTable(TABLE t ,int page){
     int totalPages = getTotalPages(t);

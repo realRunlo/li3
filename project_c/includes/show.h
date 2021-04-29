@@ -20,7 +20,9 @@ void show_welcome();
 
 void show_exit();
 
-void show_sgr_options();
+void show_menu();
+
+void show_help();
 
 int show_pagedTable(TABLE t ,int page);
 
