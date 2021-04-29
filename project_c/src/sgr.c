@@ -638,6 +638,37 @@ static void query9_iterator(gpointer key, gpointer value, gpointer user_data){
 /*  ----------public----------  */
 
 /**
+ * @brief da free nas hashes tables de uma estrutura sgr
+ * 
+ * @param sgr 
+ */
+void free_sgr_hashes(SGR sgr){
+    free_all_key_value_entries(sgr->hashT_users);
+    free_all_key_value_entries(sgr->hashT_businesses);
+    free_all_key_value_entries(sgr->hashT_reviews); 
+}
+
+/**
+ * @brief modifica o sgr atual, dando free nas hashes e guardando novas
+ *      criadas a partir de novos diretorios
+ * 
+ * @param sgr 
+ * @param users 
+ * @param businesses 
+ * @param reviews 
+ */
+void sgr_new_hashes(SGR sgr,char * users, char* businesses, char* reviews){
+    free_sgr_hashes(sgr);
+    sgr->hashT_users = initHashT();
+    sgr->hashT_businesses = initHashT();
+    sgr->hashT_reviews = initHashT();
+    readUser(sgr->hashT_users,users);
+    readBusiness(sgr->hashT_businesses,businesses);
+    readReviews(sgr->hashT_reviews,reviews);
+}
+
+
+/**
 \brief Inicializador de dados SGR
 @returns new_sgr stuct sgr
 */

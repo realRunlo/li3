@@ -11,6 +11,9 @@
 
 typedef struct sgr * SGR;
 
+
+void sgr_new_hashes(SGR sgr,char * users, char* businesses, char* reviews);
+
 SGR init_sgr();
 
 void free_sgr(SGR sgr);

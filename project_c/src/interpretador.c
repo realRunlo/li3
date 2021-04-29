@@ -674,7 +674,40 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
 }
 
 
-
+int executeLoadSgr(char * comando,int i,SGR sgr){
+    int erro = 0;
+    char* buf1 = getVar(comando + i);
+    i += strlen(buf1);
+    i = addSpaces(i,comando);
+    if(comando[i] == ','){erro++;
+        i++;
+        i = addSpaces(i,comando);
+        char* buf2 = getVar(comando + i);
+        i += strlen(buf2);
+        i = addSpaces(i,comando);
+        printf(".%s. .%c.\n",buf2,comando[i]);
+        if(comando[i] == ','){erro++;
+            i++;
+            i = addSpaces(i,comando);
+            char* buf3 = getVar(comando + i);
+            i += strlen(buf3);
+            i = addSpaces(i,comando);
+            if(comando[i] == ')'){erro++;
+                i++;
+                i = addSpaces(i,comando);
+                if(comando[i] == ';'){erro = 0;
+                    char* user_file = buf1 +1;
+                    char* business_file = buf2 +1;
+                    char* reviews_file = buf3 +1;
+                    sgr_new_hashes(sgr,strsep(&user_file,"\""),strsep(&business_file,"\""),strsep(&reviews_file,"\""));
+                    printf("SGR updated\n");
+                }
+            }free(buf3);
+        }free(buf2);
+    }free(buf1);
+    if(erro != 0) printf("Error %d\n",erro);
+    return erro;
+}
 
 /**
  * @brief analisa o input dado pelo utilizador, separando a funcao a executar
@@ -701,7 +734,6 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     }
     
     //verificar comando show()
-    //falta executar e talvez comprimir para uma funçao separada
     if(strcmp(buff,"show") == 0){
         if(comando[i + 4] == '('){
         free(buff);
@@ -711,15 +743,23 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
     }
 
     //verificar comando toCSV()
-    //falta comprimir para uma funçao separada e executar
     if(strcmp(buff,"toCSV") == 0){
         if(comando[i + 5] == '('){
         i += 6;
         i = addSpaces(i,comando);
         free(buff);
         return executeToCSV(comando,i,v);
-        
+        }
     }
+
+    //verificar comando load_sgr()
+    if(strcmp(buff,"load_sgr") == 0){
+        if(comando[i + 8] == '('){
+        i += 9;
+        i = addSpaces(i,comando);
+        free(buff);
+        return executeLoadSgr(comando,i,sgr);
+        }
     }
 
     i = espacos;
@@ -734,7 +774,6 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
             i += skipSpaces(comando+i);
             char * function = commandString(comando+i);
             //verificar se a variavel esta a ser atribuida a um comando compativel e executar
-            //variable_command(buff,function,comando+i,sgr,v);
             i+= strlen(function);
             return variable_command(comando+i, buff, function,sgr,v);
         }
@@ -745,7 +784,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
         
     }
     free(buff);
-    
+    return 0;
 }
 
 
@@ -772,7 +811,7 @@ SGR initial_load_sgr(){
                         j += length;
                         j = addSpaces(j,buff)+1;
                     }
-                    j = addSpaces;
+                    j = addSpaces(j,buff);
                     if(i != 3 && (buff[j] != ';' || buff[j] != '\n' || buff[j] != '\0')) printf("Insert a valid SGR to load.\n");
                     else{
                         char *file1 = files[0] + 1;char *file2 = files[1] + 1; char *file3 = files[2] + 1; 

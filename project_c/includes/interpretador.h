@@ -21,6 +21,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v);
 char* getVar(char* comando);
 int functionId(char * function);
 int variable_command(char *comando,char *var,char *function,SGR sgr,VARIAVEIS v);
+int executeLoadSgr(char* comando, int i, SGR sgr);
 int executeCommand(char *comando,VARIAVEIS v,SGR sgr);
 SGR initial_load_sgr();
 int interpretador();
