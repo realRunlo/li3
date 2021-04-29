@@ -10,6 +10,12 @@
 #define WHT   "\x1B[37m"
 #define RESET "\x1B[0m"
 
+void show_banner();
+
+void show_info_banner();
+
+void show_bar();
+
 void show_welcome();
 
 void show_exit();
