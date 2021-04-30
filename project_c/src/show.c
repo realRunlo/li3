@@ -5,12 +5,12 @@
 /* -----public----- */
 
 void show_banner(){
-    printf(YEL"                       _____  _____ _____  \n");
-    printf(YEL"                      / ____|/ ____|  __ \\ \n");
-    printf(YEL"                     | (___ | |  __| |__) |\n");
-    printf(YEL"                      \\___ \\| | |_ |  _  / \n");
-    printf(YEL"                      ____) | |__| | | \\ \\ \n");
-    printf(YEL"                     |_____/ \\_____|_|  \\_\\ ");
+    printf(YEL"                          _____  _____ _____  \n");
+    printf(YEL"                         / ____|/ ____|  __ \\ \n");
+    printf(YEL"                        | (___ | |  __| |__) |\n");
+    printf(YEL"                         \\___ \\| | |_ |  _  / \n");
+    printf(YEL"                         ____) | |__| | | \\ \\ \n");
+    printf(YEL"                        |_____/ \\_____|_|  \\_\\ ");
     printf("\n"RESET);
 
 }
@@ -35,7 +35,7 @@ void show_welcome(){
     printf("\n");
     show_banner();
     printf("\n\n");
-    printf("                         Copyrigth (c)                         \n");
+    printf("                            Copyrigth (c)                         \n");
     show_bar();
 }
 void show_exit(){
@@ -56,7 +56,7 @@ void show_menu(){
     show_banner();
     printf("\n");
     printf("[1] -> Load default sgr\n");
-    printf("[2] -> Costumize a sgr\n");
+    printf("[2] -> Load costum sgr\n");
     printf("[3] -> Go to sgr terminal\n");
     printf("[4] -> Help\n");
     printf("[5] -> Quit\n");

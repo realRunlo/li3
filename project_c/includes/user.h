@@ -26,7 +26,7 @@ void setFriends(User u, char* newFriends);
 
 void print_user_iterator(gpointer key, gpointer value, gpointer user_data);
 
-int u_checkNewLine(char * str)
+int u_checkNewLine(char * str);
 
 User createUser(char * buffer);
 
