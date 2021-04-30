@@ -26,8 +26,10 @@ void show_help();
 
 int show_pagedTable(TABLE t ,int page);
 
+void show_query2_error(int error);
 
+void show_query3_error(int error);
 
-
+void show_query_error(int error);
 
 #endif //___SHOW_H___

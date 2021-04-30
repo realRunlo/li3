@@ -523,48 +523,39 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 return -1;
             }
             if(funcao == 2 || funcao == 3 || funcao == 4 || funcao == 6 || funcao == 9 ){//query de 2 argumentos
-                if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){
+                erro++;
+                if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){erro++;
                     i++;
                     i = addSpaces(i,comando);
-                    if(comando[i] == ';'){
+                    if(comando[i] == ';'){erro = 0;
                         switch(funcao){
-                            case(2):{
+                            case(2):{erro++;
                                 char c;
-                                if(arg2[0] == '\'' && arg2[2] == '\''){
+                                if(arg2[0] == '\'' && arg2[2] == '\''){erro = 0;
                                     c = arg2[1];
                                     TABLE t = businesses_started_by_letter(sgr, c);
                                     addVar(v,var,t);
                                     printf("Variable %s stored!\n",var);
-                                    free(arg1);free(arg2);
-                                    return 1;
                                 } 
+                                if(erro != 0) show_query2_error(erro);
                                 free(arg1);free(arg2);
-                                return -1;
+                                return erro;
                                 }
-                            case(6):{
-                                int isDigit = 0;
-                                for(int i = 0; arg2[i] != '\0' && isDigit == 0; i++){
-                                    if(arg2[i] >= 48 && arg2[i] <= 57);
-                                    else isDigit++;
-                                }
-                                if(isDigit == 0){
+                            case(6):{erro=0;
+                                if(isNumber(arg2) == 0){erro++;
                                     int top = atoi(arg2);
-                                    if(top > 0){
+                                    if(top > 0){erro = 0;
                                         TABLE t = top_businesses_by_city(sgr,top);
                                         addVar(v,var,t);
                                         printf("Variable %s stored!\n",var);
-                                        free(arg1);free(arg2);
-                                        return 1;
                                     }
-                                    printf("Utilize um valor maior que 0.\n");
-                                    free(arg1);free(arg2);
-                                    return 1;
                                 }
+                                if(erro!=0) show_query3_error(erro);
                                 free(arg1);free(arg2);
-                                return -1;
+                                return erro;
                                 }
-                            default:{ //query 3, 4 e 9
-                                if(arg2[0] == '"' && arg2[strlen(arg2)-1] == '"'){
+                            default:{erro = 1; //query 3, 4 e 9
+                                if(arg2[0] == '"' && arg2[strlen(arg2)-1] == '"'){erro = 0;
                                 char* search = arg2+1;
                                 TABLE t;
                                 if(funcao == 3) t = business_info(sgr,strsep(&search,"\""));
@@ -572,16 +563,16 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 if(funcao == 9) t = reviews_with_word(sgr,strsep(&search,"\""));
                                 addVar(v,var,t);
                                 printf("Variable %s stored!\n",var);
-                                free(arg1);free(arg2);
-                                return 1;
                                 }
                                 free(arg1);free(arg2);
-                                return -1;
+                                return erro;
                             }
                         }
                     }
                 }
-                return -1;
+                show_query_error(erro);
+                free(arg1);free(arg2);
+                return erro;
             }
             if(funcao == 5 || funcao == 8){//query de 3 argumentos
                 if(comando[i] == ',' && strcmp(arg1,"sgr") == 0){
@@ -837,7 +828,6 @@ SGR load_costume_sgr(){
 int menu_handler(){
     char c[200];
     do{
-        clrscr();
         show_menu();
         printf("Enter choice [1-5]:");
     }while(strlen(fgets(c,200,stdin)) != 2);
@@ -892,6 +882,7 @@ int interpretador(){
                 clrscr();
                 show_help();
                 while(fgets(c,200,stdin) == 0);
+                clrscr();
             } else if(choice==5){
                show_exit();
                running = 0;
@@ -911,8 +902,8 @@ int interpretador(){
             for(int i =0; perro == 0 && s[i] != '\n' && process == 2; i++){
                 buff[j] = s[i];
                 j++;
-                if(s[i] == '(') pflag++; 
-                if(s[i] == ')') pflag--;
+                if(s[i] == '(' && dflag == 0) pflag++; 
+                if(s[i] == ')' && dflag == 0) pflag--;
                 if(s[i] == '\'' || s[i] == '"'){
                 if(dflag == 1) dflag--;
                 else dflag++;

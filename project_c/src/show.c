@@ -122,3 +122,17 @@ int show_pagedTable(TABLE t ,int page){
 
     return r;
 }
+
+
+void show_query2_error(int error){
+    if(error == 1) printf("Error, invalid letter.\n");
+}
+
+void show_query3_error(int error){
+    if(error == 1) printf("Error, invalid number.\n");
+    if(error == 2) printf("Error, please insert a number greater than 0.\n");
+}
+
+void show_query_error(error){
+    if(error == 1) printf("Error, invalid sgr.\n");
+}
