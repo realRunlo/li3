@@ -63,8 +63,39 @@ void show_menu(){
 }
 
 void show_help(){
-    printf("             Welcome to sgr guide      \n");
-   
+    printf(YEL"\t\t            WELCOME TO OUR SGR GUIDE     \n"RESET);
+    printf("Available commands: \n");
+    printf("Query1 :load_sgr( \"[user_file]\", \"[business_file]\", \"[reviews_file]\");\n"RESET);
+    printf("\tLoads a costum sgr using the files given as arguments.\n\n");
+    printf("Query2 :[var] = businesses_started_by_letter(sgr, [letter]); \n"RESET);
+    printf("\tSaves all the businesses started by the letter given.\n\n");
+    printf("Query3 :[var] = business_info(sgr,[business_id]); \n"RESET);
+    printf("\tSaves the information of a business with the id given.\n\n");
+    printf("Query4 :[var] = business_reviewed(sgr,[user_id]); \n"RESET);
+    printf("\tSaves the information of the businesses reviewd by the user with the given id.\n\n");
+    printf("Query5 :[var] = business_with_stars_and_city(sgr,[stars],[city]); \n"RESET);
+    printf("\tSaves the businesses that meet the number of stars and city given.\n\n");
+    printf("Query6 :[var] = top_businesses_by_city(sgr,[top]); \n"RESET);
+    printf("\tSaves the information of the top businesses of each city.\n\n");
+    printf("Query7 :[var] = international_users(sgr); \n"RESET);
+    printf("\tSaves the information of the users who have visited more than one state.\n\n");
+    printf("Query8 :[var] = top_businesses_with_category(sgr,[stars],[category]); \n"RESET);
+    printf("\tSaves the information of the businesses that meet the number of stars and category given.\n\n");
+    printf("Query9 :[var] = reviews_with_word(sgr,[word]); \n"RESET);
+    printf("\tSaves the id of the reviews which use the word given in their text.\n\n");
+    printf("[var] = fromCSV(\"[file]\",\"delimiter\");\n"RESET);
+    printf("\tSaves the information of the file given into a TABLE structure, using the delimiter given to separate each element.\n\n");
+    printf("[var] = proj([var],[column_names]);\n"RESET);
+    printf("\tSaves the given columns, if valid, from an initialized variable to a variable.\n\n");
+    printf("[var] = [var][line][column];\n"RESET);
+    printf("\tSaves a specific element from an initialized variable (using the line and column given), to a variable.\n\n");
+    printf("toCSV([var],[delimiter],\"[file]\"); \n"RESET);
+    printf("\tTransfers the information from an initialized variable to a given file, using the given delimiter to separate each line from the TABLE\n\n");
+    printf("show([var]); \n"RESET);
+    printf("\tShows the information saved in an initialized variable\n\n");
+    printf("quit; \n"RESET);
+    printf("\tEnds the program.\n\n");
+    printf("Information: follow the sintax of each command as shown above, not forgetting to end each command with ';'.\nMultiple commands can be issued in each line, which will then executed one at a time.\n");
 }
 
 

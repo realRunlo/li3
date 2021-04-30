@@ -809,12 +809,16 @@ SGR load_costume_sgr(){
      }
     return sgr;
 }
+
+
 int menu_handler(){
-    int choise;
-    show_menu();
-    printf("Enter choice [1-5]:");
-    scanf("%d",&choise);
-    return choise;
+    char c[200];
+    do{
+        clrscr();
+        show_menu();
+        printf("Enter choice [1-5]:");
+    }while(strlen(fgets(c,200,stdin)) != 2);
+    return atoi(c);
 }
 
 //funcao principal que ira receber os comandos e interpreta-los
@@ -863,8 +867,8 @@ int interpretador(){
                     printf(RED"Load sgr before proceeding!\n"RESET);   
                 } 
             }else if(choice==4){//help
+                clrscr();
                 show_help();
-                while(fgets(c,200,stdin) == 0);
                 while(fgets(c,200,stdin) == 0);
             } else if(choice==5){
                show_exit();

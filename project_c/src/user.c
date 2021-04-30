@@ -95,6 +95,10 @@ int u_checkNewLine(char * str){
     if(strcmp(seped,"")==0) empty++;
     seped = strsep(&test,";"); // user_name
     if(strcmp(seped,"")==0) empty++;
+    seped = strsep(&test,";"); 
+
+    seped = strsep(&test,";"); //verificar se nao tem campos a mais
+    if(strcmp(seped,"") !=0) empty++;
     free (pointer);
     return empty;
 }
