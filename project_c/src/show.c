@@ -133,6 +133,32 @@ void show_query3_error(int error){
     if(error == 2) printf("Error, please insert a number greater than 0.\n");
 }
 
-void show_query_error(error){
+void show_query3_4_9_error(int error){
+    if(error == 1) printf("Error, invalid argument, check the '\"'.\n");
+}
+
+void show_query5_8_error(int error){
     if(error == 1) printf("Error, invalid sgr.\n");
+    if(error == 2) printf("Error, not enough arguments.\n");
+    if(error == 3) printf("Error, invalid parentheses.\n");
+    if(error == 4) printf("Error, invalid closing.\n");
+    if(error == 5) printf("Error, invalid arguments.\n");
+}
+
+void show_variable_command_error(int error){
+    if(error == 0) printf("Error, unknown command.\n");
+    if(error == 1) printf("Error, invalid sgr.\n");
+}
+
+void show_proj_error(int error){
+    if(error == 1) printf("Error, variable uninitialized.\n");
+    if(error == 2 || error == 3) printf("Error, invalid syntax.\n");
+}
+
+void show_index_error(int error){
+    if(error == 1) printf("Error, variable uninitialized.\n");
+    if(error > 1 && error < 5) printf("Error, invalid brackets.\n");
+    if(error == 5) printf("Error, invalid closing.\n");
+    if(error == 6) printf("Error, invalid line.\n");
+    if(error == 7) printf("Error, invalid column.\n");
 }
