@@ -634,7 +634,52 @@ static void query9_iterator(gpointer key, gpointer value, gpointer user_data){
    
 }
 
+void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+    TABLE catalog = (TABLE) user_data;
 
+    char * revId = r_getReviewId((Reviews) value);
+    char * usId = r_getUserId((Reviews) value);
+    char * busId = r_getBusinessId((Reviews) value);
+    float stars = r_getStars((Reviews) value);
+    int useful = r_getUseful((Reviews) value);
+    int funny = r_getFunny((Reviews) value);
+    int cool = r_getCool((Reviews) value);
+    char * date = r_getDate((Reviews) value);
+    
+
+    int size = strlen(revId)+strlen(usId)+strlen(busId) + 6 +strlen(date) + 7 ;
+    char * buffer = malloc(sizeof(char)*size);
+    sprintf(buffer,"%s;%s;%s;%.2f;%d;%d;%d;%s",revId,usId,busId,stars,useful,funny,cool,date);
+    setNewLine(catalog,buffer);
+}
+void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+    TABLE catalog = (TABLE) user_data;
+
+    char * usId = getUserId((User) value);
+    char * name = getUserName((User) value);
+    
+    int size = strlen(usId) + strlen(name) + 1 ;
+    char * buffer = malloc(sizeof(char) * size);
+    sprintf(buffer,"%s;%s",usId,name);
+    setNewLine(catalog,buffer);
+
+}
+
+void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+    TABLE catalog = (TABLE) user_data;
+
+    char * bus_id = get_id((Business) value);
+    char * name = get_name((Business) value);
+    char * city = get_city((Business) value);
+    char * state = get_state((Business) value);
+
+    int size = strlen(bus_id) + strlen(name) + strlen(city) + strlen(state) + 3;
+    char * buffer = malloc(sizeof(char) * size);
+    sprintf(buffer,"%s;%s;%s;%s",bus_id,name,city,state);
+    setNewLine(catalog,buffer);
+
+
+}
 /*  ----------public----------  */
 
 /**
@@ -708,7 +753,7 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 
     readReviews(sgr_load->hashT_reviews,reviews_file);
     
-    //readUser(sgr_load->hashT_users,users_file);
+    readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
     return sgr_load;
@@ -942,4 +987,37 @@ TABLE reviews_with_word(SGR sgr,char * word){
     g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) query9_iterator,query_data);
     
     return query_data->t;
+}
+
+TABLE businesses_catalog(SGR sgr){
+    int max_lines = g_hash_table_size(sgr->hashT_businesses);
+    TABLE catalog = init_Sized_Table(max_lines);
+
+    setNewLine(catalog,"business_id;name;city;state");
+
+    g_hash_table_foreach(sgr->hashT_businesses,(GHFunc)busCatalog_iterator,catalog);
+
+    return catalog;
+}
+
+TABLE users_catalog(SGR sgr){
+    int max_lines = g_hash_table_size(sgr->hashT_users);
+    TABLE catalog = init_Sized_Table(max_lines);
+
+    setNewLine(catalog,"user_id;name");
+
+    g_hash_table_foreach(sgr->hashT_users,(GHFunc)usCatalog_iterator,catalog);
+
+    return catalog;
+}
+
+TABLE reviews_catalog(SGR sgr){
+    int max_lines = g_hash_table_size(sgr->hashT_reviews);
+    TABLE catalog = init_Sized_Table(max_lines);
+
+    setNewLine(catalog,"review_id;user_id;business_id;stars;useful;funny;cool;date");
+
+    g_hash_table_foreach(sgr->hashT_reviews,(GHFunc) revCatalog_iterator,catalog);
+
+    return catalog;
 }

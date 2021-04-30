@@ -12,8 +12,6 @@
 typedef struct sgr * SGR;
 
 
-void sgr_new_hashes(SGR sgr,char * users, char* businesses, char* reviews);
-
 SGR init_sgr();
 
 void free_sgr(SGR sgr);
@@ -44,6 +42,15 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category);
 
 /* query 9 */
 TABLE reviews_with_word(SGR sgr,char * word);
+
+
+void sgr_new_hashes(SGR sgr,char * users, char* businesses, char* reviews);
+
+TABLE reviews_catalog(SGR sgr);
+
+TABLE users_catalog(SGR sgr);
+
+TABLE businesses_catalog(SGR sgr);
 
 #endif //___SGR_H___
 
