@@ -802,6 +802,7 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr,int* process){
 }
 
 SGR load_costume_sgr(){
+    printf("\nEnter 3 files to load\nSyntax :[user_file],[businesses_file],[reviews_file]\n");
     SGR sgr;
     int j = 0, i; int length = 0;
     char * dir = getCommand();
@@ -866,7 +867,6 @@ int interpretador(){
                 printf(GRN"sgr loaded!\n"RESET);
                 loaded = 1;
             }else if (choice==2){//costum load
-                printf("Loading...\n");
                 sgr = load_costume_sgr();
                 clrscr();
                 printf(GRN"sgr loaded!\n"RESET);
