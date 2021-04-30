@@ -715,9 +715,10 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
  * @param comando input do utilizador
  * @param v lista das variaveis iniciadas
  * @param sgr data dos ficheiros lidos ao iniciar o programa
+ * @param r int utilizado para verificar se o comando return foi utilizado
  * @return int 
  */
-int executeCommand(char *comando,VARIAVEIS v, SGR sgr){ 
+int executeCommand(char *comando,VARIAVEIS v, SGR sgr,int* process){ 
     int len = strlen(comando);
     int i = 0, espacos = 0;
     
@@ -732,7 +733,29 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr){
             exit(0);
         }
     }
-    
+
+    if(strcmp(buff,"return") == 0){
+        if(comando[i + 6 + skipSpaces(comando + i + 6)] == ';'){
+            *process= 1;
+            return 0;
+        }
+    }
+
+    if(strcmp(buff,"clear") == 0){
+        if(comando[i + 5 + skipSpaces(comando + i + 5)] == ';'){
+            clrscr();
+            return 0;
+        }
+    }
+
+    if(strcmp(buff,"help") == 0){
+        if(comando[i + 4 + skipSpaces(comando + i + 4)] == ';'){
+            clrscr();
+            show_help();
+            return 0;
+        }
+    }
+
     //verificar comando show()
     if(strcmp(buff,"show") == 0){
         if(comando[i + 4] == '('){
@@ -834,14 +857,13 @@ int menu_handler(){
 int interpretador(){
     clrscr();
     char c[200];
-    int running = 1,process = 1,choice = 0,loaded = 0;
+    int running = 1,process = 1,choice = 0,loaded = 0 ;
     VARIAVEIS v = initVariaveis();
     show_welcome();
     printf("\nPress ENTER to start...");
     while(fgets(c,200,stdin) == 0);
     clrscr();
     SGR sgr;
-    int q = 0;
     while(running){
         switch (process)
         {
@@ -877,16 +899,16 @@ int interpretador(){
             break;
         
         case 2://sgr terminal
-            while(q == 0){
-                clrscr();
+            clrscr();
+            while(process == 2){
                 printf(".>$ ");
                 char *s = getCommand();
-            //interpretar comandos
+                //interpretar comandos
                 char *buff = malloc(sizeof(char) * strlen(s));
                 size_t commandlen = 0;
                 int pflag = 0, cflag = 0 , dflag = 0, perro = 0; //flags para deteçao de parenteses, delimitadores, e erros
                 int j = 0;
-            for(int i =0; perro == 0 && s[i] != '\n'; i++){
+            for(int i =0; perro == 0 && s[i] != '\n' && process == 2; i++){
                 buff[j] = s[i];
                 j++;
                 if(s[i] == '(') pflag++; 
@@ -897,7 +919,7 @@ int interpretador(){
                 }
                 if(s[i] == ';' && pflag == 0){
                     buff[j] = '\0';
-                    executeCommand(buff,v,sgr);
+                    executeCommand(buff,v,sgr, &process);
                     j = 0;
                 }
                 if(s[i] == ';' && pflag != 0 && dflag == 0){
@@ -907,7 +929,6 @@ int interpretador(){
             }
             free(s);
             free(buff);
-        
             }
             break;
         }

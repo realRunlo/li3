@@ -63,7 +63,7 @@ void show_menu(){
 }
 
 void show_help(){
-    printf(YEL"\t\t            WELCOME TO OUR SGR GUIDE     \n"RESET);
+    printf(YEL"\n\n\t\t            WELCOME TO OUR SGR GUIDE     \n"RESET);
     printf("Available commands: \n");
     printf("Query1 :load_sgr( \"[user_file]\", \"[business_file]\", \"[reviews_file]\");\n"RESET);
     printf("\tLoads a costum sgr using the files given as arguments.\n\n");
@@ -93,9 +93,14 @@ void show_help(){
     printf("\tTransfers the information from an initialized variable to a given file, using the given delimiter to separate each line from the TABLE\n\n");
     printf("show([var]); \n"RESET);
     printf("\tShows the information saved in an initialized variable\n\n");
+    printf("help; \n"RESET);
+    printf("\tShows this page.\n\n");
+    printf("clear; \n"RESET);
+    printf("\tClears the screen.\n\n");
     printf("quit; \n"RESET);
     printf("\tEnds the program.\n\n");
-    printf("Information: follow the sintax of each command as shown above, not forgetting to end each command with ';'.\nMultiple commands can be issued in each line, which will then executed one at a time.\n");
+    printf("Information: follow the sintax of each command as shown above, not forgetting to end each command with ';'.\n");
+    printf("Multiple commands can be issued in each line, which will then executed one at a time.\n");
 }
 
 
