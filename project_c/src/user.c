@@ -93,12 +93,15 @@ int u_checkNewLine(char * str){
     int i = 0 , empty = 0;
     seped = strsep(&test,";"); // user_id
     if(strcmp(seped,"")==0) empty++;
-    seped = strsep(&test,";"); // user_name
-    if(strcmp(seped,"")==0) empty++;
-    seped = strsep(&test,";"); 
-
-    seped = strsep(&test,";"); //verificar se nao tem campos a mais
-    if(strcmp(seped,"") !=0) empty++;
+    else{
+        seped = strsep(&test,";"); // user_name
+        if(strcmp(seped,"")==0) empty++;
+        else{
+            if(strlen(test)){ seped = strsep(&test,";"); //friends
+                if(seped[strlen(seped) - 1] == ';') empty++;  //verificar se nao tem campos a mais
+        }
+        }
+    }
     free (pointer);
     return empty;
 }
