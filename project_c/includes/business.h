@@ -19,6 +19,10 @@ int check_line (char *str);
 
 void add_b (Business *b, char *str,int p);
 
+int count_fiels (char* str);
+
+void check_comma (char* city);
+
 Business create_b (char *str);
 
 #endif //___BUSINESS_H___

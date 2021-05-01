@@ -375,7 +375,6 @@ char* getLine_file(FILE *f){
 @param file Nome do ficheiro
 @returns int
 */
-
 int nLinhas (char* file){
     FILE *fp;
     int count = 0; 

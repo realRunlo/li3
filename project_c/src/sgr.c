@@ -22,11 +22,9 @@ typedef struct query2{
         int column;
         int total;
 }*Query2;
-
-/* 
-Dado um id de negócio, determinar a sua informação: nome,
-cidade,estado,stars,e número total reviews
-query 3*/
+/**
+\brief struct query para usar no iterator
+*/
 typedef struct query3{
       GHashTable * h_reviews_info;
 }*Query3;
@@ -38,14 +36,14 @@ typedef struct query4{
         int column;
 }*Query4;
 
-//Dado um número n de stars e uma cidade, determinar a lista de negócios com n ou mais
-//stars na cidade.A informação associada a cada negócio deve ser o seu id e nome.
+/**
+\brief struct query5 para usar no iterator
+*/
 typedef struct query5{
         TABLE t;
         char* city;
         float stars;
         GHashTable * hashT_business;
-        GHashTable * h_business_visitado;
         GHashTable * h_reviews_info;
 }*Query5;
 
@@ -77,14 +75,13 @@ typedef struct b_average_stars{
     float lowScore;
 }*B_AVERAGE_STARS;
 
-//Lista ids de utilizadores e o número total de utilizadores que tenham visitado mais 
-//de um estado,i.e. que tenham feito reviews em negócios de diferentes estados.
-
+/**
+\brief struct query5 para usar no iterator
+*/
 typedef struct query7{
     TABLE t;
-    GHashTable * h_user_visitado;
+    GHashTable * h_user_and_businesses;// cada user tem lista de business que fez review
     GHashTable * hashT_businesses;
-    char * state_atual;
     GHashTable * h_state;
 }*Query7;
 
@@ -114,7 +111,12 @@ static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
         data->total++;
     }
 }
-//Cria uma hash para cada negócio com as estatisticas das suas reviews
+/**
+@brief Coloca as estatisticas das reviews na hash h_reviews_info;
+@param key review_id
+@param value review struct
+@param user_data proc, query3 struct onde esta guardado o apontador para a h_reviews_info
+*/
 static void reviews3_info(gpointer key, gpointer value, gpointer user_data){
     Reviews r = ((Reviews)value);
     char* b_id = r_getBusinessId((Reviews) value);
@@ -122,7 +124,6 @@ static void reviews3_info(gpointer key, gpointer value, gpointer user_data){
     if(g_hash_table_lookup(data->h_reviews_info,GINT_TO_POINTER(b_id)) == NULL){
         B_STARS business = malloc(sizeof(struct b_stars));
         business->b_id = b_id;
-        //business->b_name = b_name;
         business->n_reviews = 1;
         business->total = r_getStars(r);
         addToHashT(data->h_reviews_info,GINT_TO_POINTER(b_id),business);
@@ -177,7 +178,14 @@ char * turn_lowerCases(char* s){
     lower[i] = '\0';
     return lower;
 }
-// Iterator for query5
+/**
+@brief Verifica se tem o número médio de estrelas necessário e a city correpondente.
+A hash table analisada contém as estatisticas das reviews
+@param key business_id
+@param value struct bstar
+@param user_data proc, struct query5 que guarda a table, a city dada, o número de stars 
+dado, o apontador da hash dos businesses e o apontador da h_reviews_info;
+*/
 static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
     float b_stars = (((B_STARS) value)->total)/(((B_STARS) value)->n_reviews);
     Query5 data = (Query5) user_data;
@@ -197,7 +205,13 @@ static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
         }
     }
 }
-//Cria uma hash para cada negócio com as estatisticas das suas reviews
+/**
+@brief Coloca as estatisticas das reviews na hash h_reviews_info;
+@param key review_id
+@param value review struct
+@param user_data proc, struct query5 que guarda a table, a city dada, o número de stars 
+dado, o apontador da hash dos businesses e o apontador da h_reviews_info;
+*/
 static void reviews5_info(gpointer key, gpointer value, gpointer user_data){
     Reviews r = ((Reviews)value);
     char* b_id = r_getBusinessId((Reviews) value);
@@ -412,7 +426,14 @@ static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     }
     }
 }
-
+/**
+@brief Coloca o user_id na table se tiver pelo menos dois estados diferentes com review;
+@param key user_id
+@param value lista com os business_id onde o user fez review
+@param user_data proc, struct query7 que guarda a table, o apontador da hash dos businesses,
+o apontador da hash dos users que fizeram reviews 
+e o apontador da hash que contém os estados;
+*/
 static void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
     Query7 data = (Query7) user_data;
     data->h_state = g_hash_table_new(g_str_hash, g_str_equal);
@@ -431,13 +452,21 @@ static void check_state_iterator(gpointer key, gpointer value, gpointer user_dat
         }
     } 
 }
-
+/**
+@brief Coloca na hash h_user o user_id como key e uma lista com os business_id que
+foram visitados pelo user
+@param key review_id
+@param value review struct
+@param user_data proc, struct query7 que guarda a table, o apontador da hash dos businesses,
+o apontador da hash dos users que fizeram reviews 
+e o apontador da hash que contém os estados;
+*/
 static void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     char* user_id = strdup(r_getUserId((Reviews) value));
     char* b_id =  strdup(r_getBusinessId((Reviews) value));
     Query7 data = (Query7) user_data;
-    g_hash_table_insert(data->h_user_visitado, user_id,
-        g_slist_append(g_hash_table_lookup(data->h_user_visitado, user_id),b_id));
+    g_hash_table_insert(data->h_user_and_businesses, user_id,
+        g_slist_append(g_hash_table_lookup(data->h_user_and_businesses, user_id),b_id));
 }
 
 /**
@@ -791,10 +820,9 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
 @param business_id - Id do negócio
 @returns TABLE - stuct table
 */
-
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
-    char* indicador = "total;stars;business_id;business_nome;business_city;business_state;business_categories";
+    char* indicador = "total_rev;stars;business_id;business_nome;business_city;business_state;business_categories";
     setNewLine(r,indicador);
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));
@@ -803,7 +831,6 @@ TABLE business_info (SGR sgr, char* business_id){
     char* b_s = get_state(b);
     char* b_cat = get_categ(b);
     Query3 pro = malloc(sizeof(struct query3));
-    //pro->b_id = strdup (business_id);
     pro->h_reviews_info = g_hash_table_new(g_str_hash, g_str_equal);
 
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)reviews3_info,pro);
@@ -811,7 +838,7 @@ TABLE business_info (SGR sgr, char* business_id){
     float s = u->total/u->n_reviews;
     char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(b_name) + 
                         strlen(b_cat)+strlen(b_c)+ strlen(b_s)+15));
-    sprintf(res,"%d;%f;%s;%s;%s;%s;%s",u->n_reviews,s,business_id, b_name,b_c,b_s,b_cat);
+    sprintf(res,"%d;%.2f;%s;%s;%s;%s;%s",u->n_reviews,s,business_id, b_name,b_c,b_s,b_cat);
     setNewLine(r,res);
 
     return r;
@@ -849,7 +876,6 @@ TABLE businesses_reviewed(SGR sgr, char *user_id){
 @param city - Cidade
 @returns TABLE - stuct table
 */
-
 TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
@@ -859,7 +885,6 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     pro->city = turn_lowerCases(city);
     pro->stars = stars;
     pro->hashT_business = sgr->hashT_businesses;
-    pro->h_business_visitado = g_hash_table_new(g_str_hash, g_str_equal);
     
     pro->h_reviews_info = g_hash_table_new(g_str_hash, g_str_equal);
     
@@ -925,10 +950,10 @@ TABLE international_users (SGR sgr){
     char* ind = "user_id";
     setNewLine(pro->t,ind);
     pro->hashT_businesses=sgr->hashT_businesses;
-    pro->h_user_visitado = g_hash_table_new(g_str_hash, g_str_equal);
+    pro->h_user_and_businesses = g_hash_table_new(g_str_hash, g_str_equal);
     pro->h_state = g_hash_table_new(g_str_hash, g_str_equal);
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)query7_iterator,pro);
-    g_hash_table_foreach(pro->h_user_visitado, (GHFunc)check_state_iterator,pro);
+    g_hash_table_foreach(pro->h_user_and_businesses, (GHFunc)check_state_iterator,pro);
     return pro->t;
 }
 
