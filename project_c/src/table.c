@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 #define MARGIN 6
-#define MAXTPAGE 10
+#define MAXTPAGE 11
 #define FLOAT 1
 #define INT 0
 #define FROMCSV_BUFFER_SIZE 2000
@@ -184,9 +184,11 @@ void printN_space(int n){
 */
 int getTotalPages(TABLE t){
     int total_entries = getEntries(t);
-    int total_pages = total_entries/MAXTPAGE + 1;
+    int total_pages = total_entries/MAXTPAGE ;
     if(total_pages%2==0)
         total_pages = total_entries/MAXTPAGE;
+    else
+    total_pages++;
 
     return total_pages;
 }
@@ -232,9 +234,7 @@ void printPage_table(TABLE t,int current_page){
     int total_pages,bottom,top,while_Iterator;
     char * str_zero;
     
-    total_pages = total_entries/MAXTPAGE + 1;
-    if(total_pages%2==0)
-        total_pages = total_entries/MAXTPAGE;
+    total_pages = getTotalPages(t);
 
     if(total_entries<MAXTPAGE){ // quando só tem uma pagina como menos entradas das que é suposto imprimir por pagina
         total_pages = 1;
