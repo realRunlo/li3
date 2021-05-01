@@ -576,7 +576,7 @@ static void top_category(gpointer key, gpointer value, gpointer user_data){
             char *pointer = buffer;
 
             int found = 0;
-            int i_lowest = 0;
+            int i_lowest = 1;
             float lowest;
             while(i < data->entries+1 && found !=1){
                 buffer = pointer;
