@@ -433,42 +433,91 @@ TABLE fromCSV (char* file, char* delim){
 }
 
 /**
-\brief Projeta determinada coluna da TABLE recebida
+ * @brief verifica se um array contem um certo valor
+ * 
+ * @param arr array a analisar
+ * @param size tamanho do array
+ * @param value valor a procurar
+ * @return int 
+ */
+int in_array(int* arr, int size, int value){
+    int found = 0;
+    for(int i =0; found == 0 && i<size; i++){
+        if(arr[i] == value) found++;
+    }
+    return found;
+}
+
+
+/**
+\brief Projeta determinadas colunas da TABLE recebida
 @param x TABLE 
 @param cols Nome da coluna a projetar
 @returns TABLE
 */
 TABLE proj(TABLE x, char* cols){
-    TABLE t = init_Sized_Table(getEntries(x));
-    char s [2] =";";
-    char * str = get_string_table(x,0);  
-    char *token = strtok(str,s);
-    int col = 0;
-    int r = 0;
-    while(token != NULL && r == 0) {
-        if(strcmp(token,cols)== 0){r = 1;setNewLine(t,token);break;}
-        token = strtok(NULL, s);
-        col++;
+    int valid = 0, columns = 0;
+    for(int i = 0; cols[i] != '\0' ;i++){//conta o numero de colunas pedido
+        if(cols[i] == ',') columns++;
     }
-    if (r == 1){
-        for(int j = 1;j<getEntries(x);j++ ){
-            char * res = get_string_table(x,j);
-            char *aux = strtok(res,s);
-            int tam = 0;
-            while(aux != NULL && tam<col) {
-                aux = strtok(NULL, s);
-                tam++;
-            }
-            setNewLine(t,aux);
+    if(cols != NULL){
+        char** c; 
+        if(columns == 0){
+            columns++;
+            c= malloc(sizeof(char*) * columns);
         }
-        return t;
-    }else {
-        clearTable(t);
-        printf("Coluna inexistente\n");
-        TABLE z = init_Sized_Table(0);
-        return z; 
+        else  c = malloc(sizeof(char*) * columns);
+        int j = 0, k = 0, i = 0; 
+        int save[columns]; //guarda a posicao das colunas no formato da primeira linha
+        while(cols[i] != '\0' && valid == 0){//verifica se todas as colunas sao validas
+            i = addSpaces(i,cols);
+            c[j] = commandString(cols+i);
+            i+= strlen(c[j]);
+            i = addSpaces(i,cols);
+            if(cols[i] == ',') i++;
+            i = addSpaces(i,cols);
+            if((k = valid_column_name(x,c[j])) == -1){
+                 valid++;
+            }
+            else save[j] = k; 
+            j++;
+        }
+        if(valid == 0){//todas as colunas sao validas
+            int entries = getEntries(x);
+            TABLE t = init_Sized_Table(entries); 
+            char* aux;char* line ;
+            char *projLine = malloc(sizeof(char) * 200);
+            size_t projLen = 200; size_t lineLen = 0;
+            int col = 0;
+            int r = 0, l = 0;
+            for(j = 0;j<entries;j++){
+                r = 0; l =0;
+                projLine[0] = '\0';
+                line = get_string_table(x,j);
+                lineLen = strlen(line);
+                if(projLen < lineLen){
+                    projLen = lineLen*2;
+                    projLine = realloc(projLine,projLen);
+                } 
+                char* pointer = line;
+                aux = strsep(&line,";");
+                while(aux != NULL) {
+                    if(in_array(save,columns,r)){l++;
+                        strcat(projLine,aux);
+                        if(l<columns) strcat(projLine,";");
+                    }
+                    aux = strsep(&line,";");
+                    r++;
+                }
+                setNewLine(t,projLine);
+                free(pointer);
+            }
+            return t;
+        }
     }
-        
+    printf("Invalid column\n");
+    TABLE z = NULL;
+    return z; 
 }
 
 /**
@@ -484,11 +533,13 @@ int valid_column_name(TABLE t, char* column_name){
         char * buff = malloc(sizeof(char) * strlen(line));
         char * pointer = buff;
         buff = strsep(&line,";");
+        int i = 0;
         while(buff != NULL){
             if(strcmp(buff,column_name) == 0){
-                free(pointer); return 0;
+                free(pointer); return i;
                 }
             buff = strsep(&line,";");
+            i++;
         }
         free(pointer);
     }
@@ -506,7 +557,7 @@ int valid_column_name(TABLE t, char* column_name){
 @returns TABLE
 */
 TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){printf(".%s. .%s.\n",column_name,value);
-    if(valid_column_name(x,column_name) == 0){ 
+    if(valid_column_name(x,column_name) != -1){ 
         TABLE comp = proj(x,column_name);
         int entries = getEntries(comp);
         //filtra ints

@@ -86,7 +86,7 @@ void show_help(){
     printf("[var] = fromCSV(\"[file]\",\"delimiter\");\n"RESET);
     printf("\tSaves the information of the file given into a TABLE structure, using the delimiter given to separate each element.\n\n");
     printf("[var] = proj([var],[column_names]);\n"RESET);
-    printf("\tSaves the given columns, if valid, from an initialized variable to a variable.\n\n");
+    printf("\tSaves the given columns(separeted with ','), if valid, from an initialized variable to a variable.\n\n");
     printf("[var] = [var][line][column];\n"RESET);
     printf("\tSaves a specific element from an initialized variable (using the line and column given), to a variable.\n\n");
     printf("toCSV([var],[delimiter],\"[file]\"); \n"RESET);

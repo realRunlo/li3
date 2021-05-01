@@ -42,6 +42,8 @@ TABLE fromCSV (char* file, char* delim);
 
 TABLE proj(TABLE x, char* cols);
 
+int valid_column_name(TABLE t, char* column_name);
+
 TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op);
 
 void printTable(TABLE t);//não vai ser precisa
