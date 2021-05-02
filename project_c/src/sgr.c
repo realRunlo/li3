@@ -676,9 +676,9 @@ void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * date = r_getDate((Reviews) value);
     
 
-    int size = strlen(revId)+strlen(usId)+strlen(busId) + 6 +strlen(date) + 7 ;
+    size_t size = strlen(revId)+strlen(usId)+strlen(busId) + 6 +strlen(date) + 7 ;
     char * buffer = malloc(sizeof(char)*size);
-    sprintf(buffer,"%s;%s;%s;%.2f;%d;%d;%d;%s",revId,usId,busId,stars,useful,funny,cool,date);
+    snprintf(buffer,size,"%s;%s;%s;%.2f;%d;%d;%d;%s",revId,usId,busId,stars,useful,funny,cool,date);
     setNewLine(catalog,buffer);
 }
 void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
@@ -687,9 +687,9 @@ void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * usId = getUserId((User) value);
     char * name = getUserName((User) value);
     
-    int size = strlen(usId) + strlen(name) + 1 ;
+    size_t size = strlen(usId) + strlen(name) + 1 ;
     char * buffer = malloc(sizeof(char) * size);
-    sprintf(buffer,"%s;%s",usId,name);
+    snprintf(buffer,size,"%s;%s",usId,name);
     setNewLine(catalog,buffer);
 
 }
@@ -702,9 +702,9 @@ void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * city = get_city((Business) value);
     char * state = get_state((Business) value);
 
-    int size = strlen(bus_id) + strlen(name) + strlen(city) + strlen(state) + 3;
+    size_t size = strlen(bus_id) + strlen(name) + strlen(city) + strlen(state) + 3;
     char * buffer = malloc(sizeof(char) * size);
-    sprintf(buffer,"%s;%s;%s;%s",bus_id,name,city,state);
+    snprintf(buffer,size,"%s;%s;%s;%s",bus_id,name,city,state);
     setNewLine(catalog,buffer);
 
 

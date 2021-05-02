@@ -931,6 +931,7 @@ int interpretador(){
                         }
                     }
                     clearTable(t);
+                    clrscr();
                 }
                 else{
                     clrscr();
