@@ -20,7 +20,7 @@ void readReviews(GHashTable * hTable,char * filename){
         perror("ERROR: ");
         return;
     } else{
-        Reviews rev;
+        Reviews rev = NULL;
         char buff[REV_BUFFER_SIZE]; 
         buff[0] = '\0';
         size_t linelen = USERS_BUFFER_SIZE, bufflen = 0 , maxlen = 0;
@@ -69,43 +69,21 @@ void readUser(GHashTable * table, char * filename){
         printf("ERROR_FILE_readUser\n");
     }
     else{
-    
         User u;
-        char buff[USERS_BUFFER_SIZE]; // espaco suficiente para os exemplos do input file
-        buff[0] = '\0';
-        size_t linelen = USERS_BUFFER_SIZE, bufflen = 0 , maxlen = 0;
-        char * line = malloc(sizeof(char) * USERS_BUFFER_SIZE);
-        if(fgets(buff,USERS_BUFFER_SIZE,f)){ // ignora primeira linha 
-        int read = 0;
-        while(fgets(buff,USERS_BUFFER_SIZE,f))
+        ssize_t linelen = 0; size_t line_buf_len = 0;
+        char * line = NULL;
+        linelen = getline(&line,&line_buf_len,f); // ignora primeira linha 
+        linelen = getline(&line,&line_buf_len,f);
+        while(linelen >=0)
         {
-            line[0] = '\0';
-            bufflen = strlen(buff);
-            maxlen = bufflen;
-            if (linelen <= bufflen){
-                linelen += maxlen + linelen;
-                line = realloc(line, linelen);
-            }
-            strcat(line, buff);
-            while(bufflen == USERS_BUFFER_SIZE - 1 && buff[USERS_BUFFER_SIZE-2] != '\n'){
-                if(fgets(buff, USERS_BUFFER_SIZE, f)){
-                bufflen = strlen(buff);
-                maxlen += bufflen;
-                if (linelen <= maxlen){
-                linelen += maxlen + linelen;
-                line = realloc(line, linelen);
-                }
-                strcat(line, buff);
-                }
-            }
             if(u_checkNewLine(line) == 0){
                 u = createUser(line);
                 addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
             }
-        }
+            linelen = getline(&line,&linelen,f);
         }
         free(line);
-    fclose(f);
+        fclose(f);
     }
 }
 
