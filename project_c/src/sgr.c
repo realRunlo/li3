@@ -14,21 +14,28 @@ struct sgr{
 };
 
 /**
-\brief struct query2 para usar no iterator
-*/
+ * @brief struct query2 para usar no iterator
+ * 
+ */
 typedef struct query2{
         char** result;
         char letter;
         int column;
         int total;
 }*Query2;
+
 /**
-\brief struct query para usar no iterator
-*/
+ * @brief struct query3 para usar no iterator
+ * 
+ */
 typedef struct query3{
       GHashTable * h_reviews_info;
 }*Query3;
 
+/**
+ * @brief struct query4 para usar no iterator
+ * 
+ */
 typedef struct query4{
         char** result; //[business_id1,business1],[business_id2,business2][...]
         char* user_id;
@@ -37,8 +44,9 @@ typedef struct query4{
 }*Query4;
 
 /**
-\brief struct query5 para usar no iterator
-*/
+ * @brief struct query5 para usar no iterator
+ * 
+ */
 typedef struct query5{
         TABLE t;
         char* city;
@@ -47,11 +55,8 @@ typedef struct query5{
         GHashTable * h_reviews_info;
 }*Query5;
 
-//
 /**
- * @brief struct da query6
- *  para guardar informacoes sobre os top negocios de cada cidade 
- *  
+ * @brief struct da query6  para guardar informacoes sobre os top negocios de cada cidade 
  */
 typedef struct city{
     char* name;
@@ -638,6 +643,13 @@ static void top_category(gpointer key, gpointer value, gpointer user_data){
     }   
 }
 
+/**
+ * @brief Verifica se uma palavra ocorre numa stri g
+ * 
+ * @param str String
+ * @param word Palavra
+ * @return int 
+ */
 static int wordInString(char *str,char * word){
     char * buffer = malloc(strlen(str) + 1);
     int j=0;
@@ -665,6 +677,13 @@ static int wordInString(char *str,char * word){
     return 0;
 }
 
+/**
+ * @brief Iterador da query9 
+ * 
+ * @param key 
+ * @param value
+ * @param user_data 
+ */
 static void query9_iterator(gpointer key, gpointer value, gpointer user_data){ 
     Query9 data = (Query9) user_data;
     char * word = strdup(data->word);
@@ -675,7 +694,14 @@ static void query9_iterator(gpointer key, gpointer value, gpointer user_data){
    
 }
 
-void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+/**
+ * @brief Iterador para criação de catalogo de reviews
+ * 
+ * @param key 
+ * @param value
+ * @param user_data 
+ */
+static void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     TABLE catalog = (TABLE) user_data;
 
     char * revId = r_getReviewId((Reviews) value);
@@ -693,7 +719,15 @@ void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     snprintf(buffer,size,"%s;%s;%s;%.2f;%d;%d;%d;%s",revId,usId,busId,stars,useful,funny,cool,date);
     setNewLine(catalog,buffer);
 }
-void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+
+/**
+ * @brief Iterador para criação de catalogo de users
+ * 
+ * @param key 
+ * @param value
+ * @param user_data 
+ */
+static void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     TABLE catalog = (TABLE) user_data;
 
     char * usId = getUserId((User) value);
@@ -706,7 +740,14 @@ void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
 
 }
 
-void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+/**
+ * @brief Iterador para criação de catalogo de business
+ * 
+ * @param key 
+ * @param value
+ * @param user_data 
+ */
+static void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     TABLE catalog = (TABLE) user_data;
 
     char * bus_id = get_id((Business) value);
@@ -718,8 +759,6 @@ void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * buffer = malloc(sizeof(char) * size);
     snprintf(buffer,size,"%s;%s;%s;%s",bus_id,name,city,state);
     setNewLine(catalog,buffer);
-
-
 }
 /*  ----------public----------  */
 
@@ -766,11 +805,11 @@ void sgr_new_hashes(SGR sgr,char * users, char* businesses, char* reviews){
     readReviews(sgr->hashT_reviews,reviews);
 }
 
-
 /**
-\brief Inicializador de dados SGR
-@returns new_sgr stuct sgr
-*/
+ * @brief Inicializador de dados SGR
+ * 
+ * @return SGR 
+ */
 SGR init_sgr(){
 
     SGR new_sgr = malloc(sizeof(struct sgr));
@@ -783,24 +822,24 @@ SGR init_sgr(){
 }
 
 /**
-\brief Liberta espaço das tabelas de hash da estrutura sgr
-@param sgr - Apontador struct sgr
-@returns new_sgr stuct sgr
-*/
+ * @brief Liberta espaço das tabelas de hash da estrutura sgr
+ * 
+ * @param sgr Apontador struct sgr
+ */
 void free_sgr(SGR sgr){
     free_all_key_value_entries(sgr->hashT_users);
     free_all_key_value_entries(sgr->hashT_businesses);
     free_all_key_value_entries(sgr->hashT_reviews);
 }
 
-
 /**
-\brief QUERY1,carrega ficheiros para uma struct sgr
-@param users_file - nome do ficheiro de users
-@param buinesses_file - nome de ficheiro de businesses
-@param reviews_file - nome de ficheiro de reviews
-@returns sgr_load - stuct sgr
-*/
+ * @brief QUERY1,carrega ficheiros para uma struct sgr
+ * 
+ * @param users_file Nome do ficheiro de users
+ * @param buinesses_file Nome de ficheiro de businesses
+ * @param reviews_file Nome de ficheiro de reviews
+ * @return SGR 
+ */
 SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     
     SGR sgr_load = init_sgr();
@@ -814,11 +853,12 @@ SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
 }
 
 /**
-\brief QUERY2,procura os negócios cujo o nome começa com uma dada letra
-@param sgr - Apontador struct sgr
-@param letter - Letra
-@returns TABLE - stuct table
-*/
+ * @brief QUERY2,procura os negócios cujo o nome começa com uma dada letra
+ * 
+ * @param sgr Apontador struct sgr
+ * @param letter Letra
+ * @return TABLE 
+ */
 TABLE businesses_started_by_letter(SGR sgr, char letter){
     int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query2 process = malloc(sizeof(struct query2));
@@ -839,12 +879,14 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     //free();
     return result;
 }
+
 /**
-\brief QUERY3,dado um id de negócio determinar sua informação
-@param sgr - Apontador struct sgr
-@param business_id - Id do negócio
-@returns TABLE - stuct table
-*/
+ * @brief QUERY3,dado um id de negócio determinar sua informação
+ * 
+ * @param sgr Apontador struct sgr
+ * @param business_id Id do negócio
+ * @return TABLE 
+ */
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
     char* indicador = "total_rev;stars;business_id;business_nome;business_city;business_state;business_categories";
@@ -870,11 +912,12 @@ TABLE business_info (SGR sgr, char* business_id){
 }
 
 /**
-\brief QUERY4,dado um utilizador determina a lista de negócios aos quais fex review
-@param sgr - Apontador struct sgr
-@param user_id - Id do utilizador
-@returns TABLE - stuct table
-*/
+ * @brief  QUERY4,dado um utilizador determina a lista de negócios aos quais fex review
+ * 
+ * @param sgr Apontador struct sgr
+ * @param user_id Id do utilizador
+ * @return TABLE 
+ */
 TABLE businesses_reviewed(SGR sgr, char *user_id){
     int max_lines = g_hash_table_size(sgr->hashT_businesses) + 1;
     Query4 process = malloc(sizeof(struct query4));
@@ -895,12 +938,13 @@ TABLE businesses_reviewed(SGR sgr, char *user_id){
 }
 
 /**
-\brief QUERY5,determina a lista de negócios na dada cidade com n ou mais estrelas
-@param sgr - Apontador struct sgr
-@param stars - Estrelas
-@param city - Cidade
-@returns TABLE - stuct table
-*/
+ * @brief QUERY5,determina a lista de negócios na dada cidade com n ou mais estrelas
+ * 
+ * @param sgr Apontador struct sgr
+ * @param stars Estrelas
+ * @param city Cidade
+ * @return TABLE 
+ */
 TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
     Query5 pro = malloc(sizeof(struct query5));
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
@@ -920,11 +964,12 @@ TABLE businesses_with_stars_and_city (SGR sgr, float stars,char* city){
 }
 
 /**
-\brief QUERY6,determina os top negócios de cada cidade
-@param sgr - Apontador struct sgr
-@param top - Top
-@returns TABLE - stuct table
-*/
+ * @brief QUERY6,determina os top negócios de cada cidade
+ * 
+ * @param sgr Apontador struct sgr
+ * @param top Top
+ * @return TABLE 
+ */
 TABLE top_businesses_by_city(SGR sgr, int top){
     B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
     process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
@@ -956,10 +1001,11 @@ TABLE top_businesses_by_city(SGR sgr, int top){
 }
 
 /**
-\brief QUERY7,determina lista de utilizadores que tenham visitado mais de um estado
-@param sgr - Apontador struct sgr
-@returns TABLE - stuct table
-*/
+ * @brief QUERY7,determina lista de utilizadores que tenham visitado mais de um estado
+ * 
+ * @param sgr Apontador struct sgr
+ * @return TABLE 
+ */
 TABLE international_users (SGR sgr){
     Query7 pro = malloc(sizeof(struct query7));
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
@@ -975,12 +1021,13 @@ TABLE international_users (SGR sgr){
 }
 
 /**
-\brief QUERY8,determina lista dos top n negócios que pertencem a uma determianda caegoria
-@param sgr - Apontador struct sgr
-@param top - Top
-@param category - Categoria
-@returns TABLE - stuct table
-*/
+ * @brief QUERY8,determina lista dos top n negócios que pertencem a uma determianda caegoria
+ * 
+ * @param sgr Apontador struct sgr
+ * @param top Top
+ * @param category Categoria
+ * @return TABLE 
+ */
 TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
     process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
@@ -1006,11 +1053,12 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
 }
 
 /**
-\brief QUERY9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
-@param sgr - struct sgr
-@param word - Palavra a procurar
-@returns TABLE apontador para struct table
-*/
+ * @brief QUERY9:Dada uma palavra,determinar a lista de ids de reviews que a referem no campo text
+ * 
+ * @param sgr struct sgr
+ * @param word Palavra a procurar
+ * @return TABLE 
+ */
 TABLE reviews_with_word(SGR sgr,char * word){
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     Query9 query_data = malloc(sizeof(struct query9));
@@ -1025,6 +1073,12 @@ TABLE reviews_with_word(SGR sgr,char * word){
     return query_data->t;
 }
 
+/**
+ * @brief Retorna um catalogo de businesses numa table
+ * 
+ * @param sgr Estrutura com as hashtables do dados
+ * @return TABLE 
+ */
 TABLE businesses_catalog(SGR sgr){
     int max_lines = g_hash_table_size(sgr->hashT_businesses);
     TABLE catalog = init_Sized_Table(max_lines);
@@ -1036,6 +1090,12 @@ TABLE businesses_catalog(SGR sgr){
     return catalog;
 }
 
+/**
+ * @brief Retorna um catalogo de users numa table
+ * 
+ * @param sgr Estrutura com as hashtables do dados
+ * @return TABLE 
+ */
 TABLE users_catalog(SGR sgr){
     int max_lines = g_hash_table_size(sgr->hashT_users);
     TABLE catalog = init_Sized_Table(max_lines);
@@ -1047,6 +1107,12 @@ TABLE users_catalog(SGR sgr){
     return catalog;
 }
 
+/**
+ * @brief Retorna um catalogo de reviews numa table
+ * 
+ * @param sgr Estrutura com as hashtables do dados
+ * @return TABLE 
+ */
 TABLE reviews_catalog(SGR sgr){
     int max_lines = g_hash_table_size(sgr->hashT_reviews);
     TABLE catalog = init_Sized_Table(max_lines);
