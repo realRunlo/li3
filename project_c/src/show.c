@@ -58,8 +58,11 @@ void show_menu(){
     printf("[1] -> Load default sgr\n");
     printf("[2] -> Load costum sgr\n");
     printf("[3] -> Go to sgr terminal\n");
-    printf("[4] -> Help\n");
-    printf("[5] -> Quit\n");
+    printf("[4] -> Users catalog\n");
+    printf("[5] -> Businesses catalog\n");
+    printf("[6] -> Reviews catalog\n");
+    printf("[7] -> Help\n");
+    printf("[8] -> Quit\n");
 }
 
 void show_help(){

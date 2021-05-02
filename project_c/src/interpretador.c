@@ -691,7 +691,6 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
         char* buf2 = getVar(comando + i);
         i += strlen(buf2);
         i = addSpaces(i,comando);
-        printf(".%s. .%c.\n",buf2,comando[i]);
         if(comando[i] == ','){erro++;
             i++;
             i = addSpaces(i,comando);
@@ -870,7 +869,7 @@ int interpretador(){
     printf("\nPress ENTER to start...");
     while(fgets(c,200,stdin) == 0);
     clrscr();
-    SGR sgr;
+    SGR sgr = NULL;
     while(running){
         switch (process)
         {
@@ -878,15 +877,24 @@ int interpretador(){
             choice = menu_handler();
             if(choice==1){//default load
                 printf("Loading...\n");
+                if(check_sgr(sgr)) free_sgr(sgr); // caso o sgr nao esteja vazio da free
                 sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
                 clrscr();
                 printf(GRN"sgr loaded!\n"RESET);
                 loaded = 1;
             }else if (choice==2){//costum load
+                if(check_sgr(sgr)) free_sgr(sgr); // caso o sgr nao esteja vazio da free
                 sgr = load_costume_sgr();
+                if(check_sgr(sgr)){
                 clrscr();
                 printf(GRN"sgr loaded!\n"RESET);
                 loaded = 1;
+                }
+                else{
+                    clrscr();
+                    printf(RED"Invalid sgr!\n"RESET);
+                    loaded = 0;
+                }
             }else if(choice==3){//sgr terminal
                 if(loaded==1)
                      process = 2;
@@ -894,16 +902,51 @@ int interpretador(){
                     clrscr();
                     printf(RED"Load sgr before proceeding!\n"RESET);   
                 } 
-            }else if(choice==4){//help
+            }else if(choice > 3 && choice < 7){ //catalogos
+                if(loaded == 1){
+                    TABLE t;
+                    switch(choice){
+                        case 4: //catalogo de users
+                            t = users_catalog(sgr);break;
+                        case 5: //catalogo de businesses
+                            t = businesses_catalog(sgr);break;
+                        case 6: // catalogo de reviews
+                            t = reviews_catalog(sgr);break;
+                    }
+                    int q = 0, page = 0,tmp=0;
+                    while(q == 0){
+                        clrscr();
+                        page = show_pagedTable(t,page);
+                        printf("[r] -> return; [p] -> previous page; [n] -> next page;[goto] -> goto page \n");
+                        char *c = getCommand();
+                        c[strlen(c)-1] = '\0';
+                        if(strcmp(c,"r") == 0) q++;
+                        else if(strcmp(c,"p") == 0) page--;
+                        else if(strcmp(c,"n") == 0) page++;
+                        else {
+                            tmp = executePagGoto(c);
+                            if(tmp!=-1 && tmp <= getTotalPages(t))
+                                page = tmp - 1;
+                            
+                        }
+                    }
+                    clearTable(t);
+                }
+                else{
+                    clrscr();
+                    printf(RED"Load sgr before proceeding!\n"RESET);   
+                }
+            }else if(choice==7){//help
                 clrscr();
                 show_help();
                 printf("\nPress ENTER to return...");
                 while(fgets(c,200,stdin) == 0);
                 clrscr();
-            } else if(choice==5){
+            } else if(choice==8){
                show_exit();
                running = 0;
             }
+            else clrscr();
             break;
         
         case 2://sgr terminal
