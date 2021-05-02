@@ -654,9 +654,16 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 if(isNumber(line) == 0){erro++;
                     if(isNumber(col) == 0){erro = -1;
                     TABLE t1 = varTable(v,function);
-                    TABLE t2 = index_table(t1,atoi(line),atoi(col));
-                    addVar(v,var,t2);
-                    printf("Variable %s stored!\n",var);
+                    if(atoi(line) >= getEntries(t1) - 1){
+                        printf("Invalid line.\n");
+                    }else if(atoi(col) > getColsNum(t1) -1){
+                        printf("Invalid colum.\n");
+                    }else{
+                        TABLE t2 = index_table(t1,atoi(line),atoi(col));
+                        addVar(v,var,t2);
+                        printf("Variable %s stored!\n",var);
+                    }
+                    
                     }
                 }
             }free(col); 
@@ -890,6 +897,7 @@ int interpretador(){
             }else if(choice==4){//help
                 clrscr();
                 show_help();
+                printf("\nPress ENTER to return...");
                 while(fgets(c,200,stdin) == 0);
                 clrscr();
             } else if(choice==5){

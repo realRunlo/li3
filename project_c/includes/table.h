@@ -32,6 +32,8 @@ int getTotalPages(TABLE t);
 
 int * getBlen_str(TABLE t);
 
+int getColsNum(TABLE t);
+
 void printPage_table(TABLE t,int current_page);
 
 TABLE index_table(TABLE t,int line,int col);

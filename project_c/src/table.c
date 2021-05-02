@@ -176,6 +176,15 @@ void printN_space(int n){
         printf(" ");
 }
 
+int getColsNum(TABLE t){
+    char *str = get_string_table(t,0);
+    char *seped;
+    int countCols = 0;
+    while((seped = strsep(&str,";"))){
+            countCols++;
+    }
+    return countCols;
+}
 
 /**
 \brief Retorna o número total de páginas
@@ -300,7 +309,9 @@ void printPage_table(TABLE t,int current_page){
 */
 TABLE index_table(TABLE t,int line,int col){
     TABLE indexed_table = init_Sized_Table(2);
-    
+    printf("%d\n",getColsNum(t));
+    printf("%d\n",getEntries(t));
+             
     char * headLine = get_string_table(t,0);
     char * seped;
     for(int i=0;i<col+1;i++){
@@ -309,12 +320,12 @@ TABLE index_table(TABLE t,int line,int col){
     setNewLine(indexed_table,strdup(seped));
 
     char * strLine = get_string_table(t,line+1);
-     for(int i=0;i<col+1;i++){
+    for(int i=0;i<col+1;i++){
         seped=strsep(&strLine,";");
     }
     setNewLine(indexed_table,strdup(seped));
 
-    return indexed_table;
+    return indexed_table; 
 }
 
 /**
