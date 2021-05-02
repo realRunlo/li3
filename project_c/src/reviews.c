@@ -1,6 +1,7 @@
 #include "../includes/reviews.h"
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /*  ----------private----------  */
 struct reviews{
@@ -98,6 +99,14 @@ char * r_getText(Reviews rev){
     return strdup(rev->text);
 }
 
+int isInt(char* arg){ //util só com inteiros
+   for(int i = 0;i<arg[i]!='\0';i++){
+      if(!isdigit(arg[i]))
+          return 0;
+   }
+
+ return 1;
+}
 /**
  * @brief Valida linha do ficheiro
  * 
@@ -117,16 +126,16 @@ int r_checkNewLine(char * str){
     seped = strsep(&test,";");
     if(atoi(seped)>5) return 0;
     seped = strsep(&test,";");
-    if(strcmp(seped,"")==0) return 0;
+    if(!isInt(seped)) return 0;
     seped = strsep(&test,";");
-    if(strcmp(seped,"")==0) return 0;
+    if(!isInt(seped)) return 0;
     seped = strsep(&test,";");
-    if(strcmp(seped,"")==0) return 0;
+    if(!isInt(seped)) return 0;
     seped = strsep(&test,";");
     if(strcmp(seped,"")==0) return 0;
     seped = strsep(&test,"\n");
     if(strcmp(seped,"")==0) return 0;
-    
+
     return 1;
 }
    
