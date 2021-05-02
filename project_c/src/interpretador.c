@@ -149,30 +149,6 @@ void addVar(VARIAVEIS v, char* var, TABLE t){
 
 
 /**
- * @brief guarda o input de uma linha no terminal na string "input" 
- * 
- * @return char* 
- */
-char* getCommand(){
-    char buff[200];
-    buff[0] = '\0';
-    char* input = malloc(sizeof(char) * 200);
-    input[0] = '\0';
-    size_t inputlen = 0, bufflen = 0;
-   do {
-       if(fgets(buff, 200, stdin)){
-       bufflen = strlen(buff);
-       input = realloc(input, inputlen+bufflen+1);
-       strcat(input, buff);
-       inputlen += bufflen;
-       }
-    } while (bufflen==200-1 && buff[200-2]!='\n');
-    input[inputlen] ='\0';
-    return input;
-}
-
-
-/**
  * @brief conta o numero de espacos consecutivos a partir da posicao inicial de uma string
  * 
  * @param str string a analisar
@@ -276,9 +252,10 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                     int q = 0, page = 0,tmp=0;
                     while(q == 0){
                         clrscr();
+                        char *c = NULL; size_t len = 0;
                         page = show_pagedTable(t,page);
                         printf("[r] -> return; [p] -> previous page; [n] -> next page;[goto] -> goto page \n");
-                        char *c = getCommand();
+                        if(getline(&c,&len,stdin)){
                         c[strlen(c)-1] = '\0';
                         if(strcmp(c,"r") == 0) q++;
                         else if(strcmp(c,"p") == 0) page--;
@@ -288,6 +265,8 @@ int executeShow(char *comando,int i, VARIAVEIS v){
                             if(tmp!=-1 && tmp <= getTotalPages(t))
                                 page = tmp - 1;
                             
+                        }
+                        free(c);
                         }
                     }
                     clrscr();
@@ -372,7 +351,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
 
 
 /**
- * @brief versao de getcomand com menos restricoes para os argumentos(ex.: diretorios)
+ * @brief versao de CommandString com menos restricoes para os argumentos(ex.: diretorios)
  *      a funcao tem em atencao que nao podem ser usados carecteres especiais do 
  *      interpretador como ';' e ')' fora de ""
  * @param comando input do utilizador
@@ -556,7 +535,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             default:{erro = 1; //query 3, 4 e 9
                                 if(arg2[0] == '"' && arg2[strlen(arg2)-1] == '"'){erro = 0;
                                 char* search = arg2+1;
-                                TABLE t;
+                                TABLE t = NULL;
                                 if(funcao == 3) t = business_info(sgr,strsep(&search,"\""));
                                 if(funcao == 4) t = businesses_reviewed(sgr,strsep(&search,"\""));
                                 if(funcao == 9) t = reviews_with_word(sgr,strsep(&search,"\""));
@@ -691,7 +670,6 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
         char* buf2 = getVar(comando + i);
         i += strlen(buf2);
         i = addSpaces(i,comando);
-        printf(".%s. .%c.\n",buf2,comando[i]);
         if(comando[i] == ','){erro++;
             i++;
             i = addSpaces(i,comando);
@@ -819,9 +797,10 @@ int executeCommand(char *comando,VARIAVEIS v, SGR sgr,int* process){
 
 SGR load_costume_sgr(){
     printf("\nEnter 3 files to load\nSyntax :[user_file],[businesses_file],[reviews_file]\n");
-    SGR sgr;
+    SGR sgr = NULL;
     int j = 0, i; int length = 0;
-    char * dir = getCommand();
+    char * dir = NULL; size_t dirlen = 0;
+    if(getline(&dir,&dirlen,stdin)){
     char * buff = dir;
     char** files = malloc(sizeof(char*) * 3);
     for(i = 0;buff[j] != '\0' && buff[j] != '\n'; i++){
@@ -837,6 +816,7 @@ SGR load_costume_sgr(){
     char *file1 = files[0] + 1;char *file2 = files[1] + 1; char *file3 = files[2] + 1; 
     sgr = load_sgr(strsep(&(file1),"\""),strsep(&(file2),"\""),strsep(&(file3),"\""));
     free(files[0]);free(files[1]);free(files[2]);
+     }
      }
     return sgr;
 }
@@ -863,14 +843,15 @@ int menu_handler(){
  */
 int interpretador(){
     clrscr();
-    char c[200];
+    char *c = NULL; size_t clen = 0;
     int running = 1,process = 1,choice = 0,loaded = 0 ;
     VARIAVEIS v = initVariaveis();
     show_welcome();
     printf("\nPress ENTER to start...");
-    while(fgets(c,200,stdin) == 0);
+    if (getline(&c,&clen,stdin)){
+    free(c);
     clrscr();
-    SGR sgr;
+    SGR sgr = NULL;
     while(running){
         switch (process)
         {
@@ -878,15 +859,24 @@ int interpretador(){
             choice = menu_handler();
             if(choice==1){//default load
                 printf("Loading...\n");
+                if(check_sgr(sgr)) free_sgr(sgr); // caso o sgr nao esteja vazio da free
                 sgr = load_sgr("./input_files/users_full.csv","./input_files/business_full.csv","./input_files/reviews_1M.csv");
                 clrscr();
                 printf(GRN"sgr loaded!\n"RESET);
                 loaded = 1;
             }else if (choice==2){//costum load
+                if(check_sgr(sgr)) free_sgr(sgr); // caso o sgr nao esteja vazio da free
                 sgr = load_costume_sgr();
+                if(check_sgr(sgr)){
                 clrscr();
                 printf(GRN"sgr loaded!\n"RESET);
                 loaded = 1;
+                }
+                else{
+                    clrscr();
+                    printf(RED"Invalid sgr!\n"RESET);
+                    loaded = 0;
+                }
             }else if(choice==3){//sgr terminal
                 if(loaded==1)
                      process = 2;
@@ -894,53 +884,95 @@ int interpretador(){
                     clrscr();
                     printf(RED"Load sgr before proceeding!\n"RESET);   
                 } 
-            }else if(choice==4){//help
+            }else if(choice > 3 && choice < 7){ //catalogos
+                if(loaded == 1){
+                    TABLE t;
+                    switch(choice){
+                        case 4: //catalogo de users
+                            t = users_catalog(sgr);break;
+                        case 5: //catalogo de businesses
+                            t = businesses_catalog(sgr);break;
+                        case 6: // catalogo de reviews
+                            t = reviews_catalog(sgr);break;
+                    }
+                    int q = 0, page = 0,tmp=0;
+                    while(q == 0){
+                        clrscr();
+                        page = show_pagedTable(t,page);
+                        printf("[r] -> return; [p] -> previous page; [n] -> next page;[goto] -> goto page \n");
+                        char *c = NULL; size_t clen = 0;
+                        if(getline(&c,&clen,stdin)){
+                        c[strlen(c)-1] = '\0';
+                        if(strcmp(c,"r") == 0) q++;
+                        else if(strcmp(c,"p") == 0) page--;
+                        else if(strcmp(c,"n") == 0) page++;
+                        else {
+                            tmp = executePagGoto(c);
+                            if(tmp!=-1 && tmp <= getTotalPages(t))
+                                page = tmp - 1;
+                            
+                        }
+                        free(c);
+                        }
+                    }
+                    clearTable(t);
+                    clrscr();
+                }
+                else{
+                    clrscr();
+                    printf(RED"Load sgr before proceeding!\n"RESET);   
+                }
+            }else if(choice==7){//help
                 clrscr();
                 show_help();
                 printf("\nPress ENTER to return...");
                 while(fgets(c,200,stdin) == 0);
                 clrscr();
-            } else if(choice==5){
+            } else if(choice==8){
                show_exit();
                running = 0;
             }
+            else clrscr();
             break;
         
         case 2://sgr terminal
             clrscr();
             while(process == 2){
                 printf(".>$ ");
-                char *s = getCommand();
-                //interpretar comandos
+                char *s = NULL;
+                size_t len = 0;
+                if(getline(&s,&len,stdin)){//recebe os comandos
                 char *buff = malloc(sizeof(char) * strlen(s));
                 size_t commandlen = 0;
                 int pflag = 0, cflag = 0 , dflag = 0, perro = 0; //flags para deteçao de parenteses, delimitadores, e erros
                 int j = 0;
-            for(int i =0; perro == 0 && s[i] != '\n' && process == 2; i++){
-                buff[j] = s[i];
-                j++;
-                if(s[i] == '(' && dflag == 0) pflag++; 
-                if(s[i] == ')' && dflag == 0) pflag--;
-                if(s[i] == '\'' || s[i] == '"'){
-                if(dflag == 1) dflag--;
-                else dflag++;
-                }
-                if(s[i] == ';' && pflag == 0){
-                    buff[j] = '\0';
-                    executeCommand(buff,v,sgr, &process);
-                    j = 0;
-                }
-                if(s[i] == ';' && pflag != 0 && dflag == 0){
-                    printf("Syntaxe error.\n");
-                    perro++;
-                 }
+                for(int i =0; perro == 0 && s[i] != '\n' && process == 2; i++){
+                    buff[j] = s[i];
+                    j++;
+                    if(s[i] == '(' && dflag == 0) pflag++; 
+                    if(s[i] == ')' && dflag == 0) pflag--;
+                    if(s[i] == '\'' || s[i] == '"'){
+                    if(dflag == 1) dflag--;
+                    else dflag++;
+                    }
+                    if(s[i] == ';' && pflag == 0){
+                        buff[j] = '\0';
+                        executeCommand(buff,v,sgr, &process);
+                        j = 0;
+                    }
+                    if(s[i] == ';' && pflag != 0 && dflag == 0){
+                        printf("Syntaxe error.\n");
+                        perro++;
+                    }
             }
             free(s);
             free(buff);
             }
+            }
             break;
         }
 
+    }
     }
     return 0;
 }

@@ -313,12 +313,9 @@ void printPage_table(TABLE t,int current_page){
 */
 TABLE index_table(TABLE t,int line,int col){
     TABLE indexed_table = init_Sized_Table(2);
-    printf("%d\n",getColsNum(t));
-    printf("%d\n",getEntries(t));
-             
     char * headLine = get_string_table(t,0);
-    char * seped;
-    for(int i=0;i<col+1;i++){
+    char * seped =strsep(&headLine,";");;
+    for(int i=1;i<col+1;i++){
         seped=strsep(&headLine,";");
     }
     setNewLine(indexed_table,strdup(seped));
@@ -571,7 +568,7 @@ int valid_column_name(TABLE t, char* column_name){
 @param op Operador a aplicar na comparação
 @returns TABLE
 */
-TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){printf(".%s. .%s.\n",column_name,value);
+TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
     if(valid_column_name(x,column_name) != -1){ 
         TABLE comp = proj(x,column_name);
         int entries = getEntries(comp);

@@ -676,9 +676,9 @@ void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * date = r_getDate((Reviews) value);
     
 
-    int size = strlen(revId)+strlen(usId)+strlen(busId) + 6 +strlen(date) + 7 ;
+    size_t size = strlen(revId)+strlen(usId)+strlen(busId) + 6 +strlen(date) + 7 ;
     char * buffer = malloc(sizeof(char)*size);
-    sprintf(buffer,"%s;%s;%s;%.2f;%d;%d;%d;%s",revId,usId,busId,stars,useful,funny,cool,date);
+    snprintf(buffer,size,"%s;%s;%s;%.2f;%d;%d;%d;%s",revId,usId,busId,stars,useful,funny,cool,date);
     setNewLine(catalog,buffer);
 }
 void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
@@ -687,9 +687,9 @@ void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * usId = getUserId((User) value);
     char * name = getUserName((User) value);
     
-    int size = strlen(usId) + strlen(name) + 1 ;
+    size_t size = strlen(usId) + strlen(name) + 1 ;
     char * buffer = malloc(sizeof(char) * size);
-    sprintf(buffer,"%s;%s",usId,name);
+    snprintf(buffer,size,"%s;%s",usId,name);
     setNewLine(catalog,buffer);
 
 }
@@ -702,14 +702,27 @@ void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
     char * city = get_city((Business) value);
     char * state = get_state((Business) value);
 
-    int size = strlen(bus_id) + strlen(name) + strlen(city) + strlen(state) + 3;
+    size_t size = strlen(bus_id) + strlen(name) + strlen(city) + strlen(state) + 3;
     char * buffer = malloc(sizeof(char) * size);
-    sprintf(buffer,"%s;%s;%s;%s",bus_id,name,city,state);
+    snprintf(buffer,size,"%s;%s;%s;%s",bus_id,name,city,state);
     setNewLine(catalog,buffer);
 
 
 }
 /*  ----------public----------  */
+
+/**
+ * @brief verifica se o sgr e valido, tem as 3 hashTables nao nulas
+ * 
+ * @param sgr 
+ * @return int 
+ */
+int check_sgr(SGR sgr){
+    if(sgr == NULL) return 0;
+    if(sgr->hashT_users != NULL && sgr->hashT_businesses != NULL && sgr->hashT_reviews != NULL) return 1;
+    return 0;
+}
+
 
 /**
  * @brief da free nas hashes tables de uma estrutura sgr
@@ -907,21 +920,15 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     process->cities = initHashT(); //hash para descobrir o numero total de cidades diferentes 
     process->top = top;
 
-    printf("Making city hashTable...");
     //cria table em q cada elemento e uma cidade distinta
     g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)city_hash, process);
-    printf("Done!\n");
     int total_cities = g_hash_table_size(process->cities);
 
-    printf("Calculating average stars of each business...");
     //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_add_stars, process);
-    printf("Done!\n");
     
-    printf("Calculating top of each city...");
     //para cada business verifica a cidade a que pertence e verifica se pertence ao top dessa cidade
     g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)top_city, process);
-    printf("Done!\n");
     
 
     TABLE result = initTable();
@@ -929,9 +936,7 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     setTab(result,malloc(sizeof(char*) * (total_cities * top + 1)));
     setNewLine(result,"city;stars;business_id;business_name");
     
-    printf("Turning data into TABLE structure...\n");
     g_hash_table_foreach(process->cities, (GHFunc)city_to_table, result);
-    printf("Done!\n"); 
 
     free_all_key_value_entries(process->b_same);   
     free_all_key_value_entries(process->cities);     
@@ -975,21 +980,15 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     process->entries = 0;
 
     //percorrer todas as reviews e vai criando uma hash de negocios para guardar o numero total de reviews dele e a soma das estrelas
-    printf("Calculating average stars of each business...");
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_category, process);
-    printf("Done!\n");
 
     //calcular os top negocios e guardar numa matriz de top linhas
-    printf("Calculating top businesses...");
     g_hash_table_foreach(process->b_same, (GHFunc)top_category, process);
-    printf("Done!\n");
     
     //tornar a matriz em forma TABLE
-    printf("Turning data into TABLE structure...\n");
     TABLE result = initTable();
     setEntries(result,process->entries+1);
     setTab(result,process->results);
-    printf("Done!\n");
 
     return result;
 }

@@ -14,6 +14,8 @@ typedef struct sgr * SGR;
 
 SGR init_sgr();
 
+int check_sgr(SGR sgr);
+
 void free_sgr(SGR sgr);
 
 /* query 1 */

@@ -11,7 +11,6 @@ TABLE varTable(VARIAVEIS v, char* var);
 int isOperator(char* arg);
 int isNumber(char* arg);
 int isFloat(char* arg);
-char* getCommand();
 int skipSpaces(char* str);
 int isDigitOrLetter(char c);
 char* commandString(char* c);
