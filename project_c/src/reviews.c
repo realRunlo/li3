@@ -98,6 +98,12 @@ char * r_getText(Reviews rev){
     return strdup(rev->text);
 }
 
+/**
+ * @brief Valida linha do ficheiro
+ * 
+ * @param str linha do ficheiro
+ * @return int 1 valida | 0 invalida
+ */
 int r_checkNewLine(char * str){
     char * test = strdup(str);
     char * seped;
@@ -109,7 +115,7 @@ int r_checkNewLine(char * str){
     seped = strsep(&test,";");
     if(strcmp(seped,"")==0) return 0;
     seped = strsep(&test,";");
-    if(strcmp(seped,"")==0) return 0;
+    if(atoi(seped)>5) return 0;
     seped = strsep(&test,";");
     if(strcmp(seped,"")==0) return 0;
     seped = strsep(&test,";");
@@ -120,14 +126,7 @@ int r_checkNewLine(char * str){
     if(strcmp(seped,"")==0) return 0;
     seped = strsep(&test,"\n");
     if(strcmp(seped,"")==0) return 0;
-
-    /*
-        if(i!=8 & strcmp(seped,"")==0) //test empty fieds except text
-            return 0;
-
-       if((i==3 || i==4 || i==5 ||i==6) && atoi(seped)>5) //test invalid stars,funny,cool
-            return 0;
-        i++;*/
+    
     return 1;
 }
    

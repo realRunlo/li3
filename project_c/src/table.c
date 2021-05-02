@@ -176,6 +176,12 @@ void printN_space(int n){
         printf(" ");
 }
 
+/**
+ * @brief Retorna o número de colunas de uma table
+ * 
+ * @param t Table
+ * @returns void
+ */
 int getColsNum(TABLE t){
     char *str = get_string_table(t,0);
     char *seped;
@@ -260,10 +266,8 @@ void printPage_table(TABLE t,int current_page){
 
     char * seped;
     char * str_c = strdup(t->tab[0]); 
-    int countCols = 0;
-    while((seped = strsep(&str_c,";"))){
-            countCols++;
-    }
+    int countCols = getColsNum(t);
+
     int * biggers = getBlen_str(t);
 
     printHeader(strdup(t->tab[0]),biggers,countCols);

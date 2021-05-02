@@ -47,8 +47,11 @@ void readReviews(GHashTable * hTable,char * filename){
                 strcat(line, buff);
                 }
             }
-           rev = addReview(rev,line);
-           addToHashT(hTable,r_getReviewId(rev),rev);
+           if(r_checkNewLine(line)){
+                rev = addReview(rev,line);
+                addToHashT(hTable,r_getReviewId(rev),rev);
+            }
+           
         }
         free(line);
     }
