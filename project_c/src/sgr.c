@@ -47,7 +47,12 @@ typedef struct query5{
         GHashTable * h_reviews_info;
 }*Query5;
 
-//struct para guardar informacoes sobre os top negocios de cada cidade 
+//
+/**
+ * @brief struct da query6
+ *  para guardar informacoes sobre os top negocios de cada cidade 
+ *  
+ */
 typedef struct city{
     char* name;
     char** top; //[score1,business1][score2,business2][...]
@@ -55,7 +60,10 @@ typedef struct city{
     float low_score;
 }*CITY;
 
-//elemento da tabela que guarda a media de estrelas de cada negocio
+/**
+ * @brief struct da query6
+ * guarda a media de estrelas de um negocio
+ */
 typedef struct b_stars{
     char* b_id;
     char* b_name;
@@ -63,7 +71,11 @@ typedef struct b_stars{
     float total;
 }*B_STARS;
 
-//user_data para business_average_stars
+
+/**
+ * @brief struct da query6
+ * user_data para business_average_stars
+ */
 typedef struct b_average_stars{
     SGR sgr;
     GHashTable * b_same;
@@ -76,7 +88,7 @@ typedef struct b_average_stars{
 }*B_AVERAGE_STARS;
 
 /**
-\brief struct query5 para usar no iterator
+\brief struct query7 para usar no iterator
 */
 typedef struct query7{
     TABLE t;
@@ -260,7 +272,7 @@ static void city_hash(gpointer key, gpointer value, gpointer user_data){
 
 
 /**
- * @brief percorre cada review para calcular a media de estrelas de cada negocio, guardando/atualizando
+ * @brief auxiliar da query 6 que percorre cada review para calcular a media de estrelas de cada negocio, guardando/atualizando
  *      numa nova hash de negocios (unindo os de mesmo id) onde guarda o numero total de estrelas e de reviews
  * 
  * @param key review_id
@@ -296,7 +308,7 @@ static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
 
 
 /**
- * @brief guarda/atualiza a matriz de cada struct de cidade da hash das cidades, os top negocios 
+ * @brief auxiliar da query6 que guarda/atualiza a matriz de cada struct de cidade da hash das cidades, os top negocios 
  *      
  * @param key business_id
  * @param value business struct

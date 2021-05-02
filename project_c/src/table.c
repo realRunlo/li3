@@ -472,13 +472,9 @@ TABLE proj(TABLE x, char* cols){
     for(int i = 0; cols[i] != '\0' ;i++){//conta o numero de colunas pedido
         if(cols[i] == ',') columns++;
     }
+    columns++;
     if(cols != NULL){
-        char** c; 
-        if(columns == 0){
-            columns++;
-            c= malloc(sizeof(char*) * columns);
-        }
-        else  c = malloc(sizeof(char*) * columns);
+        char** c = malloc(sizeof(char*) * columns);
         int j = 0, k = 0, i = 0; 
         int save[columns]; //guarda a posicao das colunas no formato da primeira linha
         while(cols[i] != '\0' && valid == 0){//verifica se todas as colunas sao validas
