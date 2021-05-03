@@ -301,8 +301,12 @@ void printPage_table(TABLE t,int current_page){
             print_LineTops(biggers[j]+MARGIN);
             
     }
+    
     printf("\n");
-    printf("Page %d out of %d || Total entries: %d\n",current_page+1,total_pages,total_entries-total_pages);    
+    if(total_entries<MAXTPAGE){
+        printf("Page %d out of %d || Total entries: %d\n",1,total_pages,total_entries-1);
+    }else
+    printf("Page %d out of %d || Total entries: %d\n",current_page+1,total_pages,total_entries-1);    
 }
 /**
 \brief Indexa uma TABLE dado indices de linha e coluna atribui essa entrada numa nova variável TABLE
