@@ -80,6 +80,7 @@ void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
  printf(user_data, getUserId((User) value),getUserName((User) value),getFriends((User) value));
 }
 
+//seped[strlen(seped) - 1] != ';'
 /**
  * @brief verifica se o user lido e valido, se tem user_id e user_name, o campo dos friends pode estar vazio
  * 
@@ -97,7 +98,8 @@ int u_checkNewLine(char * str){
         seped = strsep(&test,";"); // user_name
         if(strcmp(seped,"")==0) empty++;
         else{
-            if(strlen(test)){ seped = strsep(&test,";"); //friends
+            if(strlen(test)){ 
+                seped = strsep(&test,";"); //friends
                 if(seped[strlen(seped) - 1] == ';') empty++;  //verificar se nao tem campos a mais
         }
         }
