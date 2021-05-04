@@ -12,6 +12,7 @@
 #define FROMCSV_BUFFER_SIZE 2000
 
 /*  ----------private----------  */
+
 struct table{
 
    char ** tab;
@@ -19,13 +20,13 @@ struct table{
 
 };
 
-
 /* ----------public---------- */
 
 /**
-\brief Inicializa uma table
-@returns TABLE apontador para struct table
-*/
+ * @brief Inicializa uma table
+ * 
+ * @return TABLE 
+ */
 TABLE initTable(){
     TABLE t = malloc(sizeof(struct table));
     t->tab = NULL;
@@ -34,10 +35,11 @@ TABLE initTable(){
 }
 
 /**
-\brief Inicializa uma table com um dado tamanho
-@param size tamanho a alocar a matriz da table
-@returns TABLE apontador para struct table
-*/
+ * @brief Inicializa uma table com um dado tamanho
+ * 
+ * @param size Tamanho a alocar a matriz da table
+ * @return TABLE 
+ */
 TABLE init_Sized_Table(int size){
     TABLE t = malloc(sizeof(struct table));
     t->tab =  malloc(sizeof(char*) * size);
@@ -46,10 +48,10 @@ TABLE init_Sized_Table(int size){
 }
 
 /**
-\brief Limpa a matriz da table libertando o espaço
-@param t TABLE
-@returns void
-*/
+ * @brief Limpa a matriz da table libertando o espaço
+ * 
+ * @param t TABLE
+ */
 void clearTable(TABLE t){
     if(t){
         for(int i=0;i<t->entries;i++)
@@ -58,50 +60,52 @@ void clearTable(TABLE t){
 }
 
 /**
-\brief Atribuiu um número de entradas
-@param t TABLE
-@param x Númeor de entradas
-@returns void
-*/
+ * @brief Atribuiu um número de entradas
+ * 
+ * @param t TABLE
+ * @param x Número de entradas
+ */
 void setEntries(TABLE t,int x){
     t->entries = x;
 }
 
 /**
-\brief Atribuiu uma matrix ao campo tab da TABLE
-@param t TABLE
-@param result Matriz a atribuir
-@returns void
-*/
+ * @brief Atribuiu uma matrix ao campo tab da TABLE
+ * 
+ * @param t TABLE
+ * @param result Matriz a atribuir
+ */
 void setTab(TABLE t, char** result){
     t->tab = result;
 }
 
 /**
-\brief Adiciona nova linha à matriz
-@param t TABLE
-@param line Linha a adicionar
-@returns void
-*/
+ * @brief Adiciona nova linha à matriz
+ * 
+ * @param t TABLE
+ * @param line line Linha a adicionar
+ */
 void setNewLine(TABLE t,char * line){
     t->tab[t->entries] = strdup(line);
     t->entries++;
 }
 
 /**
-\brief Devolve número de entradas da matriz
-@param t TABLE
-@returns int 
-*/
+ * @brief Devolve número de entradas da matriz
+ * 
+ * @param t TABLE
+ * @return int 
+ */
 int getEntries(TABLE t){
     return t->entries;
 }
 
 /**
-\brief Devolve o campo tab de uma TABLE,uma matriz
-@param t TABLE
-@returns char**
-*/
+ * @brief Devolve o campo tab de uma TABLE,uma matriz
+ * 
+ * @param t TABLE
+ * @return char** 
+ */
 char** getTab(TABLE t){
     int entries = getEntries(t);
     char **results = malloc(sizeof(char*) * entries);
@@ -112,11 +116,12 @@ char** getTab(TABLE t){
 }
 
 /**
-\brief Devolve uma entrada da matriz
-@param t TABLE
-@param n Posição na matriz
-@returns char *
-*/
+ * @brief Devolve uma entrada da matriz
+ * 
+ * @param t TABLE
+ * @param n Posição na matriz
+ * @return char* 
+ */
 char * get_string_table(TABLE t,int n){
     char* r;
     if(t->tab[n]) r = strdup(t->tab[n]);
@@ -125,10 +130,11 @@ char * get_string_table(TABLE t,int n){
 }
 
 /**
-\brief Devolve um array com o tamanho da maior string de cada coluna
-@param t TABLE
-@returns int *
-*/
+ * @brief Devolve um array com o tamanho da maior string de cada coluna
+ * 
+ * @param t TABLE
+ * @return int* 
+ */
 int * getBlen_str(TABLE t){
     int countCols = 1;
     int size = 0;
@@ -157,20 +163,20 @@ int * getBlen_str(TABLE t){
 }
 
 /**
-\brief Imprime linhas dado um tamanho
-@param n tamanho da linha a imprimir
-@returns void
-*/
+ * @brief Imprime linhas dado um tamanho
+ * 
+ * @param n Tamanho da linha a imprimir
+ */
 void print_LineTops(int n){
     for(int i=0;i<n;i++)
         printf("-");
 }
 
 /**
-\brief Imprime espaços dado um tamanho
-@param n quantidade de espaços a imprimir
-@returns void
-*/
+ * @brief Imprime espaços dado um tamanho
+ * 
+ * @param n Quantidade de espaços a imprimir
+ */
 void printN_space(int n){
     for(int i=0;i<n;i++)
         printf(" ");
@@ -193,10 +199,11 @@ int getColsNum(TABLE t){
 }
 
 /**
-\brief Retorna o número total de páginas
-@param t - Table
-@returns int
-*/
+ * @brief Retorna o número total de páginas
+ * 
+ * @param t Table
+ * @return int 
+ */
 int getTotalPages(TABLE t){
     int total_entries = getEntries(t);
     int total_pages = total_entries/MAXTPAGE ;
@@ -209,12 +216,12 @@ int getTotalPages(TABLE t){
 }
 
 /**
-\brief Imprime uma header da TABLE,indentificando as colunas
-@param str - Header a imprimir
-@param biggers - Array de inteiros que guarda o tamanho da maior string de cada coluna
-@param cols - Número de colunas
-@returns void
-*/
+ * @brief Imprime a linha edentificadora do nome das colunas
+ * 
+ * @param str Header a imprimir
+ * @param biggers Array de inteiros que guarda o tamanho da maior string de cada coluna
+ * @param cols Número de colunas
+ */
 void printHeader(char * str,int *biggers,int cols){
     char * seped;
 
@@ -240,10 +247,11 @@ void printHeader(char * str,int *biggers,int cols){
 }
 
 /**
-\brief Imprime uma página da TABLE
-@param current_page Página a imprimir
-@returns void
-*/
+ * @brief Imprime uma página da TABLE
+ * 
+ * @param t TABLE
+ * @param current_page Página a imprimir
+ */
 void printPage_table(TABLE t,int current_page){
     int total_entries = getEntries(t);
     int total_pages,bottom,top,while_Iterator;
@@ -296,25 +304,25 @@ void printPage_table(TABLE t,int current_page){
         printf("\n");
     
     }
-
     for(int j=0;j<countCols;j++){
             print_LineTops(biggers[j]+MARGIN);
             
     }
-    
     printf("\n");
     if(total_entries<MAXTPAGE){
         printf("Page %d out of %d || Total entries: %d\n",1,total_pages,total_entries-1);
     }else
     printf("Page %d out of %d || Total entries: %d\n",current_page+1,total_pages,total_entries-1);    
 }
+
 /**
-\brief Indexa uma TABLE dado indices de linha e coluna atribui essa entrada numa nova variável TABLE
-@param t TABLE
-@param line Indice da linha
-@param col Indice coluna
-@returns TABLE
-*/
+ * @brief Indexa uma TABLE dado indices de linha e coluna atribui essa entrada numa nova variável TABLE
+ * 
+ * @param t TABLE
+ * @param line Indice da linha
+ * @param col Indice coluna
+ * @return TABLE 
+ */
 TABLE index_table(TABLE t,int line,int col){
     TABLE indexed_table = init_Sized_Table(2);
     char * headLine = get_string_table(t,0);
@@ -334,12 +342,12 @@ TABLE index_table(TABLE t,int line,int col){
 }
 
 /**
-\brief Converte uma TABLE para ficheiro csv
-@param x TABLE
-@param delim Delimitador de campos
-@param name Nome do ficheiro
-@returns void
-*/
+ * @brief Converte uma TABLE para ficheiro csv
+ * 
+ * @param x  TABLE
+ * @param delim Delimitador de campos
+ * @param name Nome do ficheiro
+ */
 void toCSV (TABLE x,char* delim, char* name){
     char s[2] =";";
     int entries = getEntries(x);
@@ -385,12 +393,12 @@ char* getLine_file(FILE *f){
     return input;
 }
 
-
 /**
-\brief Dá o número de linhas de um ficheiro, é necessária para a fromCSV
-@param file Nome do ficheiro
-@returns int
-*/
+ * @brief Dá o número de linhas de um ficheiro, é necessária para a fromCSV
+ * 
+ * @param file Nome do ficheiro
+ * @return int 
+ */
 int nLinhas (char* file){
     FILE *fp;
     int count = 0; 
@@ -405,12 +413,14 @@ int nLinhas (char* file){
     fclose(fp);
     return count;
 }
+
 /**
-\brief Converte de um ficheiro csv para TABLE
-@param delim Delimitador de campos
-@param file Nome do ficheiro
-@returns TABLE
-*/
+ * @brief Converte de um ficheiro csv para TABLE
+ * 
+ * @param file Nome do ficheiro
+ * @param delim Delimitador de campos
+ * @return TABLE 
+ */
 TABLE fromCSV (char* file, char* delim){
     FILE* f = fopen(file,"r");
     if (f==NULL){
@@ -464,13 +474,13 @@ int in_array(int* arr, int size, int value){
     return found;
 }
 
-
 /**
-\brief Projeta determinadas colunas da TABLE recebida
-@param x TABLE 
-@param cols Nome da coluna a projetar
-@returns TABLE
-*/
+ * @brief Projeta numa nova estrutura table determinadas colunas da TABLE recebida
+ * 
+ * @param x TABLE 
+ * @param cols Nome da coluna a projetar
+ * @return TABLE 
+ */
 TABLE proj(TABLE x, char* cols){
     int valid = 0, columns = 0;
     for(int i = 0; cols[i] != '\0' ;i++){//conta o numero de colunas pedido
@@ -558,16 +568,15 @@ int valid_column_name(TABLE t, char* column_name){
     return -1;
 }
 
-
-
 /**
-\brief Filtra determinada coluna da TABLE recebida
-@param x TABLE 
-@param column_name Nome da coluna que será analizada
-@param value Palavra utilizada na comparação
-@param op Operador a aplicar na comparação
-@returns TABLE
-*/
+ * @brief Filtra determinada coluna da TABLE recebida
+ * 
+ * @param x TABLE 
+ * @param column_name Nome da coluna que será analizada
+ * @param value Palavra utilizada na comparação
+ * @param op Operador a aplicar na comparação
+ * @return TABLE 
+ */
 TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
     if(valid_column_name(x,column_name) != -1){ 
         TABLE comp = proj(x,column_name);

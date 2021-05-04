@@ -3,6 +3,7 @@
 
 
 /*  ----------private----------  */
+
 struct user{
     char * user_id;
     char * name;
@@ -11,29 +12,33 @@ struct user{
 
 /*  ----------public----------  */
 
+
 /**
-\brief Devolve campo user_id
-@param u Apontador para struct user
-@returns char * - string com o user id
-*/
+ * @brief Devolve campo user_id
+ * 
+ * @param u Apontador para struct user
+ * @return char* 
+ */
 char * getUserId(User u){
     return strdup(u->user_id);
 }
 
 /**
-\brief Devolve campo name
-@param u Apontador para struct user
-@returns char * - string com o nome
-*/
+ * @brief Devolve campo name
+ * 
+ * @param u Apontador para struct user
+ * @return char* 
+ */
 char * getUserName(User u){
     return strdup(u->name);
 }
 
 /**
-\brief Devolve campo friend
-@param u Apontador para struct user
-@returns char * - string com os friends
-*/
+ * @brief Devolve campo friend
+ * 
+ * @param u Apontador para struct user
+ * @return char* 
+ */
 char * getFriends(User u){
     return strdup(u->friends);
 }
@@ -109,10 +114,11 @@ int u_checkNewLine(char * str){
 }
 
 /**
-\brief Mapea dados para uma struct user
-@param buffer Buffer com informação
-@returns USER - apontador struct user
-*/
+ * @brief Mapea dados para uma struct user
+ * 
+ * @param buffer Buffer com informação
+ * @return User 
+ */
 User createUser(char * buffer){
     User u = malloc(sizeof(struct user));
     u->user_id = strdup(strsep(&buffer,";"));

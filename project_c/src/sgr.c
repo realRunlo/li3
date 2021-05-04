@@ -126,12 +126,14 @@ static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
         data->line++;
     }
 }
+
 /**
-@brief Coloca as estatisticas das reviews na hash h_reviews_info;
-@param key review_id
-@param value review struct
-@param user_data proc, query3 struct onde esta guardado o apontador para a h_reviews_info
-*/
+ * @brief Coloca as estatisticas das reviews na hash h_reviews_info
+ * 
+ * @param key review_id
+ * @param value review struct
+ * @param user_data process, query3 struct onde esta guardado o apontador para a h_reviews_info
+ */
 static void reviews3_info(gpointer key, gpointer value, gpointer user_data){
     Reviews r = ((Reviews)value);
     char* b_id = r_getBusinessId((Reviews) value);
@@ -246,8 +248,6 @@ static void reviews5_info(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-
-
 /**
  * @brief auxiliar da query6 que cria uma hash das diferentes cidades
  * 
@@ -272,7 +272,6 @@ static void city_hash(gpointer key, gpointer value, gpointer user_data){
         addToHashT(data->cities,GINT_TO_POINTER(city),c);
     }
 }
-
 
 /**
  * @brief auxiliar da query 6 que percorre cada review para calcular a media de estrelas de cada negocio, guardando/atualizando
@@ -308,7 +307,6 @@ static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
         update->total += r_getStars(r);
     }
 }
-
 
 /**
  * @brief auxiliar da query6 que guarda/atualiza a matriz de cada struct de cidade da hash das cidades, os top negocios 
@@ -411,7 +409,6 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
-
 /**
  * @brief transfere a matriz do top guardada em cada struct de city para a table
  * 
@@ -441,14 +438,16 @@ static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     }
     }
 }
+
 /**
-@brief Coloca o user_id na table se tiver pelo menos dois estados diferentes com review;
-@param key user_id
-@param value lista com os business_id onde o user fez review
-@param user_data proc, struct query7 que guarda a table, o apontador da hash dos businesses,
+ * @brief Coloca o user_id na table se tiver pelo menos dois estados diferentes com review
+ * 
+ * @param key user_id
+ * @param value lista com os business_id onde o user fez review
+ * @param user_data proc, struct query7 que guarda a table, o apontador da hash dos businesses,
 o apontador da hash dos users que fizeram reviews 
-e o apontador da hash que contém os estados;
-*/
+e o apontador da hash que contém os estados
+ */
 static void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
     Query7 data = (Query7) user_data;
     data->h_state = g_hash_table_new(g_str_hash, g_str_equal);
@@ -467,15 +466,17 @@ static void check_state_iterator(gpointer key, gpointer value, gpointer user_dat
         }
     } 
 }
+
 /**
-@brief Coloca na hash h_user o user_id como key e uma lista com os business_id que
+ * @brief Coloca na hash h_user o user_id como key e uma lista com os business_id que
 foram visitados pelo user
-@param key review_id
-@param value review struct
-@param user_data proc, struct query7 que guarda a table, o apontador da hash dos businesses,
+ * 
+ * @param key review_id
+ * @param value review struct
+ * @param user_data proc, struct query7 que guarda a table, o apontador da hash dos businesses,
 o apontador da hash dos users que fizeram reviews 
-e o apontador da hash que contém os estados;
-*/
+e o apontador da hash que contém os estados
+ */
 static void query7_iterator(gpointer key, gpointer value, gpointer user_data){
     char* user_id = strdup(r_getUserId((Reviews) value));
     char* b_id =  strdup(r_getBusinessId((Reviews) value));

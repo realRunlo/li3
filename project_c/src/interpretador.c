@@ -374,8 +374,6 @@ char* getVar(char* comando){
     } 
     result[i] ='\0';
     return result;
-
-
 }
 
 /**
