@@ -71,6 +71,7 @@ typedef struct city{
 typedef struct b_stars{
     char* b_id;
     char* b_name;
+    char* city;
     int n_reviews;
     float total;
 }*B_STARS;
@@ -296,6 +297,7 @@ static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
         B_STARS business = malloc(sizeof(struct b_stars));
         business->b_id = b_id;
         business->b_name= b_name;
+        business->city = get_city(b);
         business->n_reviews = 1;
         business->total = r_getStars(r);
         addToHashT(data->b_same,GINT_TO_POINTER(b_id),business);
@@ -318,15 +320,14 @@ static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
  */
 static void top_city(gpointer key, gpointer value, gpointer user_data){
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
-    Business b = (Business) value;
+    B_STARS bStar = (B_STARS) value;
     GHashTable * b_same_name = data->b_same;
     GHashTable * cities = data->cities;
-    char* b_name    = get_name(b);
-    char* b_id      = get_id(b);
-    char* city      = get_city(b);
+    char* b_name    = bStar->b_name;
+    char* b_id      = bStar->b_id;
+    char* city      = bStar->city;
     char* city_name = turn_lowerCases(city);
     city_name[0]    = toupper(city_name[0]);
-    B_STARS bStar   = g_hash_table_lookup(b_same_name,GINT_TO_POINTER(b_id));
     CITY c          = g_hash_table_lookup(cities,GINT_TO_POINTER(city_name));
     //verifica se houve reviews para o negocio em questao
     if(bStar != NULL){
@@ -409,6 +410,70 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
+static float get_stars(char *business){
+    char* buffer = strdup(business);
+    char* pointer = buffer;
+    float stars = atof(strsep(&buffer,";"));
+    free(pointer);
+    return stars;
+}
+
+static int partition_top(float stars_index[][2], int low, int high){
+
+    float pivot[2]; 
+    pivot[0] = stars_index[high][0];
+    pivot[1] = stars_index[high][1];
+    int i = low-1;
+
+    float swapper1[2] = {0,0}; float swapper2[2] = {0,0};
+    for(int j = low; j <= high- 1; j++){
+        if(stars_index[j][0] < pivot[0]){
+            i++;  
+            swapper1[0] = stars_index[j][0];swapper1[1] = stars_index[j][1];
+            swapper2[0] = stars_index[i][0];swapper2[1] = stars_index[i][1];
+            
+            stars_index[i][0] = swapper1[0]; stars_index[i][1] = swapper1[1];  
+            stars_index[j][0] = swapper2[0]; stars_index[j][1] = swapper2[1];  
+        }
+    }
+    swapper1[0] = stars_index[high][0]; swapper1[1] = stars_index[high][1];
+    swapper2[0] = stars_index[i+1][0];  swapper2[1] = stars_index[i+1][1];
+    stars_index[high][0] = swapper2[0]; stars_index[high][1] = swapper2[1];  
+    stars_index[i+1][0] = swapper1[0];  stars_index[i+1][1] = swapper1[1];  
+    return (i + 1);
+}
+
+static void quickSort_top(float stars_index[][2], int low, int high){
+    if(low < high){
+        int pi = partition_top(stars_index, low, high);
+
+        quickSort_top(stars_index, low, pi -1);
+        quickSort_top(stars_index, pi + 1, high);
+    }
+}
+
+
+static char** sort_top(char** top, int entries,int low){
+    float stars_index[entries][2];
+    int k = 0;
+    for(int i = low; i<entries ; i++,k++){
+        stars_index[k][0] = get_stars(top[i]);
+        stars_index[k][1] = i;
+    }
+    quickSort_top(stars_index,0,entries-1-low);
+    char** sorted_top = malloc(sizeof(char*) * entries);
+    int j = low;
+    for(int i = 0; i<low;i++){
+        sorted_top[i] = top[i];
+    }
+    k=0;
+    for(int i = low; i<entries; i++,k++){
+        j = (int) stars_index[k][1];
+        sorted_top[i] = top[j];
+    }
+    return sorted_top;
+}
+
 /**
  * @brief transfere a matriz do top guardada em cada struct de city para a table
  * 
@@ -427,13 +492,13 @@ static void city_to_table(gpointer key, gpointer value, gpointer user_data){
         //printf("%s\n",c->top[0]);
         if (maxlength < strlen(c->top[j])) maxlength = strlen(c->top[j]);
         }
-    char  buff[strlen(c->name) + maxlength + 1];
+    char  buff[strlen(c->name) + maxlength + 2];
     
     //concatena os dados dos negocios e coloca-os na table
-    
+    char** sorted_top = sort_top(c->top,c->entries,0); 
     for(k=0 ; k<j;k++){
         buff[0] = '\0';
-        snprintf(buff,strlen(c->name)+strlen(c->top[k]) + 2,"%s;%s",c->name,c->top[k]);
+        snprintf(buff,strlen(c->name)+strlen(sorted_top[k]) + 2,"%s;%s",c->name,sorted_top[k]);
         setNewLine(result,buff);
     }
     }
@@ -983,7 +1048,7 @@ TABLE top_businesses_by_city(SGR sgr, int top){
     g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)b_add_stars, process);
     
     //para cada business verifica a cidade a que pertence e verifica se pertence ao top dessa cidade
-    g_hash_table_foreach(sgr->hashT_businesses, (GHFunc)top_city, process);
+    g_hash_table_foreach(process->b_same, (GHFunc)top_city, process);
     
 
     TABLE result = initTable();
@@ -1030,9 +1095,9 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     B_AVERAGE_STARS process = malloc(sizeof(struct b_average_stars));
     process->b_same = initHashT(); //hash para guardar o numero medio de estrelas de cada negocio
     process->sgr = sgr;
-    process->top = top;
+    process->top = top+1;
     process->condition = strdup(category);
-    process->results = malloc(sizeof(char*) * (top + 1));
+    process->results = malloc(sizeof(char*) * (top + 2));
     process->results[0] = strdup("stars;business_id;business_name");
     process->entries = 0;
 
@@ -1045,7 +1110,7 @@ TABLE top_businesses_with_category(SGR sgr, int top, char *category){
     //tornar a matriz em forma TABLE
     TABLE result = initTable();
     setEntries(result,process->entries+1);
-    setTab(result,process->results);
+    setTab(result,sort_top(process->results,process->entries+1,1));
 
     return result;
 }
