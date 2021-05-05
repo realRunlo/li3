@@ -1,4 +1,4 @@
-FLAGS= -std=c99 -Wall -o2
+FLAGS= -std=c99 -Wall -o2 -D_GNU_SOURCE 
 PKG = `pkg-config --cflags --libs glib-2.0`
 COMPILER=gcc
 INCLUDES=includes
