@@ -4,7 +4,7 @@
 
 typedef struct reviews * Reviews;
 
-Reviews addReview(Reviews  rev,char * str);
+Reviews addReview(char * str);
 
 int r_checkNewLine(char * str);
 

@@ -273,7 +273,6 @@ void printPage_table(TABLE t,int current_page){
     }
 
     char * seped;
-    char * str_c = strdup(t->tab[0]); 
     int countCols = getColsNum(t);
 
     int * biggers = getBlen_str(t);
@@ -510,7 +509,6 @@ TABLE proj(TABLE x, char* cols){
             char* aux;char* line ;
             char *projLine = malloc(sizeof(char) * 200);
             size_t projLen = 200; size_t lineLen = 0;
-            int col = 0;
             int r = 0, l = 0;
             for(j = 0;j<entries;j++){
                 r = 0; l =0;

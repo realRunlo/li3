@@ -2,6 +2,7 @@
 #define ___STRUCTS_H___
 
 #include "glibWarningAvoid.h"
+#define UNUSED(x) (void)(x)
 
 typedef GHashTable * hashTable;
 

@@ -73,18 +73,6 @@ void setFriends(User u, char* newFriends){
     u->friends = strdup(newFriends);
 }
 
-
-/**
- * @brief simples iterator para imprimir uma hashtable de users
- * 
- * @param key user_id
- * @param value user
- * @param user_data formato de print
- */
-void print_user_iterator(gpointer key, gpointer value, gpointer user_data) {
- printf(user_data, getUserId((User) value),getUserName((User) value),getFriends((User) value));
-}
-
 //seped[strlen(seped) - 1] != ';'
 /**
  * @brief verifica se o user lido e valido, se tem user_id e user_name, o campo dos friends pode estar vazio
@@ -96,7 +84,7 @@ int u_checkNewLine(char * str){
     char * test = strdup(str);
     char* pointer = test;
     char * seped;
-    int i = 0 , empty = 0;
+    int empty = 0;
     seped = strsep(&test,";"); // user_id
     if(strcmp(seped,"")==0) empty++;
     else{

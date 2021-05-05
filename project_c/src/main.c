@@ -18,7 +18,7 @@ int main(){
    //TABLE t = top_businesses_by_city(sgr,15);TABLE x = proj(t," business_id,stars,");show_pagedTable(t,0);show_pagedTable(x,0);
     //TABLE t = businesses_catalog(sgr);
     int f = interpretador(); 
-    return 0;
+    return f;
 }
 
 

@@ -132,7 +132,6 @@ char * r_getText(Reviews rev){
 int r_checkNewLine(char * str){
     char * test = strdup(str);
     char * seped;
-    int i = 0;
     seped = strsep(&test,";");
     if(strcmp(seped,"")==0) return 0;
     seped = strsep(&test,";");
@@ -162,7 +161,8 @@ int r_checkNewLine(char * str){
  * @param str string 
  * @return Reviews 
  */
-Reviews addReview(Reviews  rev,char * str){
+Reviews addReview(char * str){
+    Reviews rev;
     if(r_checkNewLine(str)){
         rev = malloc(sizeof(struct reviews));
         rev->review_id = strdup(strsep(&str,";"));

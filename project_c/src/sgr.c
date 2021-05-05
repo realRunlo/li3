@@ -117,6 +117,7 @@ typedef struct query9{
  * @param user_data process, query2 struct onde esta guardado a letra para comparacao, a table e os numeros totais de entradas
  */
 static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     char* name = get_name((Business) value);
     Query2 data = (Query2) user_data;
     char letter = data->letter;
@@ -136,6 +137,7 @@ static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
  * @param user_data process, query3 struct onde esta guardado o apontador para a h_reviews_info
  */
 static void reviews3_info(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     Reviews r = ((Reviews)value);
     char* b_id = r_getBusinessId((Reviews) value);
     Query3 data = (Query3)user_data;
@@ -162,6 +164,7 @@ static void reviews3_info(gpointer key, gpointer value, gpointer user_data){
  * @param user_data process, struct query4 que guarda a table, o apontador da hash dos businesses, o user_id em questao e o numero total de entries
  */
 static void query4_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     Reviews r = (Reviews) value;
     char* user_id = r_getUserId(r);
     Query4 data = (Query4) user_data;
@@ -205,6 +208,7 @@ A hash table analisada contém as estatisticas das reviews
 dado, o apontador da hash dos businesses e o apontador da h_reviews_info;
 */
 static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     float b_stars = (((B_STARS) value)->total)/(((B_STARS) value)->n_reviews);
     Query5 data = (Query5) user_data;
     char* city_data = strdup(data->city);
@@ -231,6 +235,7 @@ static void query5_iterator(gpointer key, gpointer value, gpointer user_data){
 dado, o apontador da hash dos businesses e o apontador da h_reviews_info;
 */
 static void reviews5_info(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     Reviews r = ((Reviews)value);
     char* b_id = r_getBusinessId((Reviews) value);
     Query5 data = (Query5)user_data;
@@ -257,6 +262,7 @@ static void reviews5_info(gpointer key, gpointer value, gpointer user_data){
  * @param user_data process, struct auxiliar da query 6 onde se vai guardar a hash das cidades
  */
 static void city_hash(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Business b = (Business) value;
 
@@ -283,6 +289,7 @@ static void city_hash(gpointer key, gpointer value, gpointer user_data){
  * @param user_data process, auxiliar da query 6 onde se vai guardar a nova hash de negocios com os dados das estrelas
  */
 static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
     char *b_id = r_getBusinessId(r);
@@ -319,9 +326,9 @@ static void b_add_stars(gpointer key, gpointer value, gpointer user_data){
  *      de cada cidade, e a hash das estrelas de cada negocio(para comparar os negocios de uma cidade com o top do momento)
  */
 static void top_city(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     B_STARS bStar = (B_STARS) value;
-    GHashTable * b_same_name = data->b_same;
     GHashTable * cities = data->cities;
     char* b_name    = bStar->b_name;
     char* b_id      = bStar->b_id;
@@ -482,6 +489,7 @@ static char** sort_top(char** top, int entries,int low){
  * @param user_data table onde se guardara os tops de cada cidade
  */
 static void city_to_table(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     TABLE result = (TABLE) user_data;
     CITY c = (CITY) value;
     int j = 0 ,k = 0;
@@ -514,6 +522,7 @@ o apontador da hash dos users que fizeram reviews
 e o apontador da hash que contém os estados
  */
 static void check_state_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     Query7 data = (Query7) user_data;
     data->h_state = g_hash_table_new(g_str_hash, g_str_equal);
     int t = g_slist_length((GSList*)value);
@@ -543,6 +552,7 @@ o apontador da hash dos users que fizeram reviews
 e o apontador da hash que contém os estados
  */
 static void query7_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     char* user_id = strdup(r_getUserId((Reviews) value));
     char* b_id =  strdup(r_getBusinessId((Reviews) value));
     Query7 data = (Query7) user_data;
@@ -581,6 +591,7 @@ static int cmp_category(char* c_condition,char* c_comparing){
  *             com o respetivo numero de estrelas e reviews
  */
 static void b_category(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     Reviews r = (Reviews) value;
     char *b_id = r_getBusinessId(r);
@@ -621,9 +632,9 @@ static void b_category(gpointer key, gpointer value, gpointer user_data){
  * @param user_data B_AVERAGE_STARS struct, onde se guarda os resultados para a table
  */
 static void top_category(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     B_AVERAGE_STARS data = (B_AVERAGE_STARS) user_data;
     B_STARS b = (B_STARS) value;
-    GHashTable * b_same_name = data->b_same;
     char** results  = data->results; 
     char* b_name    = b->b_name;
     char* b_id      = b->b_id;    
@@ -749,6 +760,7 @@ static int wordInString(char *str,char * word){
  * @param user_data 
  */
 static void query9_iterator(gpointer key, gpointer value, gpointer user_data){ 
+    UNUSED(key);
     Query9 data = (Query9) user_data;
     char * word = strdup(data->word);
     char * txt = r_getText((Reviews) value);
@@ -766,6 +778,7 @@ static void query9_iterator(gpointer key, gpointer value, gpointer user_data){
  * @param user_data 
  */
 static void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     TABLE catalog = (TABLE) user_data;
 
     char * revId = r_getReviewId((Reviews) value);
@@ -792,6 +805,7 @@ static void revCatalog_iterator(gpointer key, gpointer value, gpointer user_data
  * @param user_data 
  */
 static void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     TABLE catalog = (TABLE) user_data;
 
     char * usId = getUserId((User) value);
@@ -812,6 +826,7 @@ static void usCatalog_iterator(gpointer key, gpointer value, gpointer user_data)
  * @param user_data 
  */
 static void busCatalog_iterator(gpointer key, gpointer value, gpointer user_data){
+    UNUSED(key);
     TABLE catalog = (TABLE) user_data;
 
     char * bus_id = get_id((Business) value);

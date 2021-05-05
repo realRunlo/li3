@@ -56,7 +56,6 @@ int check_line (char *str){
     if(count_fiels(str) == 4){
         char * test = strdup(str);
         char * seped;
-        int i = 0;
         seped = strsep(&test,";");
         if(strcmp(seped,"")==0) return 0;// testa o business_id
         seped = strsep(&test,";");
@@ -127,18 +126,4 @@ char * get_state(Business b){
 */
 char * get_categ(Business b){
     return strdup(b->categories);
-}
-
-/**
-\@brief simples iterator para imprimir uma hashtable de business
-@param key business_id
-@param value business
-@param user_data formato de print
-*/
-void iterator(gpointer key, gpointer value, gpointer user_data) {
- printf(user_data,  get_id((Business) value),
-                    get_name((Business) value),
-                    get_city((Business) value),
-                    get_state((Business) value),
-                    get_categ((Business) value));
 }

@@ -202,7 +202,6 @@ char* commandString(char* c){
  * @return int 
  */
 int check_variable(VARIAVEIS v, char* variavel){
-    int entries = v->entries;
     VARIAVEL * lista = v->variaveis;
     for(int i = 0; lista[i]; i++){
         
@@ -410,7 +409,7 @@ int functionId(char * function){
  */
 int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS v){
     int funcao = functionId(function);
-    int espacos = 0 , i = 0 , erro = 0;
+    int i = 0 , erro = 0;
     if(comando[i] == '('){// 1ºargumento
         if(funcao == 0){//fromCSV (segundo elemento delimitador
                         //primeiro argumento sendo um diretorio tem de se usar getVar
@@ -701,7 +700,6 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
  * @return int 
  */
 int executeCommand(char *comando,VARIAVEIS v, SGR sgr,int* process){ 
-    int len = strlen(comando);
     int i = 0, espacos = 0;
     
     espacos = skipSpaces(comando);
@@ -941,8 +939,7 @@ int interpretador(){
                 size_t len = 0;
                 if(getline(&s,&len,stdin)){//recebe os comandos
                 char *buff = malloc(sizeof(char) * strlen(s));
-                size_t commandlen = 0;
-                int pflag = 0, cflag = 0 , dflag = 0, perro = 0; //flags para deteçao de parenteses, delimitadores, e erros
+                int pflag = 0, dflag = 0, perro = 0; //flags para deteçao de parenteses, delimitadores, e erros
                 int j = 0;
                 for(int i =0; perro == 0 && s[i] != '\n' && process == 2; i++){
                     buff[j] = s[i];

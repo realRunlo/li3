@@ -7,6 +7,7 @@
 #include "../includes/user.h"
 #include "../includes/reviews.h"
 #include "../includes/business.h"
+#define UNUSED(x) (void)(x)
 
 
 typedef struct sgr * SGR;

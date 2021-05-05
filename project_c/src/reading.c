@@ -19,13 +19,13 @@ void readReviews(GHashTable * hTable,char * filename,GHashTable * htUsers,GHashT
         perror("ERROR: ");
         return;
     } else{
-        ssize_t linelen = 0; size_t line_buf_len = 0;
+        size_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,fp); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,fp);
         while(linelen >=0)
         {
-            Reviews r = addReview(r,line);
+            Reviews r = addReview(line);
             if(r!=NULL){ // pode ser NULL caso a linha n seja valida
                 User  us = lookUpHashT(htUsers,r_getUserId(r));
                 Business bus = lookUpHashT(htBusinesses,r_getBusinessId(r));
@@ -56,7 +56,7 @@ void readUser(GHashTable * table, char * filename){
     }
     else{
         User u;
-        ssize_t linelen = 0; size_t line_buf_len = 0;
+        size_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,f); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,f);
@@ -83,7 +83,7 @@ void readBusiness (GHashTable * hash, char * filename ){
     FILE *f = fopen(filename,"r");
     if(f!=NULL){
         Business b;
-        ssize_t linelen = 0; size_t line_buf_len = 0;
+        size_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,f); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,f);
