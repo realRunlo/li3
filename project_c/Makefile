@@ -1,4 +1,4 @@
-FLAGS= -std=c99 -Wextra -O2 -D_GNU_SOURCE 
+FLAGS= -std=c99 -Wall -o2
 PKG = `pkg-config --cflags --libs glib-2.0`
 COMPILER=gcc
 INCLUDES=includes
@@ -15,7 +15,10 @@ valgrind:
          	--log-file=valgrind-out.txt \
 		./allprog
 
-program: $(SRC)/main.c $(SRC)/interpretador.c $(SRC)/show.c $(SRC)/reviews.c $(SRC)/structs.c $(SRC)/reading.c $(SRC)/user.c $(SRC)/sgr.c  $(SRC)/business.c $(SRC)/table.c 
-	$(COMPILER) $(FLAGS) -o program $(SRC)/main.c $(SRC)/interpretador.c $(SRC)/show.c $(SRC)/reviews.c $(SRC)/structs.c $(SRC)/reading.c $(SRC)/user.c $(SRC)/sgr.c  $(SRC)/business.c $(SRC)/table.c $(PKG)  
+program: $(wildcard $(SRC)/*.c)
+	$(COMPILER) $(FLAGS) $(wildcard $(SRC)/*.c) $(PKG)  -o program 
+
+clean: 
+	rm program
 
 
