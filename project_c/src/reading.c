@@ -19,7 +19,7 @@ void readReviews(GHashTable * hTable,char * filename,GHashTable * htUsers,GHashT
         perror("ERROR: ");
         return;
     } else{
-        size_t linelen = 0; size_t line_buf_len = 0;
+        ssize_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,fp); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,fp);
@@ -34,7 +34,7 @@ void readReviews(GHashTable * hTable,char * filename,GHashTable * htUsers,GHashT
                  }
             }
           
-            linelen = getline(&line,&linelen,fp);
+            linelen = getline(&line,&line_buf_len,fp);
         }
         free(line);
         fclose(fp);
@@ -56,7 +56,7 @@ void readUser(GHashTable * table, char * filename){
     }
     else{
         User u;
-        size_t linelen = 0; size_t line_buf_len = 0;
+        ssize_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,f); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,f);
@@ -66,7 +66,7 @@ void readUser(GHashTable * table, char * filename){
                 u = createUser(line);
                 addToHashT(table,GINT_TO_POINTER((getUserId(u))),u);
             }
-            linelen = getline(&line,&linelen,f);
+            linelen = getline(&line,&line_buf_len,f);
         }
         free(line);
         fclose(f);
@@ -83,7 +83,7 @@ void readBusiness (GHashTable * hash, char * filename ){
     FILE *f = fopen(filename,"r");
     if(f!=NULL){
         Business b;
-        size_t linelen = 0; size_t line_buf_len = 0;
+        ssize_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,f); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,f);
@@ -93,7 +93,7 @@ void readBusiness (GHashTable * hash, char * filename ){
                 b = create_b(line);
                 addToHashT(hash,GINT_TO_POINTER(get_id(b)),b);
             }
-            linelen = getline(&line,&linelen,f);
+            linelen = getline(&line,&line_buf_len,f);
         }
         free(line);
         fclose(f);
