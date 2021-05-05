@@ -45,6 +45,7 @@ gpointer lookUpHashT(GHashTable * ht,char * tofind){
  * @param user_data NULL
  */
 void free_a_hash_table_entry (gpointer key, gpointer value, gpointer user_data){
+    UNUSED(user_data);
     g_free (key);
     g_free (value);
 }
