@@ -298,39 +298,36 @@ int executeShow(char *comando,int i, VARIAVEIS v){
  */
 int executeToCSV(char* comando, int i, VARIAVEIS v){
     char* var = commandString(comando+i); //primeira variavel de toCSV
-    int erro = 0;
-    if(check_variable(v,var) == 0){erro++;//verifica se variavel existe 1
+    int erro = 1;
+    if(check_variable(v,var) == 0){erro++;//verifica se variavel existe 
         i += strlen(var);
         i = addSpaces(i,comando);
-        if(comando[i] == ','){erro++;//2
+        if(comando[i] == ','){erro++;
             i++;
             i = addSpaces(i,comando);
-            if(comando[i] == '"'){erro++;//delimitador  3
+            if(comando[i] == '"'){erro++;//delimitador  
                 char *delim = getVar(comando + i);
                 i+= strlen(delim);
-                printf(".%s.%s.\n",var,delim);
-                if(comando[i-1] == '"'){erro++;//4
+                if(comando[i-1] == '"'){erro++;
                     char *del_body = delim+1;
                     i = addSpaces(i,comando);
-                    if(comando[i] == ','){erro++;//5
+                    if(comando[i] == ','){erro++;
                         i++;
                         i = addSpaces(i,comando);
-                        if(comando[i] == '"'){erro++;//guardar nome do ficheiro6
+                        if(comando[i] == '"'){erro++;//guardar nome do ficheiro
                         i = addSpaces(i,comando);
                         char* file = getVar(comando+i);
                         i+= strlen(file);
                         i = addSpaces(i,comando);
-                            if(file[0] == '"' && file[strlen(file)-1] == '"'){erro++;//7
+                            if(file[0] == '"' && file[strlen(file)-1] == '"'){erro++;
                                 char* dir = file+1;  
-                            if(comando[i] == ')'){erro++;// 8
+                            if(comando[i] == ')'){erro++;
                                 i++;
                                 i = addSpaces(i,comando);
-                                if(comando[i] == ';'){erro++; //9
+                                if(comando[i] == ';'){erro = 0;
                                     TABLE t = varTable(v,var);
                                     toCSV(t,strsep(&del_body,"\""),strsep(&dir,"\""));
                                     printf("File saved.\n");
-                                    free(delim);free(file);
-                                    return 1;
                                 }
                             }
                             }free(file);
@@ -340,12 +337,8 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
             }
         }
     }
-    else{
-        printf("Variable not inicialize.\n");
-        return -1;
-    }
-    printf("Erro no comando toCSV %d\n",erro);
-    return -1;
+    if (erro != 0) show_toCSV_error(erro);
+    return erro;
 }
 
 
@@ -423,10 +416,10 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 i = addSpaces(i,comando);
                 char* delim = getVar(comando+i);
                 i+= strlen(delim);
-                if(delim[0] == '"' && delim[strlen(delim) -1] == '"'){
-                    i = addSpaces(i,comando);erro++;    
-                    if(comando[i] == ')'){
-                        i++;erro++;
+                if(delim[0] == '"' && delim[strlen(delim) -1] == '"'){erro++; 
+                    i = addSpaces(i,comando);   
+                    if(comando[i] == ')'){erro++;
+                        i++;
                         i = addSpaces(i,comando);
                         if(comando[i] == ';'){erro = 0;
                             char* body = dir+1;
@@ -438,6 +431,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                 }        
             }    
             free(dir);
+            if(erro != 0) show_fromCSV_error(erro);
             return erro;
         }
         i++;
@@ -657,7 +651,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
 
 
 int executeLoadSgr(char * comando,int i,SGR sgr){
-    int erro = 0;
+    int erro = 1;
     char* buf1 = getVar(comando + i);
     i += strlen(buf1);
     i = addSpaces(i,comando);
@@ -686,7 +680,7 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
             }free(buf3);
         }free(buf2);
     }free(buf1);
-    if(erro != 0) printf("Error %d\n",erro);
+    if(erro != 0) show_loadSgr_error(erro);
     return erro;
 }
 
@@ -813,16 +807,20 @@ SGR load_costume_sgr(){
     sgr = load_sgr(strsep(&(file1),"\""),strsep(&(file2),"\""),strsep(&(file3),"\""));
     free(files[0]);free(files[1]);free(files[2]);
      }
-     }
+    }
     return sgr;
 }
 
-
+/**
+ * @brief menu inicial do programa
+ * 
+ * @return int escolha do utilizador
+ */
 int menu_handler(){
     char c[200];
     do{
         show_menu();
-        printf("Enter choice [1-5]:");
+        printf("Enter choice [1-8]:");
     }while(strlen(fgets(c,200,stdin)) != 2);
     return atoi(c);
 }
@@ -947,15 +945,16 @@ int interpretador(){
                     if(s[i] == '(' && dflag == 0) pflag++; 
                     if(s[i] == ')' && dflag == 0) pflag--;
                     if(s[i] == '\'' || s[i] == '"'){
-                    if(dflag == 1) dflag--;
+                        if(dflag == 1) dflag--;
                     else dflag++;
                     }
-                    if(s[i] == ';' && pflag == 0){
+                    if(s[i] == ';' && pflag == 0 && dflag == 0){
                         buff[j] = '\0';
                         executeCommand(buff,v,sgr, &process);
                         j = 0;
                     }
-                    if(s[i] == ';' && pflag != 0 && dflag == 0){
+                    //caso de ';' dentro de parenteses sem ser entre aspas ou entre aspas depois de fechar parenteses
+                    if(s[i] == ';' && ((pflag != 0 && dflag == 0) || (pflag == 0 && dflag != 0))){
                         printf("Syntaxe error.\n");
                         perro++;
                     }

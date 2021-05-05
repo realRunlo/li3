@@ -165,3 +165,20 @@ void show_index_error(int error){
     if(error == 6) printf("Error, invalid line.\n");
     if(error == 7) printf("Error, invalid column.\n");
 }
+
+void show_toCSV_error(int error){
+    if(error == 1) printf("Error, variable uninitialized.\n");
+    if(error == 2 || error == 5 || error == 8 || error == 9) printf("Error, invalid syntax.\n");
+    if(error == 3 || error == 4) printf("Error, invalid delimiter.\n");
+    if(error == 6 || error == 7) printf("Error, invalid filename.\n");
+
+}
+
+void show_loadSgr_error(int error){
+    printf("Error, invalid syntax\n");
+}
+
+void show_fromCSV_error(int error){
+    if(error == 1 || error == 3 || error == 4) printf("Error, invalid syntax\n");
+    if(error == 2) printf("Error, invalid delimiter\n");
+}

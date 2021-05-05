@@ -39,4 +39,12 @@ void show_variable_command_error(int error);
 void show_proj_error(int error);
 
 void show_index_error(int error);
+
+void show_toCSV_error(int error);
+
+void show_loadSgr_error(int error);
+
+void show_fromCSV_error(int error);
+
+
 #endif //___SHOW_H___

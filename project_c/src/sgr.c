@@ -417,6 +417,12 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
     }
 }
 
+/**
+ * @brief Auxiliar da query6, recolhe o campo das estrelas de uma string e torna em float
+ * 
+ * @param business business com as suas estrelas medias
+ * @return float estrelas 
+ */
 static float get_stars(char *business){
     char* buffer = strdup(business);
     char* pointer = buffer;
@@ -425,6 +431,14 @@ static float get_stars(char *business){
     return stars;
 }
 
+/**
+ * @brief auxiliar da quickSort_top
+ * 
+ * @param stars_index matriz a ordenar
+ * @param low indice inferior da particao
+ * @param high indice superior da particao
+ * @return int 
+ */
 static int partition_top(float stars_index[][2], int low, int high){
 
     float pivot[2]; 
@@ -450,6 +464,13 @@ static int partition_top(float stars_index[][2], int low, int high){
     return (i + 1);
 }
 
+/**
+ * @brief adaptacao do algoritmo quicksort para ordenar uma matriz em que o primeiro indice
+ *  serve como valor para ordenar e o segundo indice indica a sua posicao original
+ * @param stars_index matriz a ordenar
+ * @param low indece inferior da particao
+ * @param high indice superior da particao
+ */
 static void quickSort_top(float stars_index[][2], int low, int high){
     if(low < high){
         int pi = partition_top(stars_index, low, high);
@@ -459,7 +480,14 @@ static void quickSort_top(float stars_index[][2], int low, int high){
     }
 }
 
-
+/**
+ * @brief auxiliar das query 6 e 8, que ordena os top business utilizando uma adaptacao do 
+ * algoritmo quicksort
+ * @param top lista a ordenar
+ * @param entries numero de entradas da lista
+ * @param low limite inferior da lista para ordenar
+ * @return char** lista original ordenada
+ */
 static char** sort_top(char** top, int entries,int low){
     float stars_index[entries][2];
     int k = 0;
