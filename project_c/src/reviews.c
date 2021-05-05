@@ -23,7 +23,7 @@ struct reviews{
  * @return int 
  */
 static int isInt(char* arg){ 
-   for(int i = 0;i<arg[i]!='\0';i++){
+   for(int i = 0;arg[i]!='\0';i++){
       if(!isdigit(arg[i]))
           return 0;
    }
