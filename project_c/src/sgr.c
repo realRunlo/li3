@@ -120,7 +120,7 @@ static void query2_iterator(gpointer key, gpointer value, gpointer user_data){
     char* name = get_name((Business) value);
     Query2 data = (Query2) user_data;
     char letter = data->letter;
-    if(name[0] == letter){ 
+    if(name[0] == tolower(letter) || name[0] == toupper(letter)){ 
         int line = data->line;
         data->result[line] = malloc(strlen(name) * sizeof(char));
         data->result[line] = name;
@@ -563,7 +563,7 @@ static int cmp_category(char* c_condition,char* c_comparing){
     if(c_condition[0] == '\0' && c_comparing[0] == '\0') return 0;
     for(;c_comparing[j] != '\0' ;j++){
         if(c_condition[i] == '\0' && (c_comparing[j] == ',' || c_comparing[j] == ';')) return 0;
-        else if(c_condition[i] == c_comparing[j]) i++;
+        else if(c_condition[i] == tolower(c_comparing[j]) || c_condition[i] == toupper(c_comparing[j])) i++;
             else if(c_condition[i] != c_comparing[j]) i = 0;
     }
     return 1;
