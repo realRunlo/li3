@@ -5,7 +5,7 @@ INCLUDES=includes
 SRC=src
 OBJ=obj
 
-all: main interpretador show reviews user business structs reading sgr allprog
+all: main interpretador show reviews user business structs reading sgr all program
 
 valgrind:
 	valgrind --leak-check=full \
@@ -15,7 +15,7 @@ valgrind:
          	--log-file=valgrind-out.txt \
 		./allprog
 
-prog: $(SRC)/main.c $(SRC)/interpretador.c $(SRC)/show.c $(SRC)/reviews.c $(SRC)/structs.c $(SRC)/reading.c $(SRC)/user.c $(SRC)/sgr.c  $(SRC)/business.c $(SRC)/table.c 
-	$(COMPILER) $(FLAGS) -o exe $(SRC)/main.c $(SRC)/interpretador.c $(SRC)/show.c $(SRC)/reviews.c $(SRC)/structs.c $(SRC)/reading.c $(SRC)/user.c $(SRC)/sgr.c  $(SRC)/business.c $(SRC)/table.c $(PKG)  
+program: $(SRC)/main.c $(SRC)/interpretador.c $(SRC)/show.c $(SRC)/reviews.c $(SRC)/structs.c $(SRC)/reading.c $(SRC)/user.c $(SRC)/sgr.c  $(SRC)/business.c $(SRC)/table.c 
+	$(COMPILER) $(FLAGS) -o program $(SRC)/main.c $(SRC)/interpretador.c $(SRC)/show.c $(SRC)/reviews.c $(SRC)/structs.c $(SRC)/reading.c $(SRC)/user.c $(SRC)/sgr.c  $(SRC)/business.c $(SRC)/table.c $(PKG)  
 
 
