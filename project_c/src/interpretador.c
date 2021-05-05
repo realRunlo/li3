@@ -244,7 +244,6 @@ int executeShow(char *comando,int i, VARIAVEIS v){
         i = addSpaces(i,comando); 
         if(comando[i] == ';'){
         //verificar se a variavel guardada em buff existe
-        //se existir ,executar o comando, caso contrario mostrar mensagem de erro
             if(check_variable(v,buff) == 0){
                 TABLE t = varTable(v,buff);
                 if(t){
@@ -298,30 +297,30 @@ int executeShow(char *comando,int i, VARIAVEIS v){
  */
 int executeToCSV(char* comando, int i, VARIAVEIS v){
     char* var = commandString(comando+i); //primeira variavel de toCSV
-    int erro = 1;
-    if(check_variable(v,var) == 0){erro++;//verifica se variavel existe 
+    int erro = 17;
+    if(check_variable(v,var) == 0){erro = 1;//verifica se variavel existe 
         i += strlen(var);
         i = addSpaces(i,comando);
-        if(comando[i] == ','){erro++;
+        if(comando[i] == ','){erro = 15;
             i++;
             i = addSpaces(i,comando);
-            if(comando[i] == '"'){erro++;//delimitador  
+            if(comando[i] == '"'){erro = 15;//delimitador  
                 char *delim = getVar(comando + i);
                 i+= strlen(delim);
-                if(comando[i-1] == '"'){erro++;
+                if(comando[i-1] == '"'){erro = 1;
                     char *del_body = delim+1;
                     i = addSpaces(i,comando);
-                    if(comando[i] == ','){erro++;
+                    if(comando[i] == ','){erro = 18;
                         i++;
                         i = addSpaces(i,comando);
-                        if(comando[i] == '"'){erro++;//guardar nome do ficheiro
+                        if(comando[i] == '"'){erro = 18;//guardar nome do ficheiro
                         i = addSpaces(i,comando);
                         char* file = getVar(comando+i);
                         i+= strlen(file);
                         i = addSpaces(i,comando);
-                            if(file[0] == '"' && file[strlen(file)-1] == '"'){erro++;
+                            if(file[0] == '"' && file[strlen(file)-1] == '"'){erro = 1;
                                 char* dir = file+1;  
-                            if(comando[i] == ')'){erro++;
+                            if(comando[i] == ')'){erro = 1;
                                 i++;
                                 i = addSpaces(i,comando);
                                 if(comando[i] == ';'){erro = 0;
@@ -337,7 +336,7 @@ int executeToCSV(char* comando, int i, VARIAVEIS v){
             }
         }
     }
-    if (erro != 0) show_toCSV_error(erro);
+    if (erro != 0) show_error_commands(erro);
     return erro;
 }
 
@@ -406,32 +405,34 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
     if(comando[i] == '('){// 1ºargumento
         if(funcao == 0){//fromCSV (segundo elemento delimitador
                         //primeiro argumento sendo um diretorio tem de se usar getVar
-            i++;erro++;
+            i++;erro = 1;
             i = addSpaces(i,comando);
             char* dir = getVar(comando+i);
             i+= strlen(dir);
             i = addSpaces(i,comando);
-            if(comando[i] == ',' && dir[0] == '"' && dir[strlen(dir)-1] == '"'){// 2ºargumento delimitador
-                i++;erro++;
-                i = addSpaces(i,comando);
-                char* delim = getVar(comando+i);
-                i+= strlen(delim);
-                if(delim[0] == '"' && delim[strlen(delim) -1] == '"'){erro++; 
-                    i = addSpaces(i,comando);   
-                    if(comando[i] == ')'){erro++;
-                        i++;
-                        i = addSpaces(i,comando);
-                        if(comando[i] == ';'){erro = 0;
-                            char* body = dir+1;
-                            char* d = delim+1;
-                            TABLE t = fromCSV(strsep(&body,"\""),strsep(&d,"\""));
-                            addVar(v,var,t);
-                        }
-                    }free(delim);    
-                }        
-            }    
-            free(dir);
-            if(erro != 0) show_fromCSV_error(erro);
+            if(comando[i] == ','){// 2ºargumento delimitador
+                erro = 18;
+                if(dir[0] == '"' && dir[strlen(dir)-1] == '"'){erro = 15;
+                    i++;
+                    i = addSpaces(i,comando);
+                    char* delim = getVar(comando+i);
+                    i+= strlen(delim);
+                    if(delim[0] == '"' && delim[strlen(delim) -1] == '"'){erro = 1; 
+                        i = addSpaces(i,comando);   
+                        if(comando[i] == ')'){erro = 1;
+                            i++;
+                            i = addSpaces(i,comando);
+                            if(comando[i] == ';'){erro = 0;
+                                char* body = dir+1;
+                                char* d = delim+1;
+                                TABLE t = fromCSV(strsep(&body,"\""),strsep(&d,"\""));
+                                addVar(v,var,t);
+                            }
+                        }free(delim);    
+                    } free(dir);    
+                }    
+            }  
+            if(erro != 0) show_error_commands(erro);
             return erro;
         }
         i++;
@@ -439,19 +440,21 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
         char* arg1 = commandString(comando+i);
         i+= strlen(arg1);
         i = addSpaces(i,comando);
-        if(funcao == 7){
-            if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){
-                i++;
-                i = addSpaces(i,comando);
-                if(comando[i] == ';'){
-                    TABLE t = international_users(sgr);
-                    addVar(v,var,t);
-                    printf("Variable %s stored!\n",var);
-                    free(arg1);
-                    return 1;
+        if(funcao == 7){erro = 1;
+            if(comando[i] == ')'){erro = 2;
+                if(strcmp(arg1,"sgr") == 0){
+                    i++;
+                    i = addSpaces(i,comando);
+                    if(comando[i] == ';'){erro = 0;
+                        TABLE t = international_users(sgr);
+                        addVar(v,var,t);
+                        printf("Variable %s stored!\n",var);
+                        
+                    }
                 }
-            }
-            return -1;
+            }free(arg1);
+            if(erro !=0) show_error_commands(erro);
+            return erro;
         }
         if(comando[i] == ','){// 2ºargumento
             i++;
@@ -459,7 +462,10 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
             char* arg2 = getVar(comando+i);
             i+= strlen(arg2);
             i = addSpaces(i,comando);
-            if(funcao == 1 && check_variable(v,arg1) == 0){//filter
+            if(funcao == 1){//filter
+                erro = 17;
+                if(check_variable(v,arg1) == 0){
+                erro = 1;
                 if(comando[i] == ','){//valor
                     i++;
                     i = addSpaces(i,comando);
@@ -472,33 +478,34 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                         char* arg4 = getVar(comando+i);
                         i+= strlen(arg4);
                         i = addSpaces(i,comando);
-                        if(comando[i] == ')' && isOperator(arg4) == 0){
+                        if(comando[i] == ')' ){erro = 19;
+                            if(isOperator(arg4) == 0){erro = 1;
                             i++;
                             i = addSpaces(i,comando);
-                            if(comando[i] == ';'){
+                            if(comando[i] == ';'){erro = 0;
                                 TABLE t1 = varTable(v,arg1);
                                 TABLE t2 = filter(t1,arg2,arg3,atoi(arg4));
                                 addVar(v,var,t2);
                                 printf("Variable %s stored!\n",var);
-                                free(arg1);free(arg2);free(arg3);free(arg4);
-                                return 1;
-                            }
+                            }free(arg4);
+                            }free(arg3);
                         }
-                        free(arg4);
-                    }
-                    free(arg3);
+                    } 
+                    }free(arg2);
                 }
-                free(arg1);free(arg2);
-                return -1;
+                free(arg1);
+                if(erro != 0) show_error_commands(erro);
+                return erro;
             }
             if(funcao == 2 || funcao == 3 || funcao == 4 || funcao == 6 || funcao == 9 ){//query de 2 argumentos
-                erro++;
-                if(comando[i] == ')' && strcmp(arg1,"sgr") == 0){erro++;
+                erro = 1;
+                if(comando[i] == ')'){erro = 2;
+                    if(strcmp(arg1,"sgr") == 0){
                     i++;
                     i = addSpaces(i,comando);
-                    if(comando[i] == ';'){erro = 0;
+                    if(comando[i] == ';'){
                         switch(funcao){
-                            case(2):{erro++;
+                            case(2):{erro = 4;
                                 char c;
                                 if(arg2[0] == '\'' && arg2[2] == '\''){erro = 0;
                                     c = arg2[1];
@@ -506,12 +513,11 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                     addVar(v,var,t);
                                     printf("Variable %s stored!\n",var);
                                 } 
-                                if(erro != 0) show_query2_error(erro);
-                                free(arg1);free(arg2);
-                                return erro;
+                                //if(erro != 0) show_query2_error(erro);
+                                break;
                                 }
-                            case(6):{erro=0;
-                                if(isNumber(arg2) == 0){erro++;
+                            case(6):{erro = 5;
+                                if(isNumber(arg2) == 0){erro=6;
                                     int top = atoi(arg2);
                                     if(top > 0){erro = 0;
                                         TABLE t = top_businesses_by_city(sgr,top);
@@ -519,11 +525,9 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                         printf("Variable %s stored!\n",var);
                                     }
                                 }
-                                if(erro!=0) show_query3_error(erro);
-                                free(arg1);free(arg2);
-                                return erro;
+                                break;
                                 }
-                            default:{erro = 1; //query 3, 4 e 9
+                            default:{erro = 3; //query 3, 4 e 9
                                 if(arg2[0] == '"' && arg2[strlen(arg2)-1] == '"'){erro = 0;
                                 char* search = arg2+1;
                                 TABLE t = NULL;
@@ -533,30 +537,29 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 addVar(v,var,t);
                                 printf("Variable %s stored!\n",var);
                                 }
-                                if(erro != 0) show_query3_4_9_error(erro);
-                                free(arg1);free(arg2);
-                                return erro;
+                                break;
                             }
                         }
                     }
+                }free(arg2);
                 }
-                show_variable_command_error(erro);
-                free(arg1);free(arg2);
+                if(erro != 0) show_error_commands(erro);
+                free(arg1);
                 return erro;
             }
             if(funcao == 5 || funcao == 8){//query de 3 argumentos
-                erro++;
-                if(strcmp(arg1,"sgr") == 0){erro++;
-                    if(comando[i] == ',' ){erro++;
+                erro = 2;
+                if(strcmp(arg1,"sgr") == 0){erro = 1;
+                    if(comando[i] == ',' ){
                     i++;
                     i = addSpaces(i,comando);
                     char* arg3 = getVar(comando+i);
                     i+= strlen(arg3);
                     i = addSpaces(i,comando);
-                    if(comando[i] == ')'){erro++;
+                    if(comando[i] == ')'){
                         i++;
                         i = addSpaces(i,comando);
-                        if(comando[i] == ';'){erro++;
+                        if(comando[i] == ';'){erro = 10;
                             if(isFloat(arg2) == 0 && arg3[0] == '"' && arg3[strlen(arg3)-1] == '"'){erro=0;
                                 float stars = atof(arg2);
                                 char* search = arg3+1;
@@ -567,19 +570,18 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                                 printf("Variable %s stored!\n",var);
                                 }
                                 free(arg3);
-                            }
+                            }free(arg2);
                         }
                     }
                 }
-                if(erro != 0) show_query5_8_error(erro);
-                free(arg1);free(arg2);
+                if(erro != 0) show_error_commands(erro);
+                free(arg1);
                 return erro;
             }
             if(funcao == 10){//proj
-                erro++;char *pointer = arg2;
-                if(check_variable(v,arg1) == 0){erro++;
-                    
-                    if(comando[i] == ')'){erro++;
+                erro = 17;char *pointer = arg2;
+                if(check_variable(v,arg1) == 0){erro = 1;
+                    if(comando[i] == ')'){
                             i++;
                             i = addSpaces(i,comando);
                             if(comando[i] == ';'){erro = 0;
@@ -593,7 +595,7 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             }
                     }
                 }
-                if(erro != 0) show_proj_error(erro);
+                if(erro != 0) show_error_commands(erro);
                 free(arg1);free(pointer);
                 return erro;
             }
@@ -601,34 +603,34 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
                             
     }
     i = addSpaces(i,comando);
-    if(comando[i] == '['){erro=1;
+    if(comando[i] == '['){erro=17;
         //associar uma coluna de uma table a uma variavel -  ex: z = x[1][0]
-        if(check_variable(v,function) == 0){erro++;
+        if(check_variable(v,function) == 0){erro=16;
         i++;
         i = addSpaces(i,comando);
         char *line = commandString(comando+i);
         i+= strlen(line);
         i = addSpaces(i,comando);
-        if(comando[i] == ']'){erro++;
+        if(comando[i] == ']'){
         i++;
-        if(comando[i] == '['){erro++;
+        if(comando[i] == '['){
         i++; 
         i = addSpaces(i,comando);
         char *col = commandString(comando+i);
         i+= strlen(col);
         i = addSpaces(i,comando);
-        if(comando[i] == ']'){erro++;
+        if(comando[i] == ']'){erro=1;
             i++;
             i = addSpaces(i,comando);
-            if(comando[i] == ';'){erro++;
-                if(isNumber(line) == 0){erro++;
+            if(comando[i] == ';'){erro=13;
+                if(isNumber(line) == 0){erro=14;
                     if(isNumber(col) == 0){erro = -1;
                     TABLE t1 = varTable(v,function);
                     if(atoi(line) >= getEntries(t1) - 1){
-                        printf("Invalid line.\n");
+                        printf("This line doesn't exist.\n");
                     }else if(atoi(col) > getColsNum(t1) -1){
-                        printf("Invalid colum.\n");
-                    }else{
+                        printf("This column doesn't exist.\n");
+                    }else{erro = 0;
                         TABLE t2 = index_table(t1,atoi(line),atoi(col));
                         addVar(v,var,t2);
                         printf("Variable %s stored!\n",var);
@@ -641,10 +643,11 @@ int variable_command(char* comando, char* var, char *function,SGR sgr,VARIAVEIS 
         }free(line);
         }
         }
-        if(erro!= 0) show_index_error(erro);
+        if(erro!= 0) show_error_commands(erro);
         return erro;
     }
-    show_variable_command_error(erro);
+    erro = 11;
+    if(erro != 0) show_error_commands(erro);
     free(function);free(var);
     return erro;
 }
@@ -655,19 +658,19 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
     char* buf1 = getVar(comando + i);
     i += strlen(buf1);
     i = addSpaces(i,comando);
-    if(comando[i] == ','){erro++;
+    if(comando[i] == ','){
         i++;
         i = addSpaces(i,comando);
         char* buf2 = getVar(comando + i);
         i += strlen(buf2);
         i = addSpaces(i,comando);
-        if(comando[i] == ','){erro++;
+        if(comando[i] == ','){
             i++;
             i = addSpaces(i,comando);
             char* buf3 = getVar(comando + i);
             i += strlen(buf3);
             i = addSpaces(i,comando);
-            if(comando[i] == ')'){erro++;
+            if(comando[i] == ')'){
                 i++;
                 i = addSpaces(i,comando);
                 if(comando[i] == ';'){erro = 0;
@@ -680,7 +683,7 @@ int executeLoadSgr(char * comando,int i,SGR sgr){
             }free(buf3);
         }free(buf2);
     }free(buf1);
-    if(erro != 0) show_loadSgr_error(erro);
+    if(erro != 0) show_error_commands(erro);
     return erro;
 }
 

@@ -92,6 +92,8 @@ void show_help(){
     printf("\tSaves the given columns(separeted with ','), if valid, from an initialized variable to a variable.\n\n");
     printf("[var] = [var][line][column];\n"RESET);
     printf("\tSaves a specific element from an initialized variable (using the line and column given), to a variable.\n\n");
+    printf("[var] = filter([var],[column_name],[value],[operator]);\n"RESET);
+    printf("\tSaves the lines which validate the condition given (relation between value and comparator) for a given column.\n\n");
     printf("toCSV([var],[delimiter],\"[file]\"); \n"RESET);
     printf("\tTransfers the information from an initialized variable to a given file, using the given delimiter to separate each line from the TABLE\n\n");
     printf("show([var]); \n"RESET);
@@ -127,58 +129,27 @@ int show_pagedTable(TABLE t ,int page){
 }
 
 
-void show_query2_error(int error){
-    if(error == 1) printf("Error, invalid letter.\n");
-}
 
-void show_query3_error(int error){
-    if(error == 1) printf("Error, invalid number.\n");
-    if(error == 2) printf("Error, please insert a number greater than 0.\n");
-}
-
-void show_query3_4_9_error(int error){
-    if(error == 1) printf("Error, invalid argument, check the '\"'.\n");
-}
-
-void show_query5_8_error(int error){
-    if(error == 1) printf("Error, invalid sgr.\n");
-    if(error == 2) printf("Error, not enough arguments.\n");
-    if(error == 3) printf("Error, invalid parentheses.\n");
-    if(error == 4) printf("Error, invalid closing.\n");
-    if(error == 5) printf("Error, invalid arguments.\n");
-}
-
-void show_variable_command_error(int error){
-    if(error == 0) printf("Error, unknown command.\n");
-    if(error == 1) printf("Error, invalid sgr.\n");
-}
-
-void show_proj_error(int error){
-    if(error == 1) printf("Error, variable uninitialized.\n");
-    if(error == 2 || error == 3) printf("Error, invalid syntax.\n");
-}
-
-void show_index_error(int error){
-    if(error == 1) printf("Error, variable uninitialized.\n");
-    if(error > 1 && error < 5) printf("Error, invalid brackets.\n");
-    if(error == 5) printf("Error, invalid closing.\n");
-    if(error == 6) printf("Error, invalid line.\n");
-    if(error == 7) printf("Error, invalid column.\n");
-}
-
-void show_toCSV_error(int error){
-    if(error == 1) printf("Error, variable uninitialized.\n");
-    if(error == 2 || error == 5 || error == 8 || error == 9) printf("Error, invalid syntax.\n");
-    if(error == 3 || error == 4) printf("Error, invalid delimiter.\n");
-    if(error == 6 || error == 7) printf("Error, invalid filename.\n");
-
-}
-
-void show_loadSgr_error(int error){
-    printf("Error, invalid syntax\n");
-}
-
-void show_fromCSV_error(int error){
-    if(error == 1 || error == 3 || error == 4) printf("Error, invalid syntax\n");
-    if(error == 2) printf("Error, invalid delimiter\n");
+void show_error_commands(int error){
+    switch(error){
+        case 1: printf("Erro, invalid syntax.\n");break;
+        case 2: printf("Error, invalid sgr.\n");break;
+        case 3: printf("Error, invalid argument, check the '\"'.\n");break;
+        case 4: printf("Error, invalid letter.\n");break;
+        case 5: printf("Error, invalid number.\n");break;
+        case 6: printf("Error, please insert a number greater than 0.\n");break;
+        case 7: printf("Error, not enough arguments.\n");break;
+        case 8: printf("Error, invalid parentheses.\n");break;
+        case 9: printf("Error, invalid closing.\n");break;
+        case 10:printf("Error, invalid arguments.\n");break;
+        case 11:printf("Error, unknown command.\n");break;
+        case 12:printf("Error, invalid sgr.\n");break;
+        case 13:printf("Error, invalid line.\n");break;
+        case 14:printf("Error, invalid column.\n");break;
+        case 15:printf("Error, invalid delimiter.\n");break;
+        case 16:printf("Error, invalid brackets.\n");break;
+        case 17:printf("Error, variable uninitialized.\n");break;
+        case 18:printf("Error, invalid filename.\n");break;
+        case 19:printf("Error, invalid operator.\n");break;
+    }
 }

@@ -995,7 +995,7 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
  */
 TABLE business_info (SGR sgr, char* business_id){
     TABLE r = init_Sized_Table(2);
-    char* indicador = "total_rev;stars;business_id;business_nome;business_city;business_state;business_categories";
+    char* indicador = "total_rev;stars;business_id;business_name;business_city;business_state;business_categories";
     setNewLine(r,indicador);
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));

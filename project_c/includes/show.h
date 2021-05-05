@@ -26,25 +26,8 @@ void show_help();
 
 int show_pagedTable(TABLE t ,int page);
 
-void show_query2_error(int error);
+void show_error_commands(int error);
 
-void show_query3_error(int error);
-
-void show_query3_4_9_error(int error);
-
-void show_query5_8_error(int error);
-
-void show_variable_command_error(int error);
-
-void show_proj_error(int error);
-
-void show_index_error(int error);
-
-void show_toCSV_error(int error);
-
-void show_loadSgr_error(int error);
-
-void show_fromCSV_error(int error);
 
 
 #endif //___SHOW_H___
