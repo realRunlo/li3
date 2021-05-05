@@ -7,10 +7,11 @@
 
 
 /**
-\brief Lê informação de um ficheiro de reviews e guarda numa hashtable
-@param filename - nome do ficheiro
-@param htable apontador para uma tabela de hash
-*/
+ * @brief Lê informação de um ficheiro de reviews e guarda numa hashtable
+ * 
+ * @param hTable Apontador para uma tabela de hash
+ * @param filename Nome do ficheiro
+ */
 void readReviews(GHashTable * hTable,char * filename){
 
     FILE *  fp = fopen(filename,"r");
@@ -35,11 +36,14 @@ void readReviews(GHashTable * hTable,char * filename){
         fclose(fp);
     }
 }
+
+
 /**
-\brief Lê informação de um ficheiro de users e guarda numa hashtable
-@param filename - nome do ficheiro
-@param htable apontador para uma tabela de hash
-*/
+ * @brief Lê informação de um ficheiro de users e guarda numa hashtable
+ * 
+ * @param table Apontador para uma tabela de hash
+ * @param filename Nome do ficheiro
+ */
 void readUser(GHashTable * table, char * filename){
     FILE* f;
     f = fopen(filename,"r");
@@ -66,10 +70,11 @@ void readUser(GHashTable * table, char * filename){
 }
 
 /**
-\brief Lê informação de um ficheiro de businesses e guarda numa hashtable
-@param filename - nome do ficheiro
-@param htable apontador para uma tabela de hash
-*/
+ * @brief Lê informação de um ficheiro de businesses e guarda numa hashtable
+ * 
+ * @param hash apontador para uma tabela de hash
+ * @param filename nome do ficheiro
+ */
 void readBusiness (GHashTable * hash, char * filename ){
     FILE *f = fopen(filename,"r");
     if(f!=NULL){
