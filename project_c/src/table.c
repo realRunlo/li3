@@ -443,6 +443,7 @@ TABLE fromCSV (char* file, char* delim){
             while (buffer != NULL) {
                 strcat(aux,strsep(&buffer, delim));
                 if (buffer != NULL && aux[strlen(aux)-1]!= ';')  strcat(aux,";"); // para não colocar no último token
+                else if(aux[strlen(aux)-1]== '\n') aux[strlen(aux)-1] = '\0';
             }
             setNewLine(t,aux);
             buffer = getLine_file(f);
