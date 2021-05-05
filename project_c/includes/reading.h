@@ -2,7 +2,7 @@
 #define ___READING_H___
 #include "structs.h"
 
-void  readReviews(GHashTable * table,char * filename);
+void readReviews(GHashTable * hTable,char * filename,GHashTable * htUsers,GHashTable * htBusinesses);
 
 void readUser(GHashTable * table, char * filename);
 

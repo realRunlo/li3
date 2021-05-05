@@ -12,24 +12,28 @@
  * @param hTable Apontador para uma tabela de hash
  * @param filename Nome do ficheiro
  */
-void readReviews(GHashTable * hTable,char * filename){
+void readReviews(GHashTable * hTable,char * filename,GHashTable * htUsers,GHashTable * htBusinesses){
 
     FILE *  fp = fopen(filename,"r");
     if (fp==NULL){
         perror("ERROR: ");
         return;
     } else{
-        Reviews r;
         ssize_t linelen = 0; size_t line_buf_len = 0;
         char * line = NULL;
         linelen = getline(&line,&line_buf_len,fp); // ignora primeira linha 
         linelen = getline(&line,&line_buf_len,fp);
         while(linelen >=0)
         {
-            if(r_checkNewLine(line)){
-                r = addReview(r,line);
-                addToHashT(hTable,r_getReviewId(r),r);
+            Reviews r = addReview(r,line);
+            if(r!=NULL){ // pode ser NULL caso a linha n seja valida
+                User  us = lookUpHashT(htUsers,r_getUserId(r));
+                Business bus = lookUpHashT(htBusinesses,r_getBusinessId(r));
+                 if(us!=NULL && bus!=NULL){
+                     addToHashT(hTable,r_getReviewId(r),r);
+                 }
             }
+          
             linelen = getline(&line,&linelen,fp);
         }
         free(line);

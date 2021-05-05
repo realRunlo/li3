@@ -866,7 +866,7 @@ void sgr_new_hashes(SGR sgr,char * users, char* businesses, char* reviews){
     sgr->hashT_reviews = initHashT();
     readUser(sgr->hashT_users,users);
     readBusiness(sgr->hashT_businesses,businesses);
-    readReviews(sgr->hashT_reviews,reviews);
+    readReviews(sgr->hashT_reviews,reviews,sgr->hashT_users,sgr->hashT_businesses);
 }
 
 /**
@@ -907,12 +907,12 @@ void free_sgr(SGR sgr){
 SGR load_sgr(char * users_file,char *buinesses_file,char * reviews_file){
     
     SGR sgr_load = init_sgr();
-
-    readReviews(sgr_load->hashT_reviews,reviews_file);
     
     readUser(sgr_load->hashT_users,users_file);
 
     readBusiness(sgr_load->hashT_businesses,buinesses_file);
+
+    readReviews(sgr_load->hashT_reviews,reviews_file,sgr_load->hashT_users,sgr_load->hashT_businesses);
     return sgr_load;
 }
 
