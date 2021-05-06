@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#define MAX_VAR 2
+#define MAX_VAR 10
 #define clrscr() printf("\e[1;1H\e[2J")
 
 struct variavel{
@@ -44,7 +44,6 @@ int addSpaces(int i,char *comando){
     return i;
 }
 
-//devolve a table de uma variavel caso ela exista
 /**
  * @brief dado o nome de uma variavel, retorna caso exista a table correspondente
  * 
@@ -161,7 +160,7 @@ int skipSpaces(char* str){
     return i;
 }
 
-//Verifica se o caractere c pode pertencer ao nome de um comando ou variavel
+
 /**
  * @brief verifica se um char se trata de uma letra, numero ou '_' (devido ao nome de algumas querys)
  *      funcao utilizada para verificar nomes de funcoes passadas ao interpretador
@@ -828,7 +827,7 @@ int menu_handler(){
     return atoi(c);
 }
 
-//funcao principal que ira receber os comandos e interpreta-los
+
 /**
  * @brief le o input de um utilizador e separa a linha em diferentes comandos, 
  *      executando de forma sequencial, caso mais do que um comando sejam dados.

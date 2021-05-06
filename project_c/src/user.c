@@ -73,7 +73,6 @@ void setFriends(User u, char* newFriends){
     u->friends = strdup(newFriends);
 }
 
-//seped[strlen(seped) - 1] != ';'
 /**
  * @brief verifica se o user lido e valido, se tem user_id e user_name, o campo dos friends pode estar vazio
  * 

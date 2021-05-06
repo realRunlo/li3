@@ -410,7 +410,6 @@ static void top_city(gpointer key, gpointer value, gpointer user_data){
                 c->top[c->entries] = result;
                 if(average < c->low_score) c->low_score = average;
                 c->entries++;
-                //printf("cidade %s\n",c->top[i]);
             }
         }
         }   
@@ -525,7 +524,6 @@ static void city_to_table(gpointer key, gpointer value, gpointer user_data){
     if(c->entries > 0){
     //calcula o tamanho necessario para concatenar os dados dos negocios todos da cidade
     for(; j< c->entries;j++){ 
-        //printf("%s\n",c->top[0]);
         if (maxlength < strlen(c->top[j])) maxlength = strlen(c->top[j]);
         }
     char  buff[strlen(c->name) + maxlength + 2];
@@ -608,7 +606,7 @@ static int cmp_category(char* c_condition,char* c_comparing){
 }
 
 
-//para cada review vai a table "b_same" e adiciona no negocio correspondente o numero de estrelas
+
 /**
  * @brief auxiliar da query8, similar ao da query6, calcula o numero de estrelas medias de cada negocio,
  *      neste caso que tenham a categoria procurada
@@ -651,7 +649,7 @@ static void b_category(gpointer key, gpointer value, gpointer user_data){
 
 }
 
-//procura dentro da hash, os business com top score 
+
 /**
  * @brief auxiliar da query8, similar ao da query6, guarda/atualiza o top negocios de uma dada categoria
  *      
@@ -740,7 +738,6 @@ static void top_category(gpointer key, gpointer value, gpointer user_data){
                 //atualizar min score se necessario
                 if (average < data->lowScore) data->lowScore = average;
                 data->entries++;
-                //printf("cidade %s\n",c->top[i]);
             }
         }
     }   
@@ -982,7 +979,6 @@ TABLE businesses_started_by_letter(SGR sgr, char letter){
     TABLE result = initTable();
     setTab(result,process->result);
     setEntries(result,process->line);
-    //free();
     return result;
 }
 

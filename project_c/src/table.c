@@ -367,30 +367,6 @@ void toCSV (TABLE x,char* delim, char* name){
     fclose(f);
 }
 
-//Recebe o input dado pelo o utilizador a passa-o para um array
-/**
- * @brief le uma linha de um ficheiro utilizando um buffer dinamico
- * 
- * @param f ficheiro
- * @return char* 
- */
-char* getLine_file(FILE *f){
-    char buff[2000];
-    buff[0] = '\0';
-    char* input = malloc(sizeof(char) * 2000);
-    input[0] = '\0';
-    size_t inputlen = 0, bufflen = 0;
-   do {
-       if(fgets(buff, 2000, f)){
-       bufflen = strlen(buff);
-       input = realloc(input, inputlen+bufflen+1);
-       strcat(input, buff);
-       inputlen += bufflen;
-       }
-    } while (bufflen==2000-1 && buff[2000-2]!='\n');
-    input[inputlen] ='\0';
-    return input;
-}
 
 /**
  * @brief Dá o número de linhas de um ficheiro, é necessária para a fromCSV
@@ -402,12 +378,15 @@ int nLinhas (char* file){
     FILE *fp;
     int count = 0; 
     fp = fopen(file, "r");
-    char* buff = getLine_file(fp);
-    while(strlen(buff) != 0){
+    ssize_t linelen = 0; size_t line_buf_len = 0;
+    char * line = NULL;
+    linelen = getline(&line,&line_buf_len,fp);
+    while(linelen >=0)
+    {   
         count++;
-        buff = getLine_file(fp);
+        linelen = getline(&line,&line_buf_len,fp);
     }
-    free(buff);
+    free(line);
     // Close the file
     fclose(fp);
     return count;
@@ -430,26 +409,26 @@ TABLE fromCSV (char* file, char* delim){
     else{
         int n_lin = nLinhas(file);
         TABLE t = init_Sized_Table(n_lin);
-        char* buffer = getLine_file(f); 
-        char* pointer = buffer;
-        char *aux = malloc(sizeof(char) * FROMCSV_BUFFER_SIZE);
-        size_t auxlen = FROMCSV_BUFFER_SIZE, bufflen = strlen(buffer);
-        while( bufflen != 0){
+        ssize_t linelen = 0; size_t line_buf_len = 0;
+        char * line = NULL;
+        linelen = getline(&line,&line_buf_len,f);
+        char *aux = malloc(sizeof(char) * linelen);
+        size_t auxlen = linelen;
+        while( linelen >=0){
             aux[0] ='\0';
-            if(auxlen < bufflen){
-                auxlen = (auxlen + bufflen )*2;
+            if(auxlen < linelen){
+                auxlen = (auxlen + linelen )*2;
                 aux = realloc(aux,auxlen);
             }
-            while (buffer != NULL) {
-                strcat(aux,strsep(&buffer, delim));
-                if (buffer != NULL && aux[strlen(aux)-1]!= ';')  strcat(aux,";"); // para não colocar no último token
+            while (line != NULL) {
+                strcat(aux,strsep(&line, delim));
+                if (line != NULL && aux[strlen(aux)-1]!= ';')  strcat(aux,";"); // para não colocar no último token
                 else if(aux[strlen(aux)-1]== '\n') aux[strlen(aux)-1] = '\0';
             }
             setNewLine(t,aux);
-            buffer = getLine_file(f);
-            bufflen = strlen(buffer);
+            linelen = getline(&line,&line_buf_len,f);
         }
-        free(pointer);
+        free(line);
         free(aux);
         fclose(f);
         printf("Read File.\n");
@@ -611,7 +590,11 @@ TABLE filter (TABLE x,char* column_name,char* value, OPERADOR op){
     return NULL;
 }
 
-
+/**
+ * @brief funcao de testes
+ * 
+ * @param t table a dar print
+ */
 void printTable(TABLE t){
     if(t){
         int entries = getEntries(t);
