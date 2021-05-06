@@ -999,21 +999,23 @@ TABLE business_info (SGR sgr, char* business_id){
     setNewLine(r,indicador);
     Business b = (Business) g_hash_table_lookup(sgr->hashT_businesses,
                                             GINT_TO_POINTER(business_id));
-    char* b_name = get_name(b);
-    char* b_c = get_city(b);
-    char* b_s = get_state(b);
-    char* b_cat = get_categ(b);
-    Query3 pro = malloc(sizeof(struct query3));
-    pro->h_reviews_info = g_hash_table_new(g_str_hash, g_str_equal);
+    if(b){
+        char* b_name = get_name(b);
+        char* b_c = get_city(b);
+        char* b_s = get_state(b);
+        char* b_cat = get_categ(b);
+        Query3 pro = malloc(sizeof(struct query3));
+        pro->h_reviews_info = g_hash_table_new(g_str_hash, g_str_equal);
 
-    g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)reviews3_info,pro);
-    B_STARS u = g_hash_table_lookup(pro->h_reviews_info,GINT_TO_POINTER(business_id));
-    float s = u->total/u->n_reviews;
-    char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(b_name) + 
-                        strlen(b_cat)+strlen(b_c)+ strlen(b_s)+15));
-    sprintf(res,"%d;%.2f;%s;%s;%s;%s;%s",u->n_reviews,s,business_id, b_name,b_c,b_s,b_cat);
-    setNewLine(r,res);
-
+        g_hash_table_foreach(sgr->hashT_reviews, (GHFunc)reviews3_info,pro);
+        B_STARS u = g_hash_table_lookup(pro->h_reviews_info,GINT_TO_POINTER(business_id));
+        float s = u->total/u->n_reviews;
+        char* res = malloc( sizeof(char) * (strlen(business_id) + strlen(b_name) + 
+                            strlen(b_cat)+strlen(b_c)+ strlen(b_s)+15));
+        sprintf(res,"%d;%.2f;%s;%s;%s;%s;%s",u->n_reviews,s,business_id, b_name,b_c,b_s,b_cat);
+        setNewLine(r,res);
+    }
+    else r = NULL;
     return r;
 }
 
