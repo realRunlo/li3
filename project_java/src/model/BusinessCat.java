@@ -1,8 +1,11 @@
+package model;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class BusinessCat implements IBusinessCat{
-    private Map<String,IBusiness> bizs;
+public class BusinessCat implements IBusinessCat {
+
+    private Map<String, IBusiness> bizs;
 
     public BusinessCat(){
         this.bizs = new HashMap<>();

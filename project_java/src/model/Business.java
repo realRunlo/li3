@@ -1,6 +1,6 @@
+package model;
 
-
-private class Business implements IBusiness {
+public class Business implements IBusiness {
     private String id;
     private String name;
     private String city;
