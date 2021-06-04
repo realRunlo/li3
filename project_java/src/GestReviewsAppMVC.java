@@ -1,6 +1,13 @@
+import model.Review;
+import model.ReviewCat;
+import model.UserCat;
+
+import java.io.IOException;
+
+
 public class GestReviewsAppMVC {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
 /*
 NÂO sei o que é mas estava na outra class que apagieo
@@ -20,6 +27,17 @@ NÂO sei o que é mas estava na outra class que apagieo
         System.exit(0);
 
 */
+        /*
+        ReviewCat revs = new ReviewCat();
+        revs.loadFromFile("src/input_files/reviews_1M.csv");
+        //Review rev = revs.getReview("vEptHcIE9GqBES5fAR6AHw");
+        revs.print();
+        //System.out.println(rev.getBusiness_id());*/
+
+
+        UserCat users = new UserCat();
+        users.loadFromFile("src/input_files/users_full.csv");
+        users.print();
 
 
     }

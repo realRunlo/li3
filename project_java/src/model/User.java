@@ -29,6 +29,30 @@ public class User {
     public User clone(){ return new User(this);}
 
 
+    public static boolean validUser(String line) {
+        String[] data = line.split(";",3);
+
+        return !data[0].equals("") && !data[1].equals("");
+
+    }
+
+    public static User createUser(String line){
+        String[] data = line.split(";",3);
+
+        return new User(data[0],data[1],data[2]);
+
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Review {\n");
+        sb.append("ID = '").append(user_id).append("'\n");
+        sb.append("BusinessID = '").append(name).append("'\n");
+        sb.append("UserID = '").append(friends).append("'\n");
+        sb.append("\n}");
+        return sb.toString();
+    }
+
+
 
 
 

@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Review {
 
@@ -73,7 +74,41 @@ public class Review {
     public String getTxt() { return txt; }
 
 
+    public static boolean validReview(String line){
+        String[] data = line.split(";",9);
 
+        return !data[0].equals("") && !data[1].equals("") && !data[2].equals("") &&
+                data[3].matches("[-+]?[0-9]*\\.?[0-9]+") && data[4].matches("[-+]?[0-9]*")
+                && data[5].matches("[-+]?[0-9]*") && data[6].matches("[-+]?[0-9]*")
+                && !data[7].equals("");
+
+    }
+
+    public static Review createReview(String line){
+            String[] data = line.split(";",9);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            return new Review(
+                    data[0],data[1],data[2],Float.parseFloat(data[3]),Integer.parseInt(data[4]),
+                    Integer.parseInt(data[5]), Integer.parseInt(data[6]), LocalDateTime.parse(data[7],formatter),
+                    data[8]);
+    }
+
+
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Review {\n");
+        sb.append("ID = '").append(review_id).append("'\n");
+        sb.append("BusinessID = '").append(business_id).append("'\n");
+        sb.append("UserID = '").append(user_id).append("'\n");
+        sb.append("Stars : '").append(stars).append("'\n");
+        sb.append("Useful: ").append(useful).append("'\n");
+        sb.append("Funny: ").append(funny).append("'\n");
+        sb.append("Cool: ").append(cool).append("'\n");
+        sb.append("Date: ").append(date).append("'\n");;
+        sb.append("Text: ").append(txt).append("'\n");
+        sb.append("\n}");
+        return sb.toString();
+    }
     public Review clone(){return new Review(this);}
 
 

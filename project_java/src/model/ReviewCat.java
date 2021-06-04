@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,30 +23,43 @@ public class ReviewCat implements Serializable {
         this.reviews = new HashMap<>();
     }
 
-    public void addReview(Review rev){
-        this.reviews.put(rev.getReview_id(),rev.clone());
+    public void addReview(Review rev){ this.reviews.put(rev.getReview_id(),rev.clone()); }
+
+    public Review getReview(String review_id){
+       return  this.reviews.get(review_id).clone();
     }
 
 
-    public void loadFromFile(String filename){
+    public void loadFromFile(String filename) throws IOException {
 
-        List<String> lines = new ArrayList<>();
+        List<String> lines;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         try{
             lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
 
             for(String line : lines){
-                String[] data = line.split(";",2);
-                Review rev = new Review(data[0],data[1],data[2],Float.parseFloat(data[3]),Integer.parseInt(data[4]),
-                                        Integer.parseInt(data[5]), Integer.parseInt(data[6]), LocalDateTime.parse(data[7]),
-                                         data[8]);
-                addReview(rev);
+                if(Review.validReview(line)){
+                    Review rev = Review.createReview(line);
+                     addReview(rev);
+                }
 
             }
 
         } catch (IOException e) {
+            e.printStackTrace();
             //faz qualque coisa,se for dar printf usar metodos da view
+            System.out.println("error");
         }
+
+    }
+
+    public void print(){
+          System.out.println(this.reviews.size());
+        /*
+        for(Review r : this.reviews.values()) {
+                  System.out.println(r.toString());
+        }  */
 
     }
 
