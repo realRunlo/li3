@@ -7,7 +7,6 @@ public class Business implements IBusiness {
     private String state;
     private String categories;
 
-    @Override
     public Business (String id, String name,String city,String categ){
         this.id = id;
         this.name = name;
