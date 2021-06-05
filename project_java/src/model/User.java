@@ -13,6 +13,13 @@ public class User {
         this.friends = friends;
     }
 
+    public User(String line){
+        String[] data = line.split(";",3);
+        this.user_id = data[0];
+        this.name = data[1];
+        this.friends = data[2];
+    }
+
     public User(User us){
         this.user_id = us.user_id;
         this.name = us.name;
@@ -33,13 +40,6 @@ public class User {
         String[] data = line.split(";",3);
 
         return !data[0].equals("") && !data[1].equals("");
-
-    }
-
-    public static User createUser(String line){
-        String[] data = line.split(";",3);
-
-        return new User(data[0],data[1],data[2]);
 
     }
 

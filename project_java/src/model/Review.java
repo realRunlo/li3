@@ -30,16 +30,18 @@ public class Review {
         this.txt = txt;
     }
 
-    public Review(){
-        this.review_id = "";
-        this.user_id = "";
-        this.business_id = "";
-        this.stars = 0;
-        this.useful = 0;
-        this.funny = 0;
-        this.cool = 0;
-       // this.date =
-        this.txt = "";
+    public Review(String line){
+        String[] data = line.split(";",9);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.review_id = data[0];
+        this.user_id = data[1];
+        this.business_id = data[2];
+        this.stars = Float.parseFloat(data[3]);
+        this.useful = Integer.parseInt(data[4]);
+        this.funny = Integer.parseInt(data[5]);
+        this.cool = Integer.parseInt(data[6]);
+        this.date = LocalDateTime.parse(data[7],formatter);
+        this.txt = data[8];
     }
 
     public Review(Review rev){
@@ -83,17 +85,6 @@ public class Review {
                 && !data[7].equals("");
 
     }
-
-    public static Review createReview(String line){
-            String[] data = line.split(";",9);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            return new Review(
-                    data[0],data[1],data[2],Float.parseFloat(data[3]),Integer.parseInt(data[4]),
-                    Integer.parseInt(data[5]), Integer.parseInt(data[6]), LocalDateTime.parse(data[7],formatter),
-                    data[8]);
-    }
-
-
 
     public String toString() {
         StringBuilder sb = new StringBuilder("Review {\n");

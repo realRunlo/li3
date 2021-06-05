@@ -40,10 +40,9 @@ public class ReviewCat implements Serializable {
 
             for(String line : lines){
                 if(Review.validReview(line)){
-                    Review rev = Review.createReview(line);
-                     addReview(rev);
+                    Review rev = new Review(line);
+                    addReview(rev);
                 }
-
             }
 
         } catch (IOException e) {

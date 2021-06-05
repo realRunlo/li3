@@ -22,7 +22,7 @@ public class UserCat {
     }
 
 
-    public void loadFromFile(String filename){
+    public void loadFromFile(String filename) throws IOException{
         List<String> lines;
 
         try{
@@ -30,7 +30,7 @@ public class UserCat {
 
             for(String line : lines){
                 if(User.validUser(line)){
-                    User us = User.createUser(line);
+                    User us = new User(line);
                     addUser(us);
                 }
 
