@@ -21,24 +21,8 @@ public class BusinessCat{
         this.bussinesses.put(biz.getId(),biz.clone());
     }
 
-    public void loadFromFile(String filename){
-        List<String> lines;
-        try{
-            lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
+    public boolean containsId(String id){return this.bussinesses.containsKey(id);}
 
-            for(String line : lines) {
-                if (Review.validReview(line)) {
-                    Business biz = new Business(line);
-                    addBusiness(biz);
-                }
-            }
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-            //faz qualque coisa,se for dar printf usar metodos da view
-            System.out.println("error");
-        }
-    }
 
     public int size(){
         return this.bussinesses.size();

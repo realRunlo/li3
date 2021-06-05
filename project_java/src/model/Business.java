@@ -47,7 +47,7 @@ public class Business{
         return this.categories;
     }
 
-    public Boolean validBusiness(String line){
+    public static Boolean validBusiness(String line){
         String[] data = line.split(";",5);
         return !data[0].equals("") && !data[1].equals("") && !data[2].equals("") && !data[3].equals("")
                 && !data[4].equals("");

@@ -21,26 +21,8 @@ public class UserCat {
         this.users.put(us.getUser_id(),us.clone());
     }
 
-
-    public void loadFromFile(String filename) throws IOException{
-        List<String> lines;
-
-        try{
-            lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
-
-            for(String line : lines){
-                if(User.validUser(line)){
-                    User us = new User(line);
-                    addUser(us);
-                }
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            //faz qualque coisa,se for dar printf usar metodos da view
-            System.out.println("error");
-        }
+    public boolean containsId(String id){
+        return users.containsKey(id);
     }
 
     public void print(){

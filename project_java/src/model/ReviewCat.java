@@ -30,28 +30,6 @@ public class ReviewCat implements Serializable {
     }
 
 
-    public void loadFromFile(String filename) throws IOException {
-
-        List<String> lines;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        try{
-            lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
-
-            for(String line : lines){
-                if(Review.validReview(line)){
-                    Review rev = new Review(line);
-                    addReview(rev);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            //faz qualque coisa,se for dar printf usar metodos da view
-            System.out.println("error");
-        }
-
-    }
 
     public void print(){
           System.out.println(this.reviews.size());

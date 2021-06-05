@@ -1,6 +1,11 @@
 package model;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class Model {
 
@@ -9,16 +14,83 @@ public class Model {
     private BusinessCat businesses;
 
 
-    public Model(String users_file, String reviews_file, String businesses_file) throws IOException {
+    public Model(){
+        this.users = new UserCat();
+        this.businesses = new BusinessCat();
+        this.reviews = new ReviewCat();
 
-        //users = new UserCat();
-       // users.loadFromFile(users_file);
+    }
 
-        reviews = new ReviewCat();
-        reviews.loadFromFile(reviews_file);
+    public void load(String users_file,String businesses_file, String reviews_file) throws IOException {
+       // loadUsers(users_file);
+        loadBusinesses(businesses_file);
+        loadReviews(reviews_file);
+    }
 
-        businesses = new BusinessCat();
-        businesses.loadFromFile(businesses_file);
+    public void loadUsers(String filename) throws IOException {
+        List<String> lines;
+        try{
+            lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
+
+            for(String line : lines){
+                if(User.validUser(line)){
+                    User us = new User(line);
+                   this.users.addUser(us);
+                }
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //faz qualque coisa,se for dar printf usar metodos da view
+            System.out.println("error");
+        }
+    }
+
+    public void loadBusinesses(String filename) throws  IOException{
+        List<String> lines;
+        try{
+            lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
+
+            for(String line : lines) {
+                if (Business.validBusiness(line)) {
+                    Business biz = new Business(line);
+                    this.businesses.addBusiness(biz);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //faz qualque coisa,se for dar printf usar metodos da view
+            System.out.println("error");
+        }
+    }
+
+    public void loadReviews(String filename){
+        List<String> lines;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        try{
+            lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
+
+            for(String line : lines){
+                if(Review.validReview(line)){ //validate fields of review
+                    Review rev = new Review(line);
+                    if(this.users.containsId(rev.getReview_id()) && this.businesses.containsId(rev.getBusiness_id())){ //check if users and businesses exist
+                        this.reviews.addReview(rev);
+                    }
+
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //faz qualque coisa,se for dar printf usar metodos da view
+            System.out.println("error");
+        }
+
+
+
     }
 
     public ReviewCat getReviews(){return reviews;}
