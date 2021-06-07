@@ -22,11 +22,18 @@ public class GestReviews {
     }
 
     public void query1(){
-        System.out.println(data.query1().toString());
+        data.query1();
     }
 
 
 
+
+
+    //metodo para executar testes, apagar para entrega
+    public void teste(int teste){
+        if(teste == 1 ) data.testeReviews();
+        else;
+    }
 
 
 

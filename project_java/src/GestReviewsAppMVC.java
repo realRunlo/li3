@@ -25,11 +25,14 @@ NÂO sei o que é mas estava na outra class que apagieo
         control.start();
         System.exit(0);
 
-*/
+*/      System.out.println("Loading");
         GestReviews execute = new GestReviews("src/input_files/users_full.csv",
                 "src/input_files/business_full.csv",
                 "src/input_files/reviews_1M.csv");
-        //execute.query1();
+
+        System.out.println("Loaded");
+
+        execute.query1();
 
 
         /*

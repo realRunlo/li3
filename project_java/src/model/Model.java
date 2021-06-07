@@ -7,8 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class Model {
 
@@ -33,7 +35,7 @@ public class Model {
 
 
     public void load(String users_file,String businesses_file, String reviews_file) throws IOException {
-        //loadUsers(users_file);
+        loadUsers(users_file);
         loadBusinesses(businesses_file);
         loadReviews(reviews_file);
     }
@@ -120,13 +122,23 @@ public class Model {
     public NotReviewed query1(){
         NotReviewed results = new NotReviewed();
         Map<String,Business> businesses = this.businesses.getBusinesses();
-        businesses.forEach((k,v) -> {
-            if(!businessReviewed(k)) results.addBusiness(v);
+        Map<String,Review> reviewsSearch = this.reviews.getReviews();
+
+        reviewsSearch.forEach((k,v) -> {
+            businesses.remove(v.getBusiness_id());
         });
 
+        businesses.forEach((k,v) -> results.addBusiness(v));
         return results;
     }
 
+
+
+
+    //metodo de teste
+    public void testeReviews(){
+        reviews.getReviews().forEach((k,v)-> System.out.println(v.toString()));
+    }
 
 
 }
