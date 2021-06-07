@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UserCat {
 
@@ -19,6 +20,10 @@ public class UserCat {
 
     public void addUser(User us){
         this.users.put(us.getUser_id(),us.clone());
+    }
+
+    public Map<String,User> getUsers(){
+        return users.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e->e.getValue().clone()));
     }
 
     public boolean containsId(String id){

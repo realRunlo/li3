@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ReviewCat implements Serializable {
 
@@ -29,6 +30,14 @@ public class ReviewCat implements Serializable {
        return  this.reviews.get(review_id).clone();
     }
 
+    public Map<String,Review> getReviews(){
+        return reviews.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e->e.getValue().clone()));
+    }
+
+    public boolean businessReviewed(String businessId){
+        return reviews.values().stream().anyMatch(e->e.getBusiness_id().equals(businessId));
+    }
+
 
 
     public void print(){
@@ -38,6 +47,15 @@ public class ReviewCat implements Serializable {
                   System.out.println(r.toString());
         }  */
 
+    }
+
+    public String toString(){
+        System.out.println("entrei");
+        StringBuilder sb = new StringBuilder();
+        for(Review r : this.reviews.values()) {
+            System.out.println(r.toString());
+        }
+        return sb.toString();
     }
 
 

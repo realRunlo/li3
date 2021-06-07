@@ -1,11 +1,14 @@
 package model;
 
+import model.QueryClasses.NotReviewed;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 public class Model {
 
@@ -18,16 +21,24 @@ public class Model {
         this.users = new UserCat();
         this.businesses = new BusinessCat();
         this.reviews = new ReviewCat();
-
     }
 
+    public Model(String userFile, String businessFile, String reviewFile) throws IOException {
+        this.users = new UserCat();
+        this.businesses = new BusinessCat();
+        this.reviews = new ReviewCat();
+        load(userFile, businessFile, reviewFile);
+    }
+
+
+
     public void load(String users_file,String businesses_file, String reviews_file) throws IOException {
-       // loadUsers(users_file);
+        //loadUsers(users_file);
         loadBusinesses(businesses_file);
         loadReviews(reviews_file);
     }
 
-    public void loadUsers(String filename) throws IOException {
+    private void loadUsers(String filename) throws IOException {
         List<String> lines;
         try{
             lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
@@ -47,7 +58,7 @@ public class Model {
         }
     }
 
-    public void loadBusinesses(String filename) throws  IOException{
+    private void loadBusinesses(String filename) throws  IOException{
         List<String> lines;
         try{
             lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
@@ -66,7 +77,7 @@ public class Model {
         }
     }
 
-    public void loadReviews(String filename){
+    private void loadReviews(String filename){
         List<String> lines;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -93,6 +104,29 @@ public class Model {
 
     }
 
-    public ReviewCat getReviews(){return reviews;}
+    public Map<String, Review> getReviews(){return reviews.getReviews();}
+
+    public Map<String, Business> getBusinesses(){return businesses.getBusinesses();}
+
+    public Map<String, User> getUsers() {
+        return users.getUsers();
+    }
+
+    public boolean businessReviewed(String businessId){
+        return reviews.businessReviewed(businessId);
+    }
+
+
+    public NotReviewed query1(){
+        NotReviewed results = new NotReviewed();
+        Map<String,Business> businesses = this.businesses.getBusinesses();
+        businesses.forEach((k,v) -> {
+            if(!businessReviewed(k)) results.addBusiness(v);
+        });
+
+        return results;
+    }
+
+
 
 }

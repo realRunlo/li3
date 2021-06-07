@@ -1,3 +1,4 @@
+import controller.GestReviews;
 import model.Model;
 
 import java.io.IOException;
@@ -25,11 +26,11 @@ NÂO sei o que é mas estava na outra class que apagieo
         System.exit(0);
 
 */
-        Model model = new Model();
+        GestReviews execute = new GestReviews("src/input_files/users_full.csv",
+                "src/input_files/business_full.csv",
+                "src/input_files/reviews_1M.csv");
+        //execute.query1();
 
-        model.load("src/input_files/users_full.csv",
-                "src/input_files/reviews_1M.csv",
-                "src/input_files/business_full.csv");
 
         /*
         ReviewCat revs = new ReviewCat();
