@@ -3,6 +3,7 @@ package controller;
 import model.Business;
 import model.Model;
 import model.QueryClasses.NotReviewed;
+import model.QueryClasses.ReviewedPerMonth;
 
 import java.io.IOException;
 import java.util.*;
@@ -32,7 +33,10 @@ public class GestReviews {
     //metodo para executar testes, apagar para entrega
     public void teste(int teste){
         if(teste == 1 ) data.testeReviews();
-        else;
+        if(teste == 4) {
+            ArrayList<ReviewedPerMonth> months = data.query4("8zehGz9jnxPqXtOc7KaJxA");
+            months.forEach(k->System.out.println(k.toString()));
+        }
     }
 
 

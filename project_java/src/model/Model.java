@@ -1,15 +1,15 @@
 package model;
 
 import model.QueryClasses.NotReviewed;
+import model.QueryClasses.ReviewedPerMonth;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Model {
@@ -121,8 +121,8 @@ public class Model {
 
     public NotReviewed query1(){
         NotReviewed results = new NotReviewed();
-        Map<String,Business> businesses = this.businesses.getBusinesses();
-        Map<String,Review> reviewsSearch = this.reviews.getReviews();
+        Map<String,Business> businesses = getBusinesses();
+        Map<String,Review> reviewsSearch = getReviews();
 
         reviewsSearch.forEach((k,v) -> {
             businesses.remove(v.getBusiness_id());
@@ -130,6 +130,31 @@ public class Model {
 
         businesses.forEach((k,v) -> results.addBusiness(v));
         return results;
+    }
+
+
+
+
+    public ArrayList<ReviewedPerMonth> query4(String b_id){
+        //filtrar para ter apenas as reviews sobre o negocio em questao
+        Map<String,Review> reviews = getReviews().values().stream()
+                .filter((r) -> r.getBusiness_id().equals(b_id))
+                .collect(Collectors.toMap(Review::getReview_id, r->r));
+
+        // TODO: apagar quando ja n for preciso testar
+        System.out.println("Reviews neste negocio: " + reviews.size());
+
+        ArrayList<ReviewedPerMonth> monthReviews = new ArrayList<>(12);
+        for (int i =0; i<12;i++) {
+            monthReviews.add(new ReviewedPerMonth());
+        }
+
+        reviews.forEach((k,v) -> {
+            int month = v.getDate().getMonthValue();
+            monthReviews.get(month - 1).incTotalReviews(v.getStars(),v.getUser_id());
+                });
+
+        return monthReviews;
     }
 
 
