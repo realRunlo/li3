@@ -32,7 +32,7 @@ NÂO sei o que é mas estava na outra class que apagieo
 
         System.out.println("Loaded");
 
-        //execute.teste(4);
+        execute.teste(7);
 
 
         /*

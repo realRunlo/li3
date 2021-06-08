@@ -37,6 +37,12 @@ public class GestReviews {
             ArrayList<ReviewedPerMonth> months = data.query4("8zehGz9jnxPqXtOc7KaJxA");
             months.forEach(k->System.out.println(k.toString()));
         }
+        if(teste == 7){
+            data.query7().forEach((k,v) -> {System.out.println();
+                System.out.println(k);
+                v.forEach(System.out::println);
+            });
+        }
     }
 
 

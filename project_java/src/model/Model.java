@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Model {
 
@@ -118,7 +117,8 @@ public class Model {
         return reviews.businessReviewed(businessId);
     }
 
-
+    //Lista ordenada alfabeticamente com os identificadores dos negócios nunca
+    //avaliados e o seu respetivo total;
     public NotReviewed query1(){
         NotReviewed results = new NotReviewed();
         Map<String,Business> businesses = getBusinesses();
@@ -134,7 +134,8 @@ public class Model {
 
 
 
-
+    //Dado o código de um negócio, determinar, mês a mês, quantas vezes foi avaliado,
+    //por quantos users diferentes e a média de classificação;
     public ArrayList<ReviewedPerMonth> query4(String b_id){
         //filtrar para ter apenas as reviews sobre o negocio em questao
         Map<String,Review> reviews = getReviews().values().stream()
@@ -157,6 +158,55 @@ public class Model {
         return monthReviews;
     }
 
+
+    //Determinar, para cada cidade, a lista dos três mais famosos negócios em termos de
+    //número de reviews;
+    public Map<String, List<String>> query7(){
+
+        //Hash das diferentes cidades
+        //a key sera o numero de cidades e o value sera um hashMap com os business dessa cidade
+        Map<String,Map<String,Integer>> cities = new HashMap<>();
+        Map<String,Business> businesses = getBusinesses();
+
+        getReviews().forEach((k,v) ->{
+            //verifica se ja existe a cidade na hash
+            String b_id_search = v.getBusiness_id();
+            String city= businesses.get(b_id_search).getCity();
+
+            if(cities.containsKey(city)){
+                //verifica se ja foi adicionado o business na cidade
+                if(cities.get(city).containsKey(b_id_search)) {
+                    int total = cities.get(city).get(b_id_search) + 1;
+                    cities.get(city).replace(b_id_search, total);
+                }
+                else{//senao cria uma entrada para o business
+                    cities.get(city).put(b_id_search,1);
+                }
+            }
+            else{//senao cria uma entrada para essa cidade
+                cities.put(city,new HashMap<String,Integer>());
+                cities.get(city).put(b_id_search,1);
+            }
+        });
+
+        Map<String,List<String>> results = new HashMap<>();
+
+        //par cada cidade ordena os negocios
+        // , pelo numero total de reviews feito em cada um, de forma descendente
+        cities.forEach((k,v) -> {
+            List<String> sortedBusinesses = v.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .map(Map.Entry::getKey).collect(Collectors.toList());
+            //pega no maximo apenas os top 3 negocios mais famosos
+            if (sortedBusinesses.size() >= 3){
+                results.put(k,sortedBusinesses.subList(0,3));
+            }
+            else results.put(k,sortedBusinesses);
+
+        });
+
+        return results;
+    }
 
 
 
