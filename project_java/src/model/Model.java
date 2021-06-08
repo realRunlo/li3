@@ -4,6 +4,10 @@ import model.QueryClasses.NotReviewed;
 import model.QueryClasses.ReviewedPerMonth;
 import model.QueryClasses.StateBusiness;
 import model.QueryClasses.businessReviews;
+import model.QueryInterfaces.Query1;
+import model.QueryInterfaces.Query10;
+import model.QueryInterfaces.Query4;
+import model.QueryInterfaces.Query7;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Model {
+public class Model implements Query1, Query4, Query7, Query10 {
 
     private UserCat users;
     private ReviewCat reviews;
