@@ -2,6 +2,7 @@ package model;
 
 import model.QueryClasses.NotReviewed;
 import model.QueryClasses.ReviewedPerMonth;
+import model.QueryClasses.businessReviews;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -88,7 +89,7 @@ public class Model {
             for(String line : lines){
                 if(Review.validReview(line)){ //validate fields of review
                     Review rev = new Review(line);
-                    if(this.users.containsId(rev.getReview_id()) && this.businesses.containsId(rev.getBusiness_id())){ //check if users and businesses exist
+                    if(this.users.containsId(rev.getUser_id()) && this.businesses.containsId(rev.getBusiness_id())){ //check if users and businesses exist
                         this.reviews.addReview(rev);
                     }
 
@@ -100,6 +101,7 @@ public class Model {
             //faz qualque coisa,se for dar printf usar metodos da view
             System.out.println("error");
         }
+        System.out.println("numero: "+reviews.getReviews().size());
 
 
 
@@ -206,6 +208,54 @@ public class Model {
         });
 
         return results;
+    }
+
+    //Determinar para cada estado, cidade a cidade, a média de classificação de cada
+    //negócio.
+    public Map<String, Map<String, Map<String, businessReviews>>> query10(){
+        //hash de estados em que para cada estado tera uma hash das cidades do estado,
+        //que, por sua vez terao um hash dos negocios e respetiva media
+        Map<String,Map<String,Map<String, businessReviews>>> states = new HashMap<>();
+
+        Map<String,Business> businesses = getBusinesses();
+
+        businesses.forEach((k,v) -> {
+            String state = v.getState();
+            String city = v.getCity();
+            String b_id = v.getId();
+            businessReviews b = new businessReviews();
+            if(!states.containsKey(v.getState())){
+                Map<String,Map<String, businessReviews>> cityMap = new HashMap<>();
+                Map<String, businessReviews> businessesMap = new HashMap<>();
+                businessesMap.put(b_id,new businessReviews());
+                cityMap.put(city,businessesMap);
+                states.put(state,cityMap);
+            }
+            else{
+                if(!states.get(state).containsKey(city)){
+                    Map<String, businessReviews> businessMap = new HashMap<>();
+                    states.get(state).put(city,businessMap);
+                }
+                else{
+                    states.get(state).get(city).put(b_id,b);
+                }
+            }
+        });
+
+        //percorre as reviews e vai dando update nos scores totais do business
+        //correspondente
+        Map<String,Review> reviews = getReviews();
+        reviews.forEach((k,v)->{
+            String b_id = v.getBusiness_id();
+            String state = businesses.get(b_id).getState();
+            String city = businesses.get(b_id).getCity();
+            double score = v.getStars();
+
+            states.get(state).get(city).get(b_id).addReview(score);
+        });
+
+        return states;
+
     }
 
 

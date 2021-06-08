@@ -7,7 +7,9 @@ import java.io.IOException;
 public class GestReviewsAppMVC {
 
     public static void main(String[] args) throws IOException {
-
+    final String users = "C:\\Users\\braza\\OneDrive\\Ambiente de Trabalho\\uni\\2º ano\\LI3\\projeto\\grupo6\\project_java\\src\\input_files\\users_full.csv";
+    final String businesses = "C:\\Users\\braza\\OneDrive\\Ambiente de Trabalho\\uni\\2º ano\\LI3\\projeto\\grupo6\\project_java\\src\\input_files\\business_full.csv";
+    final String reviews = "C:\\Users\\braza\\OneDrive\\Ambiente de Trabalho\\uni\\2º ano\\LI3\\projeto\\grupo6\\project_java\\src\\input_files\\reviews_1M.csv";
 /*
 NÂO sei o que é mas estava na outra class que apagieo
     public public static void main(String[] args) {
@@ -26,13 +28,13 @@ NÂO sei o que é mas estava na outra class que apagieo
         System.exit(0);
 
 */      System.out.println("Loading");
-        GestReviews execute = new GestReviews("src/input_files/users_full.csv",
-                "src/input_files/business_full.csv",
-                "src/input_files/reviews_1M.csv");
+        GestReviews execute = new GestReviews(users,
+                businesses,
+                reviews);
 
         System.out.println("Loaded");
 
-        execute.teste(7);
+        //execute.teste(10);
 
 
         /*

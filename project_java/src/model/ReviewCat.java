@@ -50,7 +50,6 @@ public class ReviewCat implements Serializable {
     }
 
     public String toString(){
-        System.out.println("entrei");
         StringBuilder sb = new StringBuilder();
         for(Review r : this.reviews.values()) {
             System.out.println(r.toString());
