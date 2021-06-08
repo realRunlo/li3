@@ -16,6 +16,7 @@ public class NotReviewed  {
 
     public void addBusiness(Business b){
         notReviewed.add(b.clone());
+        total++;
     }
 
     public int getTotal(){

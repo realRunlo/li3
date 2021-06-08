@@ -31,7 +31,7 @@ public class GestReviews {
 
     //TODO: metodo de teste,apagar para entrega
     public void teste(int teste){
-        if(teste == 1 ) data.testeReviews();
+        if(teste == 1 ) System.out.println(data.query1().toString());
         if(teste == 4) {
             ArrayList<ReviewedPerMonth> months = data.query4("8zehGz9jnxPqXtOc7KaJxA");
             months.forEach(k->System.out.println(k.toString()));
@@ -43,15 +43,7 @@ public class GestReviews {
             });
         }
         if(teste ==10){
-            data.query10().forEach((k,v) -> {
-                System.out.println("State: "+ k);
-                v.forEach((l,b)->{
-                    System.out.println("\tCity: "+l);
-                    b.forEach((q,w) ->{
-                        System.out.println("\t\t"+q + " :" + w.calcAverage());
-                    });
-                });
-            });
+            System.out.println(data.query10().toString());
         }
     }
 

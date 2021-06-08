@@ -34,7 +34,7 @@ NÂO sei o que é mas estava na outra class que apagieo
 
         System.out.println("Loaded");
 
-        //execute.teste(10);
+        execute.teste(10);
 
 
         /*

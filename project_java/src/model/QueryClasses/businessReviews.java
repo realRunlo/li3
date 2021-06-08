@@ -14,9 +14,9 @@ public class businessReviews {
         totalScore += score;
     }
 
-    public double calcAverage(){
+    public float calcAverage(){
         if(totalReviews > 0)
-        return (totalScore*1.0/totalReviews);
+        return (float) (totalScore*1.0/totalReviews);
         else return 0;
     }
 
