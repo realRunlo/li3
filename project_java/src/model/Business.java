@@ -2,7 +2,7 @@ package model;
 
 import java.time.format.DateTimeFormatter;
 
-public class Business{
+public class Business implements IBusiness{
     private String id;
     private String name;
     private String city;
@@ -47,7 +47,7 @@ public class Business{
         return this.categories;
     }
 
-    public static Boolean validBusiness(String line){
+    public static Boolean validBusiness (String line){
         String[] data = line.split(";",5);
         return !data[0].equals("") && !data[1].equals("") && !data[2].equals("") && !data[3].equals("")
                 && !data[4].equals("");
@@ -65,4 +65,5 @@ public class Business{
         sb.append("\n");
         return sb.toString();
     }
+    
 }

@@ -1,6 +1,6 @@
 package model;
 
-public class User {
+public class User implements IUser {
 
     private String user_id;
     private String name;

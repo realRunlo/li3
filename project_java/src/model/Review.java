@@ -3,7 +3,7 @@ package model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Review {
+public class Review implements IReview{
 
     private String review_id;
     private String user_id;
@@ -76,7 +76,7 @@ public class Review {
     public String getTxt() { return txt; }
 
 
-    public static boolean validReview(String line){
+    public static boolean validReview (String line){
         String[] data = line.split(";",9);
 
         return !data[0].equals("") && !data[1].equals("") && !data[2].equals("") &&

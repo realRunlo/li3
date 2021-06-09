@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ReviewCat implements Serializable {
+public class ReviewCat implements IReviewCat, Serializable {
 
     private Map<String,Review> reviews;
 
