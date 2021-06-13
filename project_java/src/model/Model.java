@@ -196,6 +196,29 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         return monthReviews;
     }
 
+    public ArrayList<ReviewsByBizName> query5(String user_id){
+
+        Map<String,Review> reviews = getReviews().values().stream()
+                                    .filter((r)->r.getUser_id().equals(user_id))
+                                    .collect(Collectors.toMap(Review::getReview_id, r->r));
+
+        Map<String,ReviewsByBizName> reviews_bizs = new HashMap<>();
+
+        for(Review rev : reviews.values()){
+            if(reviews.containsKey(rev.getBusiness_id())){
+                reviews_bizs.get(rev.getBusiness_id()).incTotal();
+            }else{
+                reviews_bizs.put(rev.getBusiness_id(),new ReviewsByBizName(rev.getBusiness_id(),1));
+            }
+        }
+        
+        ArrayList<ReviewsByBizName> reviews_bizsList = new ArrayList<>(reviews_bizs.values());
+        reviews_bizsList.sort(new ReviewsByBizNameComp());
+
+        return reviews_bizsList;
+
+    }
+
 
     //Determinar, para cada cidade, a lista dos três mais famosos negócios em termos de
     //número de reviews;
