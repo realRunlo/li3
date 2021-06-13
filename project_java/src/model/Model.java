@@ -1,13 +1,7 @@
 package model;
 
-import model.QueryClasses.NotReviewed;
-import model.QueryClasses.ReviewedPerMonth;
-import model.QueryClasses.StateBusiness;
-import model.QueryClasses.businessReviews;
-import model.QueryInterfaces.Query1;
-import model.QueryInterfaces.Query10;
-import model.QueryInterfaces.Query4;
-import model.QueryInterfaces.Query7;
+import model.QueryClasses.*;
+import model.QueryInterfaces.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Model implements Query1, Query4, Query7, Query10 {
+public class Model implements Query1, Query3, Query4, Query7, Query10 {
 
     private UserCat users;
     private ReviewCat reviews;
@@ -136,6 +130,44 @@ public class Model implements Query1, Query4, Query7, Query10 {
 
         businesses.forEach((k,v) -> results.addBusiness(v));
         return results;
+    }
+
+
+    public ArrayList<UserReviewsByMonth> query3(String user_id){
+
+        //contem reviews do dado user
+        Map<String,Review> reviews = getReviews().values().stream()
+                                    .filter((r)->r.getUser_id().equals(user_id))
+                                    .collect(Collectors.toMap(Review::getReview_id, r->r));
+        ArrayList<UserReviewsByMonth> reviewsByMonth= new ArrayList<>();
+        int totalRevs = 0;
+        int variety = 0;
+        int totalStars = 0;
+        ArrayList<String> varietyList = new ArrayList<>(12);
+        for(int i = 1;i<=12;i++){
+            for(Review rev : reviews.values()){
+                String busId = rev.getBusiness_id();
+                if(!varietyList.contains(busId)){
+                    varietyList.add(busId);
+                    variety++;
+                }
+
+                if(rev.getDate().getMonthValue() == i){
+                    totalRevs++;
+                    totalStars += rev.getStars();
+
+                }
+                varietyList.clear();
+
+            }
+
+            reviewsByMonth.add(new UserReviewsByMonth(totalRevs,variety,(double) totalStars/totalRevs));
+            totalRevs = 0;
+            totalStars = 0;
+            variety = 0;
+        }
+
+        return reviewsByMonth;
     }
 
 
