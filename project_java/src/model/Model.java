@@ -7,18 +7,22 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormatSymbols;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Model implements Query1, Query3, Query4, Query7, Query10 {
-
+    private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;
     private BusinessCat businesses;
     //dados para estatisticas
-    private List<String> filesLoaded;
-    private int invalidReviews;
+    private List<String> filesLoaded = new ArrayList<>();
+    private int invalidReviews = 0;
+
 
     /**
      * Construtor de Model
@@ -38,15 +42,10 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
      * @throws IOException
      */
     public Model(String userFile, String businessFile, String reviewFile,boolean loadFriends) throws IOException {
+        this.loaded = false;
         this.users = new UserCat();
         this.businesses = new BusinessCat();
         this.reviews = new ReviewCat();
-
-        filesLoaded = new ArrayList<>();
-        filesLoaded.add(userFile);
-        filesLoaded.add(userFile);
-        filesLoaded.add(reviewFile);
-
         load(userFile, businessFile, reviewFile,loadFriends);
     }
 
@@ -63,6 +62,11 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         loadUsers(users_file,loadFriends);
         loadBusinesses(businesses_file);
         loadReviews(reviews_file);
+
+        filesLoaded.add(users_file);
+        filesLoaded.add(businesses_file);
+        filesLoaded.add(reviews_file);
+        loaded = true;
     }
 
     /**
@@ -134,7 +138,7 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
                     Review rev = new Review(line);
                     if(this.users.containsId(rev.getUser_id()) && this.businesses.containsId(rev.getBusiness_id())){ //check if users and businesses exist
                         this.reviews.addReview(rev);
-                    }
+                    }else invalidReviews++;
 
                 }
             }
@@ -168,6 +172,12 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     public Map<String, User> getUsers() {
         return users.getUsers();
     }
+
+    /**
+     * Verifica se ja foram carregados dados
+     * @return boolean loaded
+     */
+    public boolean getLoaded(){return loaded;}
 
     /**
      * Metodo que verifica se um certo businessId foi avaliado
@@ -332,7 +342,7 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
 
         Map<String,List<String>> results = new HashMap<>();
 
-        //par cada cidade ordena os negocios
+        //para cada cidade ordena os negocios
         // , pelo numero total de reviews feito em cada um, de forma descendente
         cities.forEach((k,v) -> {
             List<String> sortedBusinesses = v.entrySet().stream()
@@ -385,6 +395,21 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
 
 
     //-----------------------------ESTATISTICAS--------------------------------------------------------
+
+    /**
+     * Retorna a lista dos ficheiros lidos
+     * @return lista dos ficheiros lidos
+     */
+    public List<String> getFilesLoaded(){
+        return new ArrayList<>(filesLoaded);
+    }
+
+    /**
+     * Retorna o numero de reviews invalidadas
+     * @return total de reviews invalidadas
+     */
+    public int getInvalidReviews(){return invalidReviews;}
+
 
     /**
      * Metodo que retorna o numero total de negocios
@@ -462,13 +487,51 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
      */
     public List<ReviewedPerMonth> getReviewsPerMonth(){
         List<ReviewedPerMonth> results = new ArrayList<>(12);
-        for(ReviewedPerMonth r: results) r= new ReviewedPerMonth();
+        for (int i =0; i<12;i++) {
+            results.add(new ReviewedPerMonth());
+        }
         getReviews().forEach(
                 (k,v)-> results.get(v.getDate().getMonthValue()-1).
                         incTotalReviews(v.getStars(),v.getUser_id())
                 );
         return results;
     }
+
+    public String statistics(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Loaded Files: ")
+                .append(filesLoaded.get(0)).append(", ")
+                .append(filesLoaded.get(1)).append(", ")
+                .append(filesLoaded.get(2)).append("\n")
+            .append("Invalid reviews: ").append(invalidReviews).append("\n")
+            .append("Total businesses: ").append(getNumberOfBusinesses()).append("\n")
+            .append("Distinct Reviewed Businesses: ").append(getDistinctBusinessesReviewed()).append("\n")
+            .append("Not reviewed Businesses: ").append(getNotReviewdBusinesses()).append("\n")
+            .append("Total Users: ").append(getNumberOfUsers()).append("\n")
+            .append("Active Users: ").append(getNumberOfUserReviewers()).append("\n")
+            .append("Inactive Users: ").append(getUsersNotReviewers()).append("\n")
+            .append("Total Reviews: ").append(getReviews().size()).append("\n")
+            .append("Unimpactful Reviews: ").append(getNonImpactReviews()).append("\n")
+            .append("Reviews Per Month\n");
+        AtomicInteger i = new AtomicInteger(0);
+        List<ReviewedPerMonth> monthsStats = getReviewsPerMonth();
+        monthsStats.forEach((v)->{
+            sb.append(new DateFormatSymbols().getMonths()[i.get()])
+                .append(":\n")
+                .append("\tTotal Reviews: ").append(v.getTotalReviews())
+                .append("\n\tAverage: ").append(v.getAverage())
+                .append("\n\tUnique Users: ").append(v.getUniqueReviews())
+                .append("\n");
+            i.incrementAndGet();
+        });
+        sb.append("Global average: ")
+                .append(monthsStats.stream().mapToInt(ReviewedPerMonth::getTotalReviews).sum() / 12);
+
+
+        return sb.toString();
+    }
+
+
 
 
 //TODO metodo de teste, apagar antes de entregar
