@@ -13,11 +13,11 @@ public class User implements IUser {
         this.friends = friends;
     }
 
-    public User(String line){
+    public User(String line,boolean loadFriends){
         String[] data = line.split(";",3);
         this.user_id = data[0];
         this.name = data[1];
-        this.friends = data[2];
+        if(loadFriends) this.friends = data[2];
     }
 
     public User(User us){

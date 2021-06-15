@@ -19,7 +19,7 @@ public class GestReviews {
 
 
     public GestReviews(String userFile, String businessFile, String reviewFile) throws IOException {
-        data = new Model(userFile,businessFile,reviewFile);
+        data = new Model(userFile,businessFile,reviewFile,false);
     }
 
     public void query1(){

@@ -16,7 +16,9 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     private UserCat users;
     private ReviewCat reviews;
     private BusinessCat businesses;
-
+    //dados para estatisticas
+    private List<String> filesLoaded;
+    private int invalidReviews;
 
     public Model(){
         this.users = new UserCat();
@@ -24,29 +26,35 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         this.reviews = new ReviewCat();
     }
 
-    public Model(String userFile, String businessFile, String reviewFile) throws IOException {
+    public Model(String userFile, String businessFile, String reviewFile,boolean loadFriends) throws IOException {
         this.users = new UserCat();
         this.businesses = new BusinessCat();
         this.reviews = new ReviewCat();
-        load(userFile, businessFile, reviewFile);
+
+        filesLoaded = new ArrayList<>();
+        filesLoaded.add(userFile);
+        filesLoaded.add(userFile);
+        filesLoaded.add(reviewFile);
+
+        load(userFile, businessFile, reviewFile,loadFriends);
     }
 
 
 
-    public void load(String users_file,String businesses_file, String reviews_file) throws IOException {
-        loadUsers(users_file);
+    public void load(String users_file,String businesses_file, String reviews_file,boolean loadFriends) throws IOException {
+        loadUsers(users_file,loadFriends);
         loadBusinesses(businesses_file);
         loadReviews(reviews_file);
     }
 
-    private void loadUsers(String filename) throws IOException {
+    private void loadUsers(String filename,boolean loadFriends) throws IOException {
         List<String> lines;
         try{
             lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
 
             for(String line : lines){
                 if(User.validUser(line)){
-                    User us = new User(line);
+                    User us = new User(line,loadFriends);
                    this.users.addUser(us);
                 }
 
@@ -187,7 +195,6 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         for (int i =0; i<12;i++) {
             monthReviews.add(new ReviewedPerMonth());
         }
-
         reviews.forEach((k,v) -> {
             int month = v.getDate().getMonthValue();
             monthReviews.get(month - 1).incTotalReviews(v.getStars(),v.getUser_id());
@@ -298,6 +305,58 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
 
         return states;
 
+    }
+
+
+    public int getNumberOfBusinesses(){
+        return this.businesses.size();
+    }
+
+    public int getDistinctBusinesses(){
+        HashMap<String,Business> reviewed = new HashMap<>();
+        Map<String,Business> businesses = getBusinesses();
+        Map<String,Review> reviewsSearch = getReviews();
+
+        reviewsSearch.forEach((k,v) -> {
+            reviewed.put(v.getBusiness_id(),businesses.get(v.getBusiness_id()));
+        });
+        return reviewed.size();
+    }
+
+    public int getNotReviewdBusinesses(){
+        return query1().getTotal();
+    }
+
+    public int getNumberOfUsers(){
+        return getUsers().size();
+    }
+
+    public int getNumberOfUserReviewers(){
+        Set<String> userReviewer = new HashSet<>();
+        getReviews().forEach((k,v) -> {
+            userReviewer.add(v.getUser_id());
+        });
+        return userReviewer.size();
+    }
+
+    public int getUsersNotReviewers(){
+        return getNumberOfUsers() - getNumberOfUserReviewers();
+    }
+
+    public int getNonImpactReviews(){
+        return getReviews().values().stream().
+                filter(v -> v.getCool()+v.getFunny()+v.getFunny()+v.getUseful() == 0).
+                collect(Collectors.toSet()).size();
+    }
+
+    public List<ReviewedPerMonth> getReviewsPerMonth(){
+        List<ReviewedPerMonth> results = new ArrayList<>(12);
+        for(ReviewedPerMonth r: results) r= new ReviewedPerMonth();
+        getReviews().forEach(
+                (k,v)-> results.get(v.getDate().getMonthValue()-1).
+                        incTotalReviews(v.getStars(),v.getUser_id())
+                );
+        return results;
     }
 
 
