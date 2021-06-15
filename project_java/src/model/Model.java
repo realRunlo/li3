@@ -20,12 +20,23 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     private List<String> filesLoaded;
     private int invalidReviews;
 
+    /**
+     * Construtor de Model
+     */
     public Model(){
         this.users = new UserCat();
         this.businesses = new BusinessCat();
         this.reviews = new ReviewCat();
     }
 
+    /**
+     * Construtor de Model
+     * @param userFile ficheiro para carregar os users
+     * @param businessFile ficheiro para carregar os businesses
+     * @param reviewFile ficheiro para carregar as reviews
+     * @param loadFriends booleano que indica se os users carregam o paramtro friends
+     * @throws IOException
+     */
     public Model(String userFile, String businessFile, String reviewFile,boolean loadFriends) throws IOException {
         this.users = new UserCat();
         this.businesses = new BusinessCat();
@@ -40,13 +51,27 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     }
 
 
-
+    /**
+     * Agrupa os varios metodos de load de ficheiros
+     * @param users_file ficheiro para carregar os users
+     * @param businesses_file ficheiro para carregar os businesses
+     * @param reviews_file ficheiro para carregar as reviews
+     * @param loadFriends booleano que indica se os users carregam o paramtro friends
+     * @throws IOException
+     */
     public void load(String users_file,String businesses_file, String reviews_file,boolean loadFriends) throws IOException {
         loadUsers(users_file,loadFriends);
         loadBusinesses(businesses_file);
         loadReviews(reviews_file);
     }
 
+    /**
+     * Carregamento dos users de um ficheiro, apenas se carrega um user caso
+     * o metodo de validacao do mesmo retorne true
+     * @param filename ficheiro onde se vao ler os users
+     * @param loadFriends booleano que indica se os friends devem ser carregados
+     * @throws IOException
+     */
     private void loadUsers(String filename,boolean loadFriends) throws IOException {
         List<String> lines;
         try{
@@ -67,6 +92,12 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         }
     }
 
+    /**
+     * Carregamento dos businesses de um ficheiro, apenas se carrega um business
+     * caso o metodo de validacao do mesmo retorne true
+     * @param filename ficheiro onde se vao ler os businesses
+     * @throws IOException
+     */
     private void loadBusinesses(String filename) throws  IOException{
         List<String> lines;
         try{
@@ -86,6 +117,11 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         }
     }
 
+    /**
+     * Carregamento dos reviews de um ficheiro, apenas se carrega uma review
+     * caso o metodo de validacao da mesma retorne true
+     * @param filename ficheiro onde se vao ler as reviews
+     */
     private void loadReviews(String filename){
         List<String> lines;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -113,18 +149,40 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
 
     }
 
+    /**
+     * Getter das reviews carregadas
+     * @return reviews carregadas
+     */
     public Map<String, Review> getReviews(){return reviews.getReviews();}
 
+    /**
+     * Getter dos businesses carregados
+     * @return businesses carregados
+     */
     public Map<String, Business> getBusinesses(){return businesses.getBusinesses();}
 
+    /**
+     * Getter dos users carregados
+     * @return users carregados
+     */
     public Map<String, User> getUsers() {
         return users.getUsers();
     }
 
+    /**
+     * Metodo que verifica se um certo businessId foi avaliado
+     * @param businessId business a verificar
+     * @return resultado da verificacao
+     */
     public boolean businessReviewed(String businessId){
         return reviews.businessReviewed(businessId);
     }
 
+    /**
+     * Query1
+     * @return lista ordenada alfabeticamente com os identificadores dos negócios nunca
+     * avaliados e o seu respetivo total
+     */
     //Lista ordenada alfabeticamente com os identificadores dos negócios nunca
     //avaliados e o seu respetivo total;
     public NotReviewed query1(){
@@ -140,7 +198,11 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         return results;
     }
 
-
+    /**
+     *
+     * @param user_id
+     * @return
+     */
     public ArrayList<UserReviewsByMonth> query3(String user_id){
 
         //contem reviews do dado user
@@ -179,9 +241,12 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     }
 
 
-
-    //Dado o código de um negócio, determinar, mês a mês, quantas vezes foi avaliado,
-    //por quantos users diferentes e a média de classificação;
+    /**
+     * Query4
+     * @param b_id codigo do negocio a analisar
+     * @return mês a mês, quantas vezes foi avaliado,
+     * por quantos users diferentes e a média de classificação
+     */
     public ArrayList<ReviewedPerMonth> query4(String b_id){
         //filtrar para ter apenas as reviews sobre o negocio em questao
         Map<String,Review> reviews = getReviews().values().stream()
@@ -203,6 +268,11 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         return monthReviews;
     }
 
+    /**
+     *
+     * @param user_id
+     * @return
+     */
     public ArrayList<ReviewsByBizName> query5(String user_id){
 
         Map<String,Review> reviews = getReviews().values().stream()
@@ -227,8 +297,11 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     }
 
 
-    //Determinar, para cada cidade, a lista dos três mais famosos negócios em termos de
-    //número de reviews;
+    /**
+     * Query7
+     * @return para cada cidade, a lista dos três mais famosos negócios em termos de
+     * número de reviews;
+     */
     public Map<String, List<String>> query7(){
 
         //Hash das diferentes cidades
@@ -276,8 +349,11 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         return results;
     }
 
-    //Determinar para cada estado, cidade a cidade, a média de classificação de cada
-    //negócio.
+    /**
+     * Query10
+     * @return para cada estado, cidade a cidade, a média de classificação de cada
+     * negócio
+     */
     public StateBusiness query10(){
         //hash de estados em que para cada estado tera uma hash das cidades do estado,
         //que, por sua vez terao um hash dos negocios e respetiva media
@@ -308,11 +384,21 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     }
 
 
+    //-----------------------------ESTATISTICAS--------------------------------------------------------
+
+    /**
+     * Metodo que retorna o numero total de negocios
+     * @return numero total de negocios
+     */
     public int getNumberOfBusinesses(){
         return this.businesses.size();
     }
 
-    public int getDistinctBusinesses(){
+    /**
+     * Calcula o numero total de negocios distintos avaliados
+     * @return numero total de negocios distintos avaliados
+     */
+    public int getDistinctBusinessesReviewed(){
         HashMap<String,Business> reviewed = new HashMap<>();
         Map<String,Business> businesses = getBusinesses();
         Map<String,Review> reviewsSearch = getReviews();
@@ -323,14 +409,26 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         return reviewed.size();
     }
 
+    /**
+     * Calcula o numero total de negocios nao avaliados
+     * @return numero de negocios nao avaliados
+     */
     public int getNotReviewdBusinesses(){
         return query1().getTotal();
     }
 
+    /**
+     * Calcula o numero de users diferentes
+     * @return numero de users
+     */
     public int getNumberOfUsers(){
         return getUsers().size();
     }
 
+    /**
+     * Calcula o numero de users ativos (realizaram reviews)
+     * @return numero de users ativos
+     */
     public int getNumberOfUserReviewers(){
         Set<String> userReviewer = new HashSet<>();
         getReviews().forEach((k,v) -> {
@@ -339,16 +437,29 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
         return userReviewer.size();
     }
 
+    /**
+     * Calcula o numero de users inativos (nao realizaram reviews)
+     * @return numero de users inativos
+     */
     public int getUsersNotReviewers(){
         return getNumberOfUsers() - getNumberOfUserReviewers();
     }
 
+    /**
+     * Calcula o numero de reviews sem impacto (somatorio dos parametros cool,funny ou useful igual a 0)
+     * @return numero de reviews sem impacto
+     */
     public int getNonImpactReviews(){
         return getReviews().values().stream().
-                filter(v -> v.getCool()+v.getFunny()+v.getFunny()+v.getUseful() == 0).
+                filter(v -> v.getCool()+v.getFunny()+v.getUseful() == 0).
                 collect(Collectors.toSet()).size();
     }
 
+    /**
+     * Calcula, mes a mes, o numero total de reviews, numero de users distintos que
+     * fizeram reviews, o score medio
+     * @return lista dos calculos dos varios meses
+     */
     public List<ReviewedPerMonth> getReviewsPerMonth(){
         List<ReviewedPerMonth> results = new ArrayList<>(12);
         for(ReviewedPerMonth r: results) r= new ReviewedPerMonth();
@@ -360,7 +471,7 @@ public class Model implements Query1, Query3, Query4, Query7, Query10 {
     }
 
 
-
+//TODO metodo de teste, apagar antes de entregar
     //metodo de teste
     public void testeReviews(){
         reviews.getReviews().forEach((k,v)-> System.out.println(v.toString()));

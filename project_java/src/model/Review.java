@@ -15,7 +15,18 @@ public class Review implements IReview{
     private LocalDateTime date;
     private String txt;
 
-
+    /**
+     * Construtor de Review
+     * @param review_id id da review
+     * @param user_id id do user que fez a review
+     * @param business_id id do negocio reviewed
+     * @param stars avaliacao
+     * @param useful impacto-util
+     * @param funny impacto-comico
+     * @param cool impacto-fixe
+     * @param date data de criacao da review
+     * @param txt texto da review
+     */
     public Review(String review_id,String user_id,String business_id,
                   float stars,int useful,int funny,int cool,LocalDateTime date,String txt){
 
@@ -30,6 +41,10 @@ public class Review implements IReview{
         this.txt = txt;
     }
 
+    /**
+     * Construtor de Review
+     * @param line string a analisar de modo a carregar uma review
+     */
     public Review(String line){
         String[] data = line.split(";",9);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -44,6 +59,10 @@ public class Review implements IReview{
         this.txt = data[8];
     }
 
+    /**
+     * Construtor de Review
+     * @param rev review a copiar
+     */
     public Review(Review rev){
         this.review_id = rev.review_id;
         this.user_id = rev.user_id;
@@ -57,25 +76,66 @@ public class Review implements IReview{
 
     }
 
+    /**
+     * Getter do id da review
+     * @return id da review
+     */
     public String getReview_id() { return review_id; }
 
+    /**
+     * Getter do id do user que criou a review
+     * @return id do user
+     */
     public String getUser_id() { return user_id; }
 
+    /**
+     * Getter do id do negocio avaliado
+     * @return id do negocio
+     */
     public String getBusiness_id() { return business_id; }
 
+    /**
+     * Getter do score da review
+     * @return score da review
+     */
     public float getStars() { return stars; }
 
+    /**
+     * Getter do impatco-util
+     * @return impacto-util
+     */
     public int getUseful() { return useful; }
 
+    /**
+     * Getter do impacto-comico
+     * @return impacto-comico
+     */
     public int getFunny() { return funny; }
 
+    /**
+     * Getter do impacto-fixe
+     * @return impacto-fixe
+     */
     public int getCool() { return cool; }
 
+    /**
+     * Getter da data de criacao da review
+     * @return data de criacao
+     */
     public LocalDateTime getDate() { return date; }
 
+    /**
+     * Getter do texto da review
+     * @return texto da review
+     */
     public String getTxt() { return txt; }
 
-
+    /**
+     * Metodo utilizado para validar se uma string
+     * representa uma review
+     * @param line linha possivelmente representante de uma review
+     * @return resultado da validacao
+     */
     public static boolean validReview (String line){
         String[] data = line.split(";",9);
 
@@ -86,6 +146,10 @@ public class Review implements IReview{
 
     }
 
+    /**
+     * ToString de Review
+     * @return Review em formato string
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder("Review {\n");
         sb.append("ID = '").append(review_id).append("'\n");
@@ -100,6 +164,11 @@ public class Review implements IReview{
         sb.append("\n}");
         return sb.toString();
     }
+
+    /**
+     * Clone de Review
+     * @return clone
+     */
     public Review clone(){return new Review(this);}
 
 

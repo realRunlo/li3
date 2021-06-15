@@ -13,14 +13,24 @@ import java.util.*;
 public class GestReviews {
     private Model data;
 
+    /**
+     * Construtor de GestReviews
+     */
     public GestReviews(){
         data = new Model();
     }
 
-
+    /**
+     * Construtor de GestReviews
+     * @param userFile ficheiro para carregar os users
+     * @param businessFile ficheiro para carregar os businesses
+     * @param reviewFile ficheiro para carregar as reviews
+     * @throws IOException
+     */
     public GestReviews(String userFile, String businessFile, String reviewFile) throws IOException {
         data = new Model(userFile,businessFile,reviewFile,false);
     }
+
 
     public void query1(){
         data.query1();

@@ -9,21 +9,36 @@ public class NotReviewed  {
     private TreeSet<Business> notReviewed;
     private Integer total;
 
+    /**
+     * Construtor de NotReviewed
+     */
     public NotReviewed(){
         notReviewed = new TreeSet<>(new NotReviewedComp());
         total = 0;
     }
 
+    /**
+     * Adiciona o business na treeSet, utilizando
+     * o comparador que ordena por ordem alfabetica
+     * @param b business a adicionar
+     */
     public void addBusiness(Business b){
         notReviewed.add(b.clone());
         total++;
     }
 
+    /**
+     * Retorna o total de negocios registados
+     * @return total de negocios
+     */
     public int getTotal(){
         return notReviewed.size();
     }
 
-
+    /**
+     * ToString da classe NotReviewed
+     * @return NotReviewed em formato string
+     */
     public String toString(){
         StringBuilder sb = new StringBuilder();
 
