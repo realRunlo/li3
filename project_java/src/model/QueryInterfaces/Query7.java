@@ -1,8 +1,9 @@
 package model.QueryInterfaces;
 
+import model.QueryClasses.Query7aux;
+
 import java.util.List;
-import java.util.Map;
 
 public interface Query7 {
-    public Map<String, List<String>> query7();
+    public List<Query7aux> query7();
 }

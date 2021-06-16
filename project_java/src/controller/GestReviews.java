@@ -2,11 +2,13 @@ package controller;
 
 import model.Business;
 import model.Model;
+import model.QueryClasses.Query7aux;
 import model.QueryClasses.ReviewedPerMonth;
 import view.UI;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormatSymbols;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -134,26 +136,30 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{3,4,5,6,7,8,9,10,11},()->false);
+        main.setSamePreCondition(new int[]{3,4,6,7,9,10,11},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2,()->query1());
-
+        main.setHandler(5,()->query4());
+        main.setHandler(8,()->query7());
 
         main.SimpleRun();
     }
 
 
-
-
+    /**
+     * Executa a query1 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
     public void query1(){
+        List<String> format = turnFormat(new String[]{"Business_name"});
         List<Business> query1 = new ArrayList<>(data.query1().getNotReviewed());
         int size = query1.size();
         boolean valid = false, validPage = true;
         int page = 0,currentPage = 0, valuesPage = 10, totalPages = size/valuesPage;
         String line = "";
-        List<String> format = new ArrayList<>();
-        format.add("Business_name");
+
+
 
         while(!valid){
             int i = 0;
@@ -162,8 +168,9 @@ public class GestReviews {
             List<List<String>> values = new ArrayList<>();
             //vai buscar os elementos para imprimir na pagina
             while(i<valuesPage && (valuesPage*page+i)<size){
+                int element = valuesPage * page + i;
                 List<String> business = new ArrayList<>();
-                business.add(query1.get((valuesPage*page+i)).getName());
+                business.add(query1.get((element)).getName());
                 values.add(business);
                 i++;
             }
@@ -187,6 +194,108 @@ public class GestReviews {
         }
     }
 
+    /**
+     * Executa a query4 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    public void query4(){
+        String b_id = getString("Insert a businessId to analyse reviews on it by month");
+        if(data.existsBusiness(b_id)) {
+            List<String> format = turnFormat(new String[]{"Month","Total Reviews","Unique Users","Average Score"});
+            ArrayList<ReviewedPerMonth> query4 = data.query4(b_id);
+            int size = query4.size();
+            boolean valid = false, validPage = true;
+            int page = 0, currentPage = 0, valuesPage = 10, totalPages = size / valuesPage;
+            String line = "";
+            int total = 0,unique = 0;float average =0;
+
+
+            while (!valid) {
+                int i = 0;
+                if ((valuesPage * page + i) > size) page = currentPage;
+                currentPage = page;
+                List<List<String>> values = new ArrayList<>();
+                //vai buscar os elementos para imprimir na pagina
+                while (i < valuesPage && (valuesPage * page + i) < size) {
+                    int element = valuesPage * page + i;
+                    List<String> month = new ArrayList<>();
+                    month.add(monthString(element));
+                    total = query4.get((element)).getTotalReviews();
+                    unique = query4.get((element)).getUniqueReviews();
+                    average = query4.get((element)).getAverage();
+                    month.add(String.valueOf(total));
+                    month.add(String.valueOf(unique));
+                    month.add(String.valueOf(average));
+                    values.add(month);
+                    i++;
+                }
+                //imprime a pagina
+                messages.printTable(format, values, page, totalPages);
+
+                //pede pelo input de uma nova pagina ou para retornar
+                try {
+                    line = scanner.nextLine();
+                    page = Integer.parseInt(line);
+                    validPage = true;
+                } catch (NumberFormatException e) { // Não foi escrito um int
+                    page = currentPage;
+                    validPage = false;
+                }
+                if (line.equals("r") || line.equals("return")) {
+                    valid = true;
+                } else if (line.equals("n")) page++;
+                else if (line.equals("p")) page--;
+                else if (!validPage) messages.errorMessage("Insert a valid command");
+            }
+        }else messages.errorMessage("Invalid business id");
+    }
+
+    /**
+     * Executa a query7 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    public void query7(){
+        List<String> format = turnFormat(new String[]{"City","Business_name"});
+        List<Query7aux> query7 = data.query7();
+        int size = query7.size();
+        boolean valid = false, validPage = true;
+        int page = 0, currentPage = 0, valuesPage = 10, totalPages = size / valuesPage;
+        String line = "";
+
+        while (!valid) {
+            int i = 0;
+            if ((valuesPage * page + i) > size) page = currentPage;
+            currentPage = page;
+            List<List<String>> values = new ArrayList<>();
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && (valuesPage * page + i) < size) {
+                int element = valuesPage * page + i;
+                List<String> business = new ArrayList<>();
+                business.add(query7.get(element).getCity());
+                business.add(query7.get(element).getB_name());
+                values.add(business);
+                i++;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page, totalPages);
+
+            //pede pelo input de uma nova pagina ou para retornar
+            try {
+                line = scanner.nextLine();
+                page = Integer.parseInt(line);
+                validPage = true;
+            } catch (NumberFormatException e) { // Não foi escrito um int
+                page = currentPage;
+                validPage = false;
+            }
+            if (line.equals("r") || line.equals("return")) {
+                valid = true;
+            } else if (line.equals("n")) page++;
+            else if (line.equals("p")) page--;
+            else if (!validPage) messages.errorMessage("Insert a valid command");
+        }
+    }
+
 
 
 
@@ -199,9 +308,8 @@ public class GestReviews {
             months.forEach(k->System.out.println(k.toString()));
         }
         if(teste == 7){
-            data.query7().forEach((k,v) -> {System.out.println();
-                System.out.println(k);
-                v.forEach(System.out::println);
+            data.query7().forEach(k -> {System.out.println();
+                System.out.println(k.getCity() +" "+k.getB_name());
             });
         }
         if(teste ==10){
@@ -235,6 +343,32 @@ public class GestReviews {
          }
         }
         return bol;
+    }
+
+    /**
+     * Dado um inteiro devolve o mes correspondente
+     * @param i inteiro a ser transformado em mes
+     * @return mes
+     */
+    private String monthString(int i){
+        return new DateFormatSymbols().getMonths()[i];
+    }
+
+    private List<String> turnFormat(String[] columns){
+        List<String> format = new ArrayList<>();
+        for(String s:columns) format.add(s);
+
+        return format;
+    }
+
+
+    /**
+     * Metodo que pede ao utilizador que indique um nome
+     * @return nome escolhido pelo utilizador
+     */
+    private String getString(String message){
+        messages.informationMessage(message);
+        return scanner.nextLine();
     }
 
 

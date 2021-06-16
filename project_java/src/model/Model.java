@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -189,6 +188,13 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
     }
 
     /**
+     * Verifica se foi carregado um business com o dado id
+     * @param b_id business a procurar
+     * @return resultado da procura
+     */
+    public boolean existsBusiness(String b_id){return this.businesses.containsId(b_id);}
+
+    /**
      * Query1
      * @return lista ordenada alfabeticamente com os identificadores dos negócios nunca
      * avaliados e o seu respetivo total
@@ -312,7 +318,7 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
      * @return para cada cidade, a lista dos três mais famosos negócios em termos de
      * número de reviews;
      */
-    public Map<String, List<String>> query7(){
+    public List<Query7aux> query7(){
 
         //Hash das diferentes cidades
         //a key sera o numero de cidades e o value sera um hashMap com os business dessa cidade
@@ -355,8 +361,9 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
             else results.put(k,sortedBusinesses);
 
         });
-
-        return results;
+        List<Query7aux> resultsList = new ArrayList<>();
+        results.forEach((k,v)-> v.forEach(b -> resultsList.add(new Query7aux(k,b))));
+        return resultsList;
     }
 
     /**

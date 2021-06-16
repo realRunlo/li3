@@ -143,7 +143,6 @@ public class Review implements IReview{
                 data[3].matches("[-+]?[0-9]*\\.?[0-9]+") && data[4].matches("[-+]?[0-9]*")
                 && data[5].matches("[-+]?[0-9]*") && data[6].matches("[-+]?[0-9]*")
                 && !data[7].equals("");
-
     }
 
     /**

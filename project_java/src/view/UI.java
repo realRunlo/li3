@@ -190,7 +190,13 @@ public class UI {
         is.nextLine();
     }
 
-
+    /**
+     * Metodo para imprimir os valores retornados das queries em formato de uma tabela
+     * @param format indica o formato da tabela e o nome de cada coluna
+     * @param values valores a imprimir em cada linha
+     * @param page numero da pagina atual
+     * @param totalPages numero total de paginas
+     */
     public void printTable(List<String> format,List<List<String>> values, int page ,int totalPages){
         StringBuilder sb = new StringBuilder();
         format.forEach(f-> sb.append(f).append(" "));
