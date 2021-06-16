@@ -16,10 +16,11 @@ public class Business implements IBusiness{
      * @param city cidade do negocio
      * @param categ categorias do negocio
      */
-    public Business (String id, String name,String city,String categ){
+    public Business (String id, String name,String city,String state,String categ){
         this.id = id;
         this.name = name;
         this.city = city;
+        this.state = state;
         this.categories = categ;
     }
 
@@ -44,6 +45,7 @@ public class Business implements IBusiness{
         this.id = b.getId();
         this.name = b.getName();
         this.city = b.getCity();
+        this.state = b.getState();
         this.categories = b.getCategories();
     }
 

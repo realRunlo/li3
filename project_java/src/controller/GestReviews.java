@@ -4,6 +4,8 @@ import model.Business;
 import model.Model;
 import model.QueryClasses.Query7aux;
 import model.QueryClasses.ReviewedPerMonth;
+import model.QueryClasses.StateBusiness;
+import model.QueryClasses.StateBusinessAux;
 import view.UI;
 
 import java.io.FileNotFoundException;
@@ -136,12 +138,13 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{3,4,6,7,9,10,11},()->false);
+        main.setSamePreCondition(new int[]{3,4,6,7,9,10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2,()->query1());
         main.setHandler(5,()->query4());
         main.setHandler(8,()->query7());
+        main.setHandler(11,()->query10());
 
         main.SimpleRun();
     }
@@ -297,6 +300,55 @@ public class GestReviews {
     }
 
 
+    /**
+     * Executa a query10 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    public void query10(){
+        List<String> format = turnFormat(new String[]{"State","City","Business Id","Average Score"});
+        List<StateBusinessAux> query10 = data.query10().toList();
+        int size = query10.size();
+        boolean valid = false, validPage = true;
+        int page = 0, currentPage = 0, valuesPage = 10, totalPages = size / valuesPage;
+        String line = "";
+
+        while (!valid) {
+            int i = 0;
+            if ((valuesPage * page + i) > size) page = currentPage;
+            currentPage = page;
+            List<List<String>> values = new ArrayList<>();
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && (valuesPage * page + i) < size) {
+                int element = valuesPage * page + i;
+                List<String> business = new ArrayList<>();
+                business.add(query10.get(element).getState());
+                business.add(query10.get(element).getCity());
+                business.add(query10.get(element).getId());
+                business.add(String.valueOf(query10.get(element).getBusinessReviews().calcAverage()));
+                values.add(business);
+                i++;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page, totalPages);
+
+            //pede pelo input de uma nova pagina ou para retornar
+            try {
+                line = scanner.nextLine();
+                page = Integer.parseInt(line);
+                validPage = true;
+            } catch (NumberFormatException e) { // Não foi escrito um int
+                page = currentPage;
+                validPage = false;
+            }
+            if (line.equals("r") || line.equals("return")) {
+                valid = true;
+            } else if (line.equals("n")) page++;
+            else if (line.equals("p")) page--;
+            else if (!validPage) messages.errorMessage("Insert a valid command");
+        }
+    }
+
+
 
 
 
@@ -354,6 +406,13 @@ public class GestReviews {
         return new DateFormatSymbols().getMonths()[i];
     }
 
+    /**
+     * Torna um arreio de string em um lista de strings
+     * utilizado para criar um argumento para a linha das colunas
+     * de printTable
+     * @param columns arreio de strings
+     * @return arreio em formato list
+     */
     private List<String> turnFormat(String[] columns){
         List<String> format = new ArrayList<>();
         for(String s:columns) format.add(s);

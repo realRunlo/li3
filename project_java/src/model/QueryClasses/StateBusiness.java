@@ -1,6 +1,8 @@
 package model.QueryClasses;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StateBusiness {
@@ -100,6 +102,15 @@ public class StateBusiness {
             addBusiness(state,city,b_id);
         }
         states.get(state).get(city).get(b_id).addReview(score);
+    }
+
+    public List<StateBusinessAux> toList(){
+        List<StateBusinessAux> list = new ArrayList<>();
+        states.forEach((state,c)->
+                c.forEach((city,b)->
+                        b.forEach((business,v)-> list.add(new StateBusinessAux(v,business,city,state)))));
+
+        return list;
     }
 
     /**

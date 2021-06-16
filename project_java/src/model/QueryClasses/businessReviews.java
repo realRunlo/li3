@@ -13,6 +13,14 @@ public class businessReviews {
     }
 
     /**
+     * Construtor de businessReviews
+     */
+    public businessReviews(int totalReviews,int totalScore){
+        this.totalReviews = totalReviews;
+        this.totalScore = totalScore;
+    }
+
+    /**
      * Incrementar o valor total das estrelas de um negocio
      * assim como o numero de reviews feitas nele
      * @param score nova review a registar
@@ -30,6 +38,14 @@ public class businessReviews {
         if(totalReviews > 0)
         return (float) (totalScore*1.0/totalReviews);
         else return 0;
+    }
+
+    /**
+     * Clone de businessReviews
+     * @return clone
+     */
+    public businessReviews clone(){
+        return new businessReviews(totalReviews,totalScore);
     }
 
 }
