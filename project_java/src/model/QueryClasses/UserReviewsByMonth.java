@@ -18,6 +18,20 @@ public class UserReviewsByMonth {
     }
 
 
+
+    public int getTotalReviews(){
+        return totalReviews;
+    }
+
+    public int getVariety(){
+        return variety;
+    }
+
+    public double getAverage(){
+        return average;
+    }
+
+
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("Total reviews: ").append(totalReviews).append(", Variety: ").append(variety).append(", Average: ").append(average);

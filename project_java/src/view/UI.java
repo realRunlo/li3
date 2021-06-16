@@ -2,6 +2,7 @@ package view;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UI {
 
@@ -198,10 +199,55 @@ public class UI {
      * @param totalPages numero total de paginas
      */
     public void printTable(List<String> format,List<List<String>> values, int page ,int totalPages){
+        //descobre a string de maior comprimento
+        AtomicInteger maxLenght = new AtomicInteger(0);
+        format.forEach(s->{
+            if(s.length() > maxLenght.get()) maxLenght.set(s.length());
+        });
+
+        values.forEach(list->list.forEach(v->{
+            if(v.length() > maxLenght.get()) maxLenght.set(v.length());
+        }));
+        maxLenght.addAndGet(2); //espacamento na coluna
+
         StringBuilder sb = new StringBuilder();
-        format.forEach(f-> sb.append(f).append(" "));
+        sb.append("|");
+        for (int i = 0; i<(maxLenght.get()*format.size() + format.size()-1);i++) sb.append("-");
+        sb.append("|\n");
+        format.forEach(f-> {
+            sb.append("|");
+            int length =  maxLenght.get() - f.length();
+            int left = length/2, right = length/2;
+            if(length%2 != 0){
+                left += 1;
+            }
+            for(int i = 0;i<left;i++) sb.append(" ");
+            sb.append(f);
+            for(int i = 0;i<right;i++) sb.append(" ");
+        });
+        sb.append("|\n");
+
+        values.forEach(v->{
+            sb.append("|");
+            for (int i = 0; i<(maxLenght.get()*format.size() + format.size()-1);i++) sb.append("-");
+            sb.append("|\n");
+            v.forEach(c->{
+                sb.append("|");
+                int length =  maxLenght.get() - c.length();
+                int left = length/2, right = length/2;
+                if(length%2 != 0){
+                    left += 1;
+                }
+                for(int i = 0;i<left;i++) sb.append(" ");
+                sb.append(c);
+                for(int i = 0;i<right;i++) sb.append(" ");
+            });
+            sb.append("|\n");
+        });
+        sb.append("|");
+        for (int i = 0; i<(maxLenght.get()*format.size() + format.size() -1 );i++) sb.append("-");
+        sb.append("|");
         System.out.println(sb.toString());
-        values.forEach(v-> System.out.println(v.toString()));
         System.out.println("Page "+ page+" of "+totalPages );
     }
 

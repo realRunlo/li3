@@ -2,10 +2,7 @@ package controller;
 
 import model.Business;
 import model.Model;
-import model.QueryClasses.Query7aux;
-import model.QueryClasses.ReviewedPerMonth;
-import model.QueryClasses.StateBusiness;
-import model.QueryClasses.StateBusinessAux;
+import model.QueryClasses.*;
 import view.UI;
 
 import java.io.FileNotFoundException;
@@ -138,10 +135,11 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{3,4,6,7,9,10},()->false);
+        main.setSamePreCondition(new int[]{3,6,7,9,10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2,()->query1());
+        main.setHandler(4,()->teste(3));
         main.setHandler(5,()->query4());
         main.setHandler(8,()->query7());
         main.setHandler(11,()->query10());
@@ -355,6 +353,10 @@ public class GestReviews {
     //TODO: metodo de teste,apagar para entrega
     public void teste(int teste){
         if(teste == 1 ) System.out.println(data.query1().toString());
+        if(teste == 3){
+            ArrayList<UserReviewsByMonth> users = data.query3("rKmD1FKz-XXD7spAgMCKDg");
+            users.forEach(u-> System.out.println(u.getTotalReviews() +", "+u.getVariety()+", "+u.getAverage()));
+        }
         if(teste == 4) {
             ArrayList<ReviewedPerMonth> months = data.query4("8zehGz9jnxPqXtOc7KaJxA");
             months.forEach(k->System.out.println(k.toString()));
