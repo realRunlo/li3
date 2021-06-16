@@ -1,10 +1,7 @@
 package view;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class UI {
 
@@ -193,6 +190,16 @@ public class UI {
         is.nextLine();
     }
 
+
+    public void printTable(List<String> format,List<List<String>> values, int page ,int totalPages){
+        StringBuilder sb = new StringBuilder();
+        format.forEach(f-> sb.append(f).append(" "));
+        System.out.println(sb.toString());
+        values.forEach(v-> System.out.println(v.toString()));
+        System.out.println("Page "+ page+" of "+totalPages );
+    }
+
+
     /**
      * Torna o booleano de controlo em falso, para encerrar o menu
      */
@@ -263,6 +270,7 @@ public class UI {
             //  Handle any exceptions.
         }
     }
+
 
 }
 

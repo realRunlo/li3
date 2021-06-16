@@ -2,14 +2,13 @@ package controller;
 
 import model.Business;
 import model.Model;
-import model.QueryClasses.NotReviewed;
 import model.QueryClasses.ReviewedPerMonth;
 import view.UI;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-
+import java.util.stream.Collectors;
 
 
 public class GestReviews {
@@ -60,6 +59,12 @@ public class GestReviews {
     public GestReviews(String userFile, String businessFile, String reviewFile) throws IOException {
         data = new Model(userFile,businessFile,reviewFile,false);
     }
+
+    /**
+     * Metodo que inicia os menus do programa
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void run() throws IOException, ClassNotFoundException {
         UI initial = new UI(InitialMenu);
         initial.setPreCondition(2,()->data.getLoaded());
@@ -70,6 +75,11 @@ public class GestReviews {
         initial.SimpleRun();
     }
 
+    /**
+     * Menu de carregamento de dados
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private void loadData() throws IOException, ClassNotFoundException {
         UI load = new UI(LoadDataMenu);
 
@@ -84,6 +94,12 @@ public class GestReviews {
         load.SimpleRun();
     }
 
+    /**
+     * Carregamento de dados
+     * @param defaultFiles indica se o carregamento de dados
+     *                     sera atraves dos ficheiros default
+     *                     ou escolhidos pelo utilizador
+     */
     private void load(boolean defaultFiles){
         String u_file = usersFile;
         String b_file = businessesFile;
@@ -109,13 +125,19 @@ public class GestReviews {
         }
     }
 
+    /**
+     * Menu principal do programa, onde se podera utilizar as diversas
+     * queries e analisar as estatisticas dos dados
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
         main.setSamePreCondition(new int[]{3,4,5,6,7,8,9,10,11},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
-        main.setHandler(2,()->teste(1));
+        main.setHandler(2,()->query1());
 
 
         main.SimpleRun();
@@ -123,6 +145,47 @@ public class GestReviews {
 
 
 
+
+    public void query1(){
+        List<Business> query1 = new ArrayList<>(data.query1().getNotReviewed());
+        int size = query1.size();
+        boolean valid = false, validPage = true;
+        int page = 0,currentPage = 0, valuesPage = 10, totalPages = size/valuesPage;
+        String line = "";
+        List<String> format = new ArrayList<>();
+        format.add("Business_name");
+
+        while(!valid){
+            int i = 0;
+            if((valuesPage*page+i)>size) page = currentPage;
+            currentPage = page;
+            List<List<String>> values = new ArrayList<>();
+            //vai buscar os elementos para imprimir na pagina
+            while(i<valuesPage && (valuesPage*page+i)<size){
+                List<String> business = new ArrayList<>();
+                business.add(query1.get((valuesPage*page+i)).getName());
+                values.add(business);
+                i++;
+            }
+            //imprime a pagina
+            messages.printTable(format,values,page,totalPages);
+
+            //pede pelo input de uma nova pagina ou para retornar
+            try {
+                line = scanner.nextLine();
+                page = Integer.parseInt(line);
+                validPage = true;
+            } catch (NumberFormatException e) { // Não foi escrito um int
+                page = currentPage;
+                validPage = false;
+            }
+            if(line.equals("r") || line.equals("return")){
+                valid = true;
+            }else if(line.equals("n")) page++;
+            else if(line.equals("p")) page--;
+            else if(!validPage) messages.errorMessage("Insert a valid command");
+        }
+    }
 
 
 
@@ -151,6 +214,11 @@ public class GestReviews {
 
 //------------------------------------GENERAL METHODS--------------------------------
 
+    /**
+     * Metodo que pede e recebe um boolean do utilizador
+     * @param message mensagem a ser passada no pedido do boolean
+     * @return input do utilizador
+     */
     private boolean getBoolean(String message){
         boolean bol = false;
         boolean valid = false;

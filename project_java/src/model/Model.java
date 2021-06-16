@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Model implements Query1, Query3, Query4, Query7, Query10 {
+public class Model implements Statistics, Query1, Query3, Query4, Query7, Query10 {
     private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;

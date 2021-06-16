@@ -4,6 +4,7 @@ import model.Business;
 
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class NotReviewed  {
     private TreeSet<Business> notReviewed;
@@ -33,6 +34,12 @@ public class NotReviewed  {
      */
     public int getTotal(){
         return notReviewed.size();
+    }
+
+    public TreeSet<Business> getNotReviewed(){
+        TreeSet<Business> clone = new TreeSet<>(new NotReviewedComp());
+        notReviewed.forEach(b-> clone.add(b.clone()));
+        return clone;
     }
 
     /**
