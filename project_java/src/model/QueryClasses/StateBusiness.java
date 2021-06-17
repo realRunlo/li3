@@ -104,6 +104,11 @@ public class StateBusiness {
         states.get(state).get(city).get(b_id).addReview(score);
     }
 
+    /**
+     * Torna a hash dos negocios em uma lista de forma a ser
+     * facilmente printavel por pagina na view
+     * @return hash em formato lista
+     */
     public List<StateBusinessAux> toList(){
         List<StateBusinessAux> list = new ArrayList<>();
         states.forEach((state,c)->

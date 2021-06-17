@@ -2,6 +2,7 @@ import controller.GestReviews;
 import model.Model;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 
 public class GestReviewsAppMVC {
@@ -24,12 +25,12 @@ NÂO sei o que é mas estava na outra class que apagieo
         control.start();
         System.exit(0);
 
-*/      System.out.println("Loading");
+*/
+
         GestReviews execute = new GestReviews();
         execute.run();
-        System.out.println("Loaded");
 
-        execute.teste(10);
+
 
 
         /*

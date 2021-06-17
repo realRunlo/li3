@@ -31,7 +31,10 @@ public class GestReviews {
     private final String[] LoadDataMenu = new String[]{
             "Load Menu",
             "Default Files",
-            "Costum Files"};
+            "Costum Files",
+            "Default Object File",
+            "Costum Object File"
+    };
     private final String[] MainMenu = new String[]{
             "Main Menu",
             "Statistics",
@@ -44,7 +47,8 @@ public class GestReviews {
             "Query7",
             "Query8",
             "Query9",
-            "Query10"
+            "Query10",
+            "Save Object File"
     };
     /**
      * Construtor de GestReviews
@@ -95,6 +99,18 @@ public class GestReviews {
             load(false);
             load.returnMenu();
         });
+        load.setHandler(3,()->{
+            messages.normalMessage("Loading File...");
+            data = new Model("gestReviews.dat");
+            messages.confirmationMessage("File Loaded");
+            load.returnMenu();
+        });
+        load.setHandler(4,()->{
+            messages.normalMessage("Loading File...");
+            data = new Model(getString("Insert an object file to load"));
+            messages.confirmationMessage("File Loaded");
+            load.returnMenu();
+        });
         load.SimpleRun();
     }
 
@@ -109,12 +125,9 @@ public class GestReviews {
         String b_file = businessesFile;
         String r_file = reviewsFile;
         if(!defaultFiles){
-            messages.informationMessage("Insert user file");
-            u_file = scanner.nextLine();
-            messages.informationMessage("Insert business file");
-            b_file = scanner.nextLine();
-            messages.informationMessage("Insert review file");
-            r_file = scanner.nextLine();
+            u_file = getString("Insert user file");
+            b_file = getString("Insert business file");
+            r_file = getString("Insert review file");
         }
         boolean loadFriends = getBoolean("Do you wish to load users friends?");
         try {
@@ -146,7 +159,12 @@ public class GestReviews {
         main.setHandler(5, this::query4);
         main.setHandler(8, this::query7);
         main.setHandler(11, this::query10);
-
+        main.setHandler(12, ()->{
+            String line = getString("Insert a name for the file");
+            messages.normalMessage("Saving File...");
+            data.saveModel(line);
+            messages.confirmationMessage("File saved");
+        });
         main.SimpleRun();
     }
 
@@ -320,6 +338,14 @@ public class GestReviews {
         }
     }
 
+    /**
+     * Pede o input de uma pagina ao utilizador, atualiza o valor em
+     * atomicIntegers que sao utilizados pela funcao chamadora
+     * @param page local a atualizar a pagina
+     * @param currentPage pagina atual
+     * @param line linha a ser lida, caso de um comando especial
+     * @param valid controlo do ciclo da funcao chamadora
+     */
     private void getPage(AtomicInteger page, AtomicInteger currentPage, AtomicReference<String> line,AtomicBoolean valid){
         boolean validPage = true;
         //pede pelo input de uma nova pagina ou para retornar
@@ -418,8 +444,14 @@ public class GestReviews {
      * @return nome escolhido pelo utilizador
      */
     private String getString(String message){
-        messages.informationMessage(message);
-        return scanner.nextLine();
+        String line ="";boolean valid = false;
+        while(!valid){
+            messages.informationMessage(message);
+            line = scanner.nextLine();
+            if(line.length()>0) valid = true;
+            else messages.errorMessage("Invalid string");
+        }
+        return line;
     }
 
 

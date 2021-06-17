@@ -3,7 +3,7 @@ package model;
 import model.QueryClasses.*;
 import model.QueryInterfaces.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Model implements Statistics, Query1, Query3, Query4, Query7, Query10 {
+public class Model implements Statistics, Query1, Query3, Query4, Query7, Query10,Serializable {
     private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;
@@ -30,6 +30,7 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
         this.users = new UserCat();
         this.businesses = new BusinessCat();
         this.reviews = new ReviewCat();
+        this.loaded = false;
     }
 
     /**
@@ -46,6 +47,51 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
         this.businesses = new BusinessCat();
         this.reviews = new ReviewCat();
         load(userFile, businessFile, reviewFile,loadFriends);
+    }
+
+    /**
+     * Construtor de Model
+     * @param objectFile ficheiro de objetos de on de carregar
+     */
+    public Model(String objectFile) throws IOException, ClassNotFoundException {
+        this();
+        Model m = loadModel(objectFile);
+        if(m != null){
+            loaded = true;
+            users = m.users;
+            businesses = m.businesses;
+            reviews = m.reviews;
+            filesLoaded = m.filesLoaded;
+            invalidReviews = m.invalidReviews;
+        }
+    }
+
+    /**
+     * Grava o estado num ficheiro de objetos
+     * @param filename ficheiro onde gravar
+     * @throws IOException
+     */
+    public void saveModel(String filename) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filename);
+        int bufferSize = 16 * 1024;
+        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos, bufferSize));
+        oos.writeObject(this);
+        oos.flush();
+        oos.close();
+    }
+
+    /**
+     * le o estado de um  ficheiro de objetos
+     * @param filename ficheiro de onde carregar
+     * @throws IOException
+     */
+    public Model loadModel(String filename) throws IOException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(filename);
+        int bufferSize = 16 * 1024;
+        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(fis, bufferSize));
+        Model s = (Model) ois.readObject() ;
+        ois.close();
+        return s;
     }
 
 
@@ -401,6 +447,11 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
     }
 
 
+
+
+
+
+
     //-----------------------------ESTATISTICAS--------------------------------------------------------
 
     /**
@@ -504,6 +555,10 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
         return results;
     }
 
+    /**
+     * Torna os dados das estatisticas em formato string
+     * @return estatisticas
+     */
     public String statistics(){
         StringBuilder sb = new StringBuilder();
         sb.append("Loaded Files: ")

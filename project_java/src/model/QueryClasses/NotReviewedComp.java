@@ -2,9 +2,10 @@ package model.QueryClasses;
 
 import model.Business;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class NotReviewedComp implements Comparator<Business> {
+public class NotReviewedComp implements Comparator<Business>, Serializable {
     /**
      * Comparator que ordena businesses alfabeticamente atraves do seu nome
      * @param b1 primeiro business

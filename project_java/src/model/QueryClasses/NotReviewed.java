@@ -2,11 +2,12 @@ package model.QueryClasses;
 
 import model.Business;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class NotReviewed  {
+public class NotReviewed implements Serializable {
     private TreeSet<Business> notReviewed;
     private Integer total;
 

@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Review implements IReview{
+public class Review implements IReview, Serializable {
 
     private String review_id;
     private String user_id;
