@@ -6,6 +6,7 @@ import model.QueryInterfaces.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
 import java.time.format.DateTimeFormatter;
@@ -135,9 +136,9 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+           /* e.printStackTrace();
             //faz qualque coisa,se for dar printf usar metodos da view
-            System.out.println("error");
+            System.out.println("error");*/
         }
     }
 
@@ -160,9 +161,9 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            /*e.printStackTrace();
             //faz qualque coisa,se for dar printf usar metodos da view
-            System.out.println("error");
+            System.out.println("error");*/
         }
     }
 
@@ -189,9 +190,9 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            /*e.printStackTrace();
             //faz qualque coisa,se for dar printf usar metodos da view
-            System.out.println("error");
+            System.out.println("error");*/
         }
 
 
@@ -290,12 +291,9 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
                 if(rev.getDate().getMonthValue() == i){
                     totalRevs++;
                     totalStars += rev.getStars();
-
                 }
                 varietyList.clear();
-
             }
-
             reviewsByMonth.add(new UserReviewsByMonth(totalRevs,variety,(double) totalStars/totalRevs));
             totalRevs = 0;
             totalStars = 0;

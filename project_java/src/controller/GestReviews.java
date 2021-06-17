@@ -5,8 +5,10 @@ import model.Model;
 import model.QueryClasses.*;
 import view.UI;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.text.DateFormatSymbols;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -99,20 +101,31 @@ public class GestReviews {
             load(false);
             load.returnMenu();
         });
-        load.setHandler(3,()->{
-            messages.normalMessage("Loading File...");
-            data = new Model("gestReviews.dat");
-            messages.confirmationMessage("File Loaded");
-            load.returnMenu();
-        });
-        load.setHandler(4,()->{
-            String line = getString("Insert an object file to load");
-            messages.normalMessage("Loading File...");
-            data = new Model(line);
-            messages.confirmationMessage("File Loaded");
-            load.returnMenu();
-        });
+        load.setHandler(3,()->loadObject(load,true));
+        load.setHandler(4,()->loadObject(load,false));
         load.SimpleRun();
+    }
+
+    /**
+     * Carrega um ficheiro de objetos
+     * @param menu menu atual
+     * @param defaultFile indica se o utilizador pretende carregar um ficheiro
+     *                    por ele escolhido
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private void loadObject(UI menu,boolean defaultFile) throws IOException, ClassNotFoundException {
+        String file = "gestReviews.dat";
+        if(!defaultFile){
+            file = getString("Insert an object file to load");
+        }
+        File f = new File(file);
+        if(f.exists() && !f.isDirectory()){
+            messages.normalMessage("Loading File...");
+            data = new Model(file);
+            messages.confirmationMessage("File Loaded");
+        }else messages.errorMessage("Invalid file");
+        menu.returnMenu();
     }
 
     /**
@@ -131,16 +144,20 @@ public class GestReviews {
             r_file = getString("Insert review file");
         }
         boolean loadFriends = getBoolean("Do you wish to load users friends?");
-        try {
-            messages.normalMessage("Loading");
-            this.data = new Model(u_file,b_file,r_file,loadFriends);
-            messages.confirmationMessage("Files Loaded");
-        } catch(FileNotFoundException e){
-            messages.errorMessage("File not found");
-        }
-        catch(IOException e){
-            messages.errorMessage("Error accessing the file");
-        }
+        File u = new File(u_file);
+        File b = new File(b_file);
+        File r = new File(r_file);
+        if(u.exists() && !u.isDirectory() && b.exists() && !b.isDirectory() && r.exists() && !r.isDirectory()) {
+            try {
+                messages.normalMessage("Loading");
+                this.data = new Model(u_file, b_file, r_file, loadFriends);
+                messages.confirmationMessage("Files Loaded");
+            } catch (FileNotFoundException e) {
+                messages.errorMessage("File not found");
+            } catch (IOException e) {
+                messages.errorMessage("Error accessing the file");
+            }
+        }else messages.errorMessage("Invalid files");
     }
 
     /**
@@ -230,7 +247,7 @@ public class GestReviews {
             AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
             int valuesPage = 10, totalPages = size / valuesPage;
             AtomicReference<String> line = new AtomicReference<>("");
-            int total = 0,unique = 0;float average =0;
+            int total = 0,unique = 0;float average = 0;
 
             while (!valid.get()) {
                 messages.normalMessage("Execution Time: " + time + " miliseconds");
