@@ -9,6 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -138,11 +141,11 @@ public class GestReviews {
         main.setSamePreCondition(new int[]{3,6,7,9,10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
-        main.setHandler(2,()->query1());
+        main.setHandler(2, this::query1);
         main.setHandler(4,()->teste(3));
-        main.setHandler(5,()->query4());
-        main.setHandler(8,()->query7());
-        main.setHandler(11,()->query10());
+        main.setHandler(5, this::query4);
+        main.setHandler(8, this::query7);
+        main.setHandler(11, this::query10);
 
         main.SimpleRun();
     }
@@ -152,46 +155,37 @@ public class GestReviews {
      * Executa a query1 e faz os passos necessarios de modo
      * a tornar os resultados obtidos paginaveis
      */
-    public void query1(){
+    private void query1(){
         List<String> format = turnFormat(new String[]{"Business_name"});
         List<Business> query1 = new ArrayList<>(data.query1().getNotReviewed());
         int size = query1.size();
-        boolean valid = false, validPage = true;
-        int page = 0,currentPage = 0, valuesPage = 10, totalPages = size/valuesPage;
-        String line = "";
+        AtomicBoolean valid = new AtomicBoolean(false);
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
 
-
-
-        while(!valid){
+        while(!valid.get()){
             int i = 0;
-            if((valuesPage*page+i)>size) page = currentPage;
-            currentPage = page;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+            currentPage.set(page.get());
             List<List<String>> values = new ArrayList<>();
+
             //vai buscar os elementos para imprimir na pagina
-            while(i<valuesPage && (valuesPage*page+i)<size){
-                int element = valuesPage * page + i;
+            while(i<valuesPage && element<size){
                 List<String> business = new ArrayList<>();
                 business.add(query1.get((element)).getName());
                 values.add(business);
                 i++;
+                element = valuesPage * page.get() + i;
             }
             //imprime a pagina
-            messages.printTable(format,values,page,totalPages);
-
-            //pede pelo input de uma nova pagina ou para retornar
-            try {
-                line = scanner.nextLine();
-                page = Integer.parseInt(line);
-                validPage = true;
-            } catch (NumberFormatException e) { // Não foi escrito um int
-                page = currentPage;
-                validPage = false;
-            }
-            if(line.equals("r") || line.equals("return")){
-                valid = true;
-            }else if(line.equals("n")) page++;
-            else if(line.equals("p")) page--;
-            else if(!validPage) messages.errorMessage("Insert a valid command");
+            messages.printTable(format, values, page.get(), totalPages);
+            getPage(page,currentPage,line,valid);
         }
     }
 
@@ -199,26 +193,31 @@ public class GestReviews {
      * Executa a query4 e faz os passos necessarios de modo
      * a tornar os resultados obtidos paginaveis
      */
-    public void query4(){
+    private void query4(){
         String b_id = getString("Insert a businessId to analyse reviews on it by month");
         if(data.existsBusiness(b_id)) {
             List<String> format = turnFormat(new String[]{"Month","Total Reviews","Unique Users","Average Score"});
             ArrayList<ReviewedPerMonth> query4 = data.query4(b_id);
             int size = query4.size();
-            boolean valid = false, validPage = true;
-            int page = 0, currentPage = 0, valuesPage = 10, totalPages = size / valuesPage;
-            String line = "";
+            AtomicBoolean valid = new AtomicBoolean(false);
+            AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+            int valuesPage = 10, totalPages = size / valuesPage;
+            AtomicReference<String> line = new AtomicReference<>("");
             int total = 0,unique = 0;float average =0;
 
-
-            while (!valid) {
+            while (!valid.get()) {
                 int i = 0;
-                if ((valuesPage * page + i) > size) page = currentPage;
-                currentPage = page;
+                if (page.get() < 0) page.set(0);
+                int element = valuesPage * page.get() + i;
+                if (element > size){
+                    page.set(currentPage.get());
+                    element = valuesPage * page.get() + i;
+                }
+                currentPage.set(page.get());
                 List<List<String>> values = new ArrayList<>();
+
                 //vai buscar os elementos para imprimir na pagina
-                while (i < valuesPage && (valuesPage * page + i) < size) {
-                    int element = valuesPage * page + i;
+                while (i < valuesPage && element < size) {
                     List<String> month = new ArrayList<>();
                     month.add(monthString(element));
                     total = query4.get((element)).getTotalReviews();
@@ -229,24 +228,11 @@ public class GestReviews {
                     month.add(String.valueOf(average));
                     values.add(month);
                     i++;
+                    element = valuesPage * page.get() + i;
                 }
                 //imprime a pagina
-                messages.printTable(format, values, page, totalPages);
-
-                //pede pelo input de uma nova pagina ou para retornar
-                try {
-                    line = scanner.nextLine();
-                    page = Integer.parseInt(line);
-                    validPage = true;
-                } catch (NumberFormatException e) { // Não foi escrito um int
-                    page = currentPage;
-                    validPage = false;
-                }
-                if (line.equals("r") || line.equals("return")) {
-                    valid = true;
-                } else if (line.equals("n")) page++;
-                else if (line.equals("p")) page--;
-                else if (!validPage) messages.errorMessage("Insert a valid command");
+                messages.printTable(format, values, page.get(), totalPages);
+                getPage(page,currentPage,line,valid);
             }
         }else messages.errorMessage("Invalid business id");
     }
@@ -255,45 +241,38 @@ public class GestReviews {
      * Executa a query7 e faz os passos necessarios de modo
      * a tornar os resultados obtidos paginaveis
      */
-    public void query7(){
+    private void query7(){
         List<String> format = turnFormat(new String[]{"City","Business_name"});
         List<Query7aux> query7 = data.query7();
         int size = query7.size();
-        boolean valid = false, validPage = true;
-        int page = 0, currentPage = 0, valuesPage = 10, totalPages = size / valuesPage;
-        String line = "";
+        AtomicBoolean valid = new AtomicBoolean(false);
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
 
-        while (!valid) {
+        while (!valid.get()) {
             int i = 0;
-            if ((valuesPage * page + i) > size) page = currentPage;
-            currentPage = page;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+            currentPage.set(page.get());
             List<List<String>> values = new ArrayList<>();
+
             //vai buscar os elementos para imprimir na pagina
-            while (i < valuesPage && (valuesPage * page + i) < size) {
-                int element = valuesPage * page + i;
+            while (i < valuesPage && element < size) {
                 List<String> business = new ArrayList<>();
                 business.add(query7.get(element).getCity());
                 business.add(query7.get(element).getB_name());
                 values.add(business);
                 i++;
+                element = valuesPage * page.get() + i;
             }
             //imprime a pagina
-            messages.printTable(format, values, page, totalPages);
-
-            //pede pelo input de uma nova pagina ou para retornar
-            try {
-                line = scanner.nextLine();
-                page = Integer.parseInt(line);
-                validPage = true;
-            } catch (NumberFormatException e) { // Não foi escrito um int
-                page = currentPage;
-                validPage = false;
-            }
-            if (line.equals("r") || line.equals("return")) {
-                valid = true;
-            } else if (line.equals("n")) page++;
-            else if (line.equals("p")) page--;
-            else if (!validPage) messages.errorMessage("Insert a valid command");
+            messages.printTable(format, values, page.get(), totalPages);
+            getPage(page,currentPage,line,valid);
         }
     }
 
@@ -302,22 +281,29 @@ public class GestReviews {
      * Executa a query10 e faz os passos necessarios de modo
      * a tornar os resultados obtidos paginaveis
      */
-    public void query10(){
+    private void query10(){
         List<String> format = turnFormat(new String[]{"State","City","Business Id","Average Score"});
         List<StateBusinessAux> query10 = data.query10().toList();
         int size = query10.size();
-        boolean valid = false, validPage = true;
-        int page = 0, currentPage = 0, valuesPage = 10, totalPages = size / valuesPage;
-        String line = "";
+        AtomicBoolean valid = new AtomicBoolean(false);
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
 
-        while (!valid) {
+        while (!valid.get()) {
             int i = 0;
-            if ((valuesPage * page + i) > size) page = currentPage;
-            currentPage = page;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+
+            currentPage.set(page.get());
             List<List<String>> values = new ArrayList<>();
+
             //vai buscar os elementos para imprimir na pagina
-            while (i < valuesPage && (valuesPage * page + i) < size) {
-                int element = valuesPage * page + i;
+            while (i < valuesPage && element < size) {
                 List<String> business = new ArrayList<>();
                 business.add(query10.get(element).getState());
                 business.add(query10.get(element).getCity());
@@ -325,28 +311,32 @@ public class GestReviews {
                 business.add(String.valueOf(query10.get(element).getBusinessReviews().calcAverage()));
                 values.add(business);
                 i++;
+                element = valuesPage * page.get() + i;
             }
             //imprime a pagina
-            messages.printTable(format, values, page, totalPages);
+            messages.printTable(format, values, page.get(), totalPages);
+            getPage(page,currentPage,line,valid);
 
-            //pede pelo input de uma nova pagina ou para retornar
-            try {
-                line = scanner.nextLine();
-                page = Integer.parseInt(line);
-                validPage = true;
-            } catch (NumberFormatException e) { // Não foi escrito um int
-                page = currentPage;
-                validPage = false;
-            }
-            if (line.equals("r") || line.equals("return")) {
-                valid = true;
-            } else if (line.equals("n")) page++;
-            else if (line.equals("p")) page--;
-            else if (!validPage) messages.errorMessage("Insert a valid command");
         }
     }
 
-
+    private void getPage(AtomicInteger page, AtomicInteger currentPage, AtomicReference<String> line,AtomicBoolean valid){
+        boolean validPage = true;
+        //pede pelo input de uma nova pagina ou para retornar
+        try {
+            line.set(scanner.nextLine());
+            page.set(Integer.parseInt(line.get()));
+            validPage = true;
+        } catch (NumberFormatException e) { // Não foi escrito um int
+            page.set(currentPage.get());
+            validPage = false;
+        }
+        if (line.get().equals("r") || line.get().equals("return")) {
+            valid.set(true);
+        } else if (line.get().equals("n")) page.incrementAndGet();
+        else if (line.get().equals("p")) page.decrementAndGet();
+        else if (!validPage) messages.errorMessage("Insert a valid command");
+    }
 
 
 

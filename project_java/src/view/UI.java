@@ -200,55 +200,71 @@ public class UI {
      */
     public void printTable(List<String> format,List<List<String>> values, int page ,int totalPages){
         //descobre a string de maior comprimento
-        AtomicInteger maxLenght = new AtomicInteger(0);
+        AtomicInteger maxLength = new AtomicInteger(0);
         format.forEach(s->{
-            if(s.length() > maxLenght.get()) maxLenght.set(s.length());
+            if(s.length() > maxLength.get()) maxLength.set(s.length());
         });
 
         values.forEach(list->list.forEach(v->{
-            if(v.length() > maxLenght.get()) maxLenght.set(v.length());
+            if(v.length() > maxLength.get()) maxLength.set(v.length());
         }));
-        maxLenght.addAndGet(2); //espacamento na coluna
+        maxLength.addAndGet(2); //espacamento na coluna
+
 
         StringBuilder sb = new StringBuilder();
-        sb.append("|");
-        for (int i = 0; i<(maxLenght.get()*format.size() + format.size()-1);i++) sb.append("-");
-        sb.append("|\n");
+        //imprime a primeira linha
+        sb.append(printLine(maxLength.get()*format.size() + format.size()-1));
         format.forEach(f-> {
-            sb.append("|");
-            int length =  maxLenght.get() - f.length();
-            int left = length/2, right = length/2;
-            if(length%2 != 0){
-                left += 1;
-            }
-            for(int i = 0;i<left;i++) sb.append(" ");
-            sb.append(f);
-            for(int i = 0;i<right;i++) sb.append(" ");
+            sb.append(printColumn(f,maxLength.get()));
         });
         sb.append("|\n");
 
+        //imprime as restantes linhas
         values.forEach(v->{
-            sb.append("|");
-            for (int i = 0; i<(maxLenght.get()*format.size() + format.size()-1);i++) sb.append("-");
-            sb.append("|\n");
+            sb.append(printLine(maxLength.get()*format.size() + format.size()-1));
             v.forEach(c->{
-                sb.append("|");
-                int length =  maxLenght.get() - c.length();
-                int left = length/2, right = length/2;
-                if(length%2 != 0){
-                    left += 1;
-                }
-                for(int i = 0;i<left;i++) sb.append(" ");
-                sb.append(c);
-                for(int i = 0;i<right;i++) sb.append(" ");
+                sb.append(printColumn(c,maxLength.get()));
             });
             sb.append("|\n");
         });
-        sb.append("|");
-        for (int i = 0; i<(maxLenght.get()*format.size() + format.size() -1 );i++) sb.append("-");
-        sb.append("|");
+        sb.append(printLine(maxLength.get()*format.size() + format.size()-1));
         System.out.println(sb.toString());
         System.out.println("Page "+ page+" of "+totalPages );
+        System.out.println("r - return/ p - previous/ n - next\nGo to page: ");
+    }
+
+    /**
+     * Auxiliar de printTable, prepara uma linha de separacao
+     * @param limit tamanho da linha
+     * @return linha
+     */
+    private String printLine(int limit){
+        StringBuilder sb = new StringBuilder();
+        sb.append("|");
+        for (int i = 0; i<limit;i++) sb.append("-");
+        sb.append("|\n");
+        return sb.toString();
+    }
+
+    /**
+     * Auxiliar de printTable, prepara um elemento de uma coluna
+     * @param value elemento da coluna
+     * @param maxLength maximo comprimento da pagina, usado para manter
+     *                  todas as colunas do mesmo tamanho e centradas
+     * @return coluna
+     */
+    private String printColumn(String value, int maxLength){
+        StringBuilder sb = new StringBuilder();
+        sb.append("|");
+        int length =  maxLength - value.length();
+        int left = length/2, right = length/2;
+        if(length%2 != 0){
+            left += 1;
+        }
+        for(int i = 0;i<left;i++) sb.append(" ");
+        sb.append(value);
+        for(int i = 0;i<right;i++) sb.append(" ");
+        return sb.toString();
     }
 
 
