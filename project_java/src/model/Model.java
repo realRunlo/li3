@@ -260,6 +260,9 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
         return results;
     }
 
+
+
+
     /**
      *
      * @param user_id
@@ -314,10 +317,6 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
         Map<String,Review> reviews = getReviews().values().stream()
                 .filter((r) -> r.getBusiness_id().equals(b_id))
                 .collect(Collectors.toMap(Review::getReview_id, r->r));
-
-        // TODO: apagar quando ja n for preciso testar
-        System.out.println("Reviews neste negocio: " + reviews.size());
-
         ArrayList<ReviewedPerMonth> monthReviews = new ArrayList<>(12);
         for (int i =0; i<12;i++) {
             monthReviews.add(new ReviewedPerMonth());

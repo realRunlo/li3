@@ -15,6 +15,6 @@ public class NotReviewedComp implements Comparator<Business>, Serializable {
     @Override
     public int compare(Business b1, Business b2){
 
-        return b1.getName().compareTo(b2.getName());
+        return b1.getId().compareTo(b2.getId());
     }
 }

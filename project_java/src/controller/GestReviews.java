@@ -106,8 +106,9 @@ public class GestReviews {
             load.returnMenu();
         });
         load.setHandler(4,()->{
+            String line = getString("Insert an object file to load");
             messages.normalMessage("Loading File...");
-            data = new Model(getString("Insert an object file to load"));
+            data = new Model(line);
             messages.confirmationMessage("File Loaded");
             load.returnMenu();
         });
@@ -174,8 +175,11 @@ public class GestReviews {
      * a tornar os resultados obtidos paginaveis
      */
     private void query1(){
-        List<String> format = turnFormat(new String[]{"Business_name"});
+        List<String> format = turnFormat(new String[]{"Business Id","Business Name"});
+        double startTime = System.nanoTime();
         List<Business> query1 = new ArrayList<>(data.query1().getNotReviewed());
+        double endTime = System.nanoTime();
+        double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = query1.size();
         AtomicBoolean valid = new AtomicBoolean(false);
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
@@ -183,6 +187,7 @@ public class GestReviews {
         AtomicReference<String> line = new AtomicReference<>("");
 
         while(!valid.get()){
+            messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
             int element = valuesPage * page.get() + i;
@@ -196,6 +201,7 @@ public class GestReviews {
             //vai buscar os elementos para imprimir na pagina
             while(i<valuesPage && element<size){
                 List<String> business = new ArrayList<>();
+                business.add(query1.get((element)).getId());
                 business.add(query1.get((element)).getName());
                 values.add(business);
                 i++;
@@ -215,7 +221,10 @@ public class GestReviews {
         String b_id = getString("Insert a businessId to analyse reviews on it by month");
         if(data.existsBusiness(b_id)) {
             List<String> format = turnFormat(new String[]{"Month","Total Reviews","Unique Users","Average Score"});
+            double startTime = System.nanoTime();
             ArrayList<ReviewedPerMonth> query4 = data.query4(b_id);
+            double endTime = System.nanoTime();
+            double time = (endTime - startTime) * ( Math.pow(10,-6));
             int size = query4.size();
             AtomicBoolean valid = new AtomicBoolean(false);
             AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
@@ -224,6 +233,7 @@ public class GestReviews {
             int total = 0,unique = 0;float average =0;
 
             while (!valid.get()) {
+                messages.normalMessage("Execution Time: " + time + " miliseconds");
                 int i = 0;
                 if (page.get() < 0) page.set(0);
                 int element = valuesPage * page.get() + i;
@@ -261,7 +271,10 @@ public class GestReviews {
      */
     private void query7(){
         List<String> format = turnFormat(new String[]{"City","Business_name"});
+        double startTime = System.nanoTime();
         List<Query7aux> query7 = data.query7();
+        double endTime = System.nanoTime();
+        double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = query7.size();
         AtomicBoolean valid = new AtomicBoolean(false);
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
@@ -269,6 +282,7 @@ public class GestReviews {
         AtomicReference<String> line = new AtomicReference<>("");
 
         while (!valid.get()) {
+            messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
             int element = valuesPage * page.get() + i;
@@ -301,7 +315,10 @@ public class GestReviews {
      */
     private void query10(){
         List<String> format = turnFormat(new String[]{"State","City","Business Id","Average Score"});
+        double startTime = System.nanoTime();
         List<StateBusinessAux> query10 = data.query10().toList();
+        double endTime = System.nanoTime();
+        double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = query10.size();
         AtomicBoolean valid = new AtomicBoolean(false);
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
@@ -309,6 +326,7 @@ public class GestReviews {
         AtomicReference<String> line = new AtomicReference<>("");
 
         while (!valid.get()) {
+            messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
             int element = valuesPage * page.get() + i;

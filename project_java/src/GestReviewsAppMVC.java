@@ -29,21 +29,5 @@ NÂO sei o que é mas estava na outra class que apagieo
 
         GestReviews execute = new GestReviews();
         execute.run();
-
-
-
-
-        /*
-        ReviewCat revs = new ReviewCat();
-        revs.loadFromFile("src/input_files/reviews_1M.csv");
-        //Review rev = revs.getReview("vEptHcIE9GqBES5fAR6AHw");
-        revs.print();*/
-        //System.out.println(rev.getBusiness_id());
-
-/*
-        UserCat users = new UserCat();
-        users.loadFromFile("src/input_files/users_full.csv");
-        users.print();*/
-
     }
 }
