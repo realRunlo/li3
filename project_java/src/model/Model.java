@@ -196,8 +196,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
             System.out.println("error");*/
         }
 
-
-
     }
 
     /**
@@ -280,7 +278,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
             getReviews().forEach((s,r)->
                     {
                         LocalDateTime date =  r.getDate();
-                        //System.out.println(date.getYear() +" " + date.getMonthValue());
                         if(date.getYear() == year && date.getMonthValue() == month)
                             result.incTotalReviews(r.getStars(),r.getUser_id());
                     });
@@ -358,7 +355,7 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
 
         for(Review rev : reviews.values()){
             String b_id = rev.getBusiness_id();
-            if(reviews.containsKey(b_id)){
+            if(reviews_bizs.containsKey(b_id)){
                 reviews_bizs.get(b_id).incTotal();
             }else{
                 reviews_bizs.put(b_id,new ReviewsByBizName(bizs.get(b_id).getName(),1));
