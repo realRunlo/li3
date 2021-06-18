@@ -3,6 +3,7 @@ package controller;
 import model.Business;
 import model.Model;
 import model.QueryClasses.*;
+import model.User;
 import view.UI;
 
 import java.io.File;
@@ -175,16 +176,17 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{9,10},()->false);
+        main.setSamePreCondition(new int[]{10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2, this::query1);
         main.setHandler(3, this::query2);
-        main.setHandler(4,this::query3);
+        main.setHandler(4, this::query3);
         main.setHandler(5, this::query4);
         main.setHandler(6, this::query5);
         main.setHandler(7, this::query6);
         main.setHandler(8, this::query7);
+        main.setHandler(9, this::query8);
         main.setHandler(11, this::query10);
         main.setHandler(12, ()->{
             String line = getString("Insert a name for the file");
@@ -531,6 +533,53 @@ public class GestReviews {
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
             getPage(page,currentPage,line,valid);
+        }
+    }
+
+
+    /**
+     * Executa a query8 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    private void query8(){
+        List<String> format = turnFormat(new String[]{"User Id","User Name","Total Reviews"});
+        double startTime = System.nanoTime();
+        List<TopReviewsAux> query8 = data.query8(getInt("Insert a top to calculate"));
+        double endTime = System.nanoTime();
+        double time = (endTime - startTime) * ( Math.pow(10,-6));
+        int size = query8.size();
+        AtomicBoolean valid = new AtomicBoolean(false);
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
+        Map<String, User> usersMap = data.getUsers();
+
+        while (!valid.get()) {
+            messages.normalMessage("Execution Time: " + time + " miliseconds");
+            int i = 0;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element >= size) {
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+            currentPage.set(page.get());
+            List<List<String>> values = new ArrayList<>();
+
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && element < size) {
+                TopReviewsAux u = query8.get(element);
+                List<String> users = new ArrayList<>();
+                users.add(u.getBus());
+                users.add(usersMap.get(u.getBus()).getName());
+                users.add(String.valueOf(u.getUniqueUsers()));
+                values.add(users);
+                i++;
+                element = valuesPage * page.get() + i;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page.get(), totalPages);
+            getPage(page, currentPage, line, valid);
         }
     }
 

@@ -39,10 +39,10 @@ public class TopReviews {
      * com apenas 'top' negocios em cada ano
      * @return lista de busScore
      */
-    public List<TopReviewsAux> topBus(){
+    public List<TopReviewsAux> topBus(Comparator<TopReviewsAux> comparator){
         Map<Integer,TreeSet<TopReviewsAux>> sort = new HashMap<>();
         busScore.forEach((k,v)-> {
-            sort.put(k,new TreeSet<>(new TopReviewsAuxComp()));
+            sort.put(k,new TreeSet<>(comparator));
             v.forEach((s,t) ->{
                 sort.get(k).add(t);
             });

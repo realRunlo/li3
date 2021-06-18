@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Query6, Query7, Query10,Serializable {
+public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Query6, Query7,Query8, Query10,Serializable {
     private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;
@@ -383,7 +383,7 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         getReviews().forEach((k,v)->{
             years.addReview(v.getDate().getYear(),v.getBusiness_id(),v.getUser_id());
         });
-        return years.topBus();
+        return years.topBus(new TopReviewsAuxComp());
     }
 
 
@@ -440,6 +440,34 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         results.forEach((k,v)-> v.forEach(b -> resultsList.add(new Query7aux(k,b))));
         return resultsList;
     }
+
+    /**
+     * Query8
+     * @param top numero de top user reviewers
+     * @return códigos dos top utilizadores que
+     * avaliaram mais negócios diferentes, indicando quantos, sendo o critério de
+     * ordenação a ordem decrescente do número de negócios
+     */
+    public List<TopReviewsAux> query8(int top){
+        //reutiliza a estrutura da query6 visto as querys serem bastante similares,
+        //a unica diferenca e que colocara todas as reviews no mesmo ano
+        TopReviews userMostReviews = new TopReviews(top);
+        getReviews().forEach((k,v)->{
+            userMostReviews.addReview(0,v.getUser_id(),v.getBusiness_id());
+        });
+        Comparator<TopReviewsAux> comparator = (t1, t2) -> {
+            if(t1.getUniqueUsers() == t2.getUniqueUsers()){
+                return t1.getBus().compareTo(t1.getBus());
+            }else{
+                return t2.getUniqueUsers() - t1.getUniqueUsers();
+            }
+        };
+        return userMostReviews.topBus(comparator);
+    }
+
+
+
+
 
     /**
      * Query10
