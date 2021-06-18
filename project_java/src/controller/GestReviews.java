@@ -175,12 +175,14 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{3,6,7,9,10},()->false);
+        main.setSamePreCondition(new int[]{7,9,10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2, this::query1);
+        main.setHandler(3, this::query2);
         main.setHandler(4,this::query3);
         main.setHandler(5, this::query4);
+        main.setHandler(6, this::query5);
         main.setHandler(8, this::query7);
         main.setHandler(11, this::query10);
         main.setHandler(12, ()->{
@@ -243,7 +245,54 @@ public class GestReviews {
     }
 
     /**
-     * Executa a query4 e faz os passos necessarios de modo
+     * Executa a query2 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    private void query2(){
+        List<String> format = turnFormat(new String[]{"Year","Month","Total Reviews","Unique Users"});
+        double startTime = System.nanoTime();
+        int year = getInt("Insert a year"), month = getInt("Insert a month (number format)");
+        ReviewedPerMonth query2 = data.query2(month,year);
+        double endTime = System.nanoTime();
+        double time = (endTime - startTime) * (Math.pow(10,-6));
+        int size = 1;
+        AtomicBoolean valid = new AtomicBoolean(false);
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
+
+        while(!valid.get()){
+            messages.normalMessage("Execution Time: " + time + " miliseconds");
+            int i = 0;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+            currentPage.set(page.get());
+            List<List<String>> values = new ArrayList<>();
+
+            //vai buscar os elementos para imprimir na pagina
+            while(i<valuesPage && element<size){
+                List<String> reviews = new ArrayList<>();
+                reviews.add(String.valueOf(year));
+                reviews.add(monthString(month-1));
+                reviews.add(String.valueOf(query2.getTotalReviews()));
+                reviews.add(String.valueOf(query2.getUniqueReviews()));
+                values.add(reviews);
+                i++;
+                element = valuesPage * page.get() + i;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page.get(), totalPages);
+            getPage(page,currentPage,line,valid);
+        }
+    }
+
+
+    /**
+     * Executa a query3 e faz os passos necessarios de modo
      * a tornar os resultados obtidos paginaveis
      */
     private void query3(){
@@ -348,6 +397,52 @@ public class GestReviews {
     }
 
     /**
+     * Executa a query5 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    private void query5(){
+        String u_id = getString("Insert a userId to analyse reviews on it by month");
+        if(data.existsUser(u_id)) {
+            List<String> format = turnFormat(new String[]{"Business_Name","Total Reviews"});
+            double startTime = System.nanoTime();
+            ArrayList<ReviewsByBizName> query5 = data.query5(u_id);
+            double endTime = System.nanoTime();
+            double time = (endTime - startTime) * ( Math.pow(10,-6));
+            int size = query5.size();
+            AtomicBoolean valid = new AtomicBoolean(false);
+            AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+            int valuesPage = 10, totalPages = size / valuesPage;
+            AtomicReference<String> line = new AtomicReference<>("");
+
+            while (!valid.get()) {
+                messages.normalMessage("Execution Time: " + time + " miliseconds");
+                int i = 0;
+                if (page.get() < 0) page.set(0);
+                int element = valuesPage * page.get() + i;
+                if (element > size){
+                    page.set(currentPage.get());
+                    element = valuesPage * page.get() + i;
+                }
+                currentPage.set(page.get());
+                List<List<String>> values = new ArrayList<>();
+
+                //vai buscar os elementos para imprimir na pagina
+                while (i < valuesPage && element < size) {
+                    List<String> business = new ArrayList<>();
+                    business.add(query5.get(element).getName());
+                    business.add(String.valueOf(query5.get(element).getTotal()));
+                    values.add(business);
+                    i++;
+                    element = valuesPage * page.get() + i;
+                }
+                //imprime a pagina
+                messages.printTable(format, values, page.get(), totalPages);
+                getPage(page,currentPage,line,valid);
+            }
+        }else messages.errorMessage("Invalid user id");
+    }
+
+    /**
      * Executa a query7 e faz os passos necessarios de modo
      * a tornar os resultados obtidos paginaveis
      */
@@ -438,31 +533,7 @@ public class GestReviews {
         }
     }
 
-    /**
-     * Pede o input de uma pagina ao utilizador, atualiza o valor em
-     * atomicIntegers que sao utilizados pela funcao chamadora
-     * @param page local a atualizar a pagina
-     * @param currentPage pagina atual
-     * @param line linha a ser lida, caso de um comando especial
-     * @param valid controlo do ciclo da funcao chamadora
-     */
-    private void getPage(AtomicInteger page, AtomicInteger currentPage, AtomicReference<String> line,AtomicBoolean valid){
-        boolean validPage = true;
-        //pede pelo input de uma nova pagina ou para retornar
-        try {
-            line.set(scanner.nextLine());
-            page.set(Integer.parseInt(line.get()));
-            validPage = true;
-        } catch (NumberFormatException e) { // Não foi escrito um int
-            page.set(currentPage.get());
-            validPage = false;
-        }
-        if (line.get().equals("r") || line.get().equals("return")) {
-            valid.set(true);
-        } else if (line.get().equals("n")) page.incrementAndGet();
-        else if (line.get().equals("p")) page.decrementAndGet();
-        else if (!validPage) messages.errorMessage("Insert a valid command");
-    }
+
 
 
 
@@ -552,6 +623,53 @@ public class GestReviews {
             else messages.errorMessage("Invalid string");
         }
         return line;
+    }
+
+    /**
+     * Metodo que pede ao utilizador que indique um int
+     * @return int escolhido pelo utilizador
+     */
+    private int getInt(String message){
+        String line ="";int op = 0;
+        boolean valid = false;
+        while(!valid) {
+            messages.informationMessage(message);
+            try {
+                line = scanner.nextLine();
+                op = Integer.parseInt(line);
+                valid = true;
+            } catch (NumberFormatException e) { // Não foi inscrito um int
+                valid = false;
+                messages.errorMessage("Invalid number");
+            }
+        }
+        return op;
+    }
+
+    /**
+     * Pede o input de uma pagina ao utilizador, atualiza o valor em
+     * atomicIntegers que sao utilizados pela funcao chamadora
+     * @param page local a atualizar a pagina
+     * @param currentPage pagina atual
+     * @param line linha a ser lida, caso de um comando especial
+     * @param valid controlo do ciclo da funcao chamadora
+     */
+    private void getPage(AtomicInteger page, AtomicInteger currentPage, AtomicReference<String> line,AtomicBoolean valid){
+        boolean validPage = true;
+        //pede pelo input de uma nova pagina ou para retornar
+        try {
+            line.set(scanner.nextLine());
+            page.set(Integer.parseInt(line.get()));
+            validPage = true;
+        } catch (NumberFormatException e) { // Não foi escrito um int
+            page.set(currentPage.get());
+            validPage = false;
+        }
+        if (line.get().equals("r") || line.get().equals("return")) {
+            valid.set(true);
+        } else if (line.get().equals("n")) page.incrementAndGet();
+        else if (line.get().equals("p")) page.decrementAndGet();
+        else if (!validPage) messages.errorMessage("Insert a valid command");
     }
 
 

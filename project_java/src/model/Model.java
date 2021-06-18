@@ -9,12 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Model implements Statistics, Query1, Query3, Query4, Query7, Query10,Serializable {
+public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5, Query7, Query10,Serializable {
     private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;
@@ -253,8 +254,6 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
      * @return lista ordenada alfabeticamente com os identificadores dos negócios nunca
      * avaliados e o seu respetivo total
      */
-    //Lista ordenada alfabeticamente com os identificadores dos negócios nunca
-    //avaliados e o seu respetivo total;
     public NotReviewed query1(){
         NotReviewed results = new NotReviewed();
         Map<String,Business> businesses = getBusinesses();
@@ -268,13 +267,35 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
         return results;
     }
 
+    /**
+     * Query2
+     * @param month mes das reviews a procurar
+     * @param year ano das reviews a procurar
+     * @return número total global de reviews
+     * realizadas e o número total de users distintos que as realizaram
+     */
+    public ReviewedPerMonth query2(int month, int year){
+        ReviewedPerMonth result = new ReviewedPerMonth();
+        if(month >0 && month <13 && year<= LocalDateTime.now().getYear()){
+            getReviews().forEach((s,r)->
+                    {
+                        LocalDateTime date =  r.getDate();
+                        //System.out.println(date.getYear() +" " + date.getMonthValue());
+                        if(date.getYear() == year && date.getMonthValue() == month)
+                            result.incTotalReviews(r.getStars(),r.getUser_id());
+                    });
+        }
+        return result;
+    }
+
 
 
 
     /**
-     *
+     * Query3
      * @param user_id
-     * @return
+     * @return para cada mês, quantas reviews fez,
+     * quantos negócios distintos avaliou e que nota média atribuiu
      */
     public ArrayList<ReviewedPerMonth> query3(String user_id){
 
@@ -319,9 +340,11 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
     }
 
     /**
-     *
-     * @param user_id
-     * @return
+     * Query5
+     * @param user_id codigo do user a analisar
+     * @return lista de nomes de negócios que mais
+     * avaliou (e quantos), ordenada por ordem decrescente de quantidade e, para
+     * quantidades iguais, por ordem alfabética dos negócios
      */
     public ArrayList<ReviewsByBizName> query5(String user_id){
 
@@ -330,12 +353,15 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
                                     .collect(Collectors.toMap(Review::getReview_id, r->r));
 
         Map<String,ReviewsByBizName> reviews_bizs = new HashMap<>();
+        Map<String,Business> bizs = getBusinesses();
+
 
         for(Review rev : reviews.values()){
-            if(reviews.containsKey(rev.getBusiness_id())){
-                reviews_bizs.get(rev.getBusiness_id()).incTotal();
+            String b_id = rev.getBusiness_id();
+            if(reviews.containsKey(b_id)){
+                reviews_bizs.get(b_id).incTotal();
             }else{
-                reviews_bizs.put(rev.getBusiness_id(),new ReviewsByBizName(rev.getBusiness_id(),1));
+                reviews_bizs.put(b_id,new ReviewsByBizName(bizs.get(b_id).getName(),1));
             }
         }
         
