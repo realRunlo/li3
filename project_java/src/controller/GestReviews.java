@@ -176,7 +176,6 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2, this::query1);
@@ -187,6 +186,7 @@ public class GestReviews {
         main.setHandler(7, this::query6);
         main.setHandler(8, this::query7);
         main.setHandler(9, this::query8);
+        main.setHandler(10, this::query9);
         main.setHandler(11, this::query10);
         main.setHandler(12, ()->{
             String line = getString("Insert a name for the file");
@@ -581,6 +581,57 @@ public class GestReviews {
             messages.printTable(format, values, page.get(), totalPages);
             getPage(page, currentPage, line, valid);
         }
+    }
+
+
+    /**
+     * Executa a query9 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    private void query9(){
+        String b_id = getString("Insert the business to search reviews from");
+        if(data.existsBusiness(b_id)) {
+            List<String> format = turnFormat(new String[]{"User Id", "User Name", "Total Reviews", "Average Score"});
+            double startTime = System.nanoTime();
+            List<TopReviewsAux> query9 = data.query9(b_id,getInt("Insert a top to calculate"));
+            double endTime = System.nanoTime();
+            double time = (endTime - startTime) * (Math.pow(10, -6));
+            int size = query9.size();
+            AtomicBoolean valid = new AtomicBoolean(false);
+            AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+            int valuesPage = 10, totalPages = size / valuesPage;
+            AtomicReference<String> line = new AtomicReference<>("");
+            Map<String, User> usersMap = data.getUsers();
+
+            while (!valid.get()) {
+                messages.normalMessage("Execution Time: " + time + " miliseconds");
+                int i = 0;
+                if (page.get() < 0) page.set(0);
+                int element = valuesPage * page.get() + i;
+                if (element >= size) {
+                    page.set(currentPage.get());
+                    element = valuesPage * page.get() + i;
+                }
+                currentPage.set(page.get());
+                List<List<String>> values = new ArrayList<>();
+
+                //vai buscar os elementos para imprimir na pagina
+                while (i < valuesPage && element < size) {
+                    TopReviewsAux u = query9.get(element);
+                    List<String> users = new ArrayList<>();
+                    users.add(u.getBus());
+                    users.add(usersMap.get(u.getBus()).getName());
+                    users.add(String.valueOf(u.getUniqueUsers()));
+                    users.add(String.valueOf(u.getAverage()));
+                    values.add(users);
+                    i++;
+                    element = valuesPage * page.get() + i;
+                }
+                //imprime a pagina
+                messages.printTable(format, values, page.get(), totalPages);
+                getPage(page, currentPage, line, valid);
+            }
+        }else messages.errorMessage("Business doens't exist");
     }
 
 

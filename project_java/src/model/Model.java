@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Query6, Query7,Query8, Query10,Serializable {
+public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Query6, Query7,Query8,Query9, Query10,Serializable {
     private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;
@@ -381,7 +381,7 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
     public List<TopReviewsAux> query6(int top){
         TopReviews years = new TopReviews(top);
         getReviews().forEach((k,v)->{
-            years.addReview(v.getDate().getYear(),v.getBusiness_id(),v.getUser_id());
+            years.addReview(v.getDate().getYear(),v.getBusiness_id(),v.getUser_id(),v.getStars());
         });
         return years.topBus(new TopReviewsAuxComp());
     }
@@ -453,7 +453,7 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         //a unica diferenca e que colocara todas as reviews no mesmo ano
         TopReviews userMostReviews = new TopReviews(top);
         getReviews().forEach((k,v)->{
-            userMostReviews.addReview(0,v.getUser_id(),v.getBusiness_id());
+            userMostReviews.addReview(0,v.getUser_id(),v.getBusiness_id(),v.getStars());
         });
         Comparator<TopReviewsAux> comparator = (t1, t2) -> {
             if(t1.getUniqueUsers() == t2.getUniqueUsers()){
@@ -463,6 +463,22 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
             }
         };
         return userMostReviews.topBus(comparator);
+    }
+
+    /**
+     * Query9
+     * @param b_id negocio cujas reviews procura
+     * @param top top users
+     * @return o conjunto dos top users que mais o
+     * avaliaram e, para cada um, qual o valor médio de classificação
+     */
+    public List<TopReviewsAux> query9(String b_id, int top){
+        TopReviews usersScore = new TopReviews(top);
+        getReviews().forEach((k,v)->{
+            if(v.getBusiness_id().equals(b_id))
+                usersScore.addReview(0,v.getUser_id(),b_id,v.getStars());
+        });
+        return usersScore.topBus(new TopReviewsAuxComp());
     }
 
 

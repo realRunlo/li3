@@ -6,6 +6,7 @@ import java.util.Set;
 public class TopReviewsAux {
     private int date;
     private int total;
+    private float totalScore;
     private String bus;
     private Set<String> uniqueUsers = new HashSet<>();
 
@@ -18,6 +19,7 @@ public class TopReviewsAux {
         this.date = date;
         this.bus = bus;
         this.total = 0;
+        this.totalScore = 0;
     }
 
     /**
@@ -25,9 +27,10 @@ public class TopReviewsAux {
      * ja tinha feito review antes na data da classe
      * @param u_id user quer fez a review
      */
-    public void addReview(String u_id){
+    public void addReview(String u_id,float score){
         uniqueUsers.add(u_id);
         total++;
+        totalScore+=score;
     }
 
     /**
@@ -53,4 +56,19 @@ public class TopReviewsAux {
      * @return data
      */
     public int getDate(){return date;}
+
+    /**
+     * Getter do totalScore
+     * @return totalScore
+     */
+    public float getTotalScore(){return totalScore;}
+
+    /**
+     * Calcula e retorna a media de reviews guardadas
+     * @return media
+     */
+    public float getAverage(){
+        if(total == 0) return 0;
+        return totalScore/total;
+    }
 }

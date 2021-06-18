@@ -24,13 +24,13 @@ public class TopReviews {
      * @param b_id negocio a ser avaliado
      * @param u_id user que avaliou
      */
-    public void addReview(int date,String b_id,String u_id){
+    public void addReview(int date,String b_id,String u_id,float score){
         if(!busScore.containsKey(date))
             busScore.put(date,new HashMap<>());
         if(!busScore.get(date).containsKey(b_id))
             busScore.get(date).put(b_id,new TopReviewsAux(b_id,date));
 
-        busScore.get(date).get(b_id).addReview(u_id);
+        busScore.get(date).get(b_id).addReview(u_id,score);
     }
 
 
