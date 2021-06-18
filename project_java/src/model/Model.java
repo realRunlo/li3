@@ -434,7 +434,7 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
 
         });
         List<Query7aux> resultsList = new ArrayList<>();
-        results.forEach((k,v)-> v.forEach(b -> resultsList.add(new Query7aux(k,b))));
+        results.forEach((k,v)-> v.forEach(b -> resultsList.add(new Query7aux(k,b,cities.get(k).get(b)))));
         return resultsList;
     }
 
