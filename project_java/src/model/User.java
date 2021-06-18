@@ -45,28 +45,14 @@ public class User implements IUser, Serializable {
         this.friends = us.friends;
     }
 
-    /**
-     * Getter do id do user
-     * @return id do user
-     */
+
     public String getUser_id(){return this.user_id;}
 
-    /**
-     * Getter do nome do user
-     * @return nome do user
-     */
+
     public String getName() {return this.name;}
 
-    /**
-     * Getter dos amigos do user
-     * @return amigos do user
-     */
     public String getFriends() { return this.friends;}
 
-    /**
-     * Clone de User
-     * @return clone
-     */
     public User clone(){ return new User(this);}
 
     /**
@@ -82,10 +68,6 @@ public class User implements IUser, Serializable {
 
     }
 
-    /**
-     * ToString de User
-     * @return User em formato string
-     */
     public String toString() {
         StringBuilder sb = new StringBuilder("Review {\n");
         sb.append("ID = '").append(user_id).append("'\n");

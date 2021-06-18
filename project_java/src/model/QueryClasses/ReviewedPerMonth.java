@@ -2,6 +2,9 @@ package model.QueryClasses;
 
 import java.util.HashMap;
 
+/**
+ * Avaliações por mês
+ */
 public class ReviewedPerMonth {
     private int totalReviews;
     private int uniqueReviews;

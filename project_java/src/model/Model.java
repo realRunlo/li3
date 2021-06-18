@@ -521,33 +521,16 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
 
     //-----------------------------ESTATISTICAS--------------------------------------------------------
 
-    /**
-     * Retorna a lista dos ficheiros lidos
-     * @return lista dos ficheiros lidos
-     */
     public List<String> getFilesLoaded(){
         return new ArrayList<>(filesLoaded);
     }
 
-    /**
-     * Retorna o numero de reviews invalidadas
-     * @return total de reviews invalidadas
-     */
     public int getInvalidReviews(){return invalidReviews;}
 
-
-    /**
-     * Metodo que retorna o numero total de negocios
-     * @return numero total de negocios
-     */
     public int getNumberOfBusinesses(){
         return this.businesses.size();
     }
 
-    /**
-     * Calcula o numero total de negocios distintos avaliados
-     * @return numero total de negocios distintos avaliados
-     */
     public int getDistinctBusinessesReviewed(){
         HashMap<String,Business> reviewed = new HashMap<>();
         Map<String,Business> businesses = getBusinesses();
@@ -559,26 +542,14 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return reviewed.size();
     }
 
-    /**
-     * Calcula o numero total de negocios nao avaliados
-     * @return numero de negocios nao avaliados
-     */
     public int getNotReviewdBusinesses(){
         return query1().getTotal();
     }
 
-    /**
-     * Calcula o numero de users diferentes
-     * @return numero de users
-     */
     public int getNumberOfUsers(){
         return getUsers().size();
     }
 
-    /**
-     * Calcula o numero de users ativos (realizaram reviews)
-     * @return numero de users ativos
-     */
     public int getNumberOfUserReviewers(){
         Set<String> userReviewer = new HashSet<>();
         getReviews().forEach((k,v) -> {
@@ -587,29 +558,16 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return userReviewer.size();
     }
 
-    /**
-     * Calcula o numero de users inativos (nao realizaram reviews)
-     * @return numero de users inativos
-     */
     public int getUsersNotReviewers(){
         return getNumberOfUsers() - getNumberOfUserReviewers();
     }
 
-    /**
-     * Calcula o numero de reviews sem impacto (somatorio dos parametros cool,funny ou useful igual a 0)
-     * @return numero de reviews sem impacto
-     */
     public int getNonImpactReviews(){
         return getReviews().values().stream().
                 filter(v -> v.getCool()+v.getFunny()+v.getUseful() == 0).
                 collect(Collectors.toSet()).size();
     }
 
-    /**
-     * Calcula, mes a mes, o numero total de reviews, numero de users distintos que
-     * fizeram reviews, o score medio
-     * @return lista dos calculos dos varios meses
-     */
     public List<ReviewedPerMonth> getReviewsPerMonth(){
         List<ReviewedPerMonth> results = new ArrayList<>(12);
         for (int i =0; i<12;i++) {
@@ -622,10 +580,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return results;
     }
 
-    /**
-     * Torna os dados das estatisticas em formato string
-     * @return estatisticas
-     */
     public String statistics(){
         StringBuilder sb = new StringBuilder();
         sb.append("Loaded Files: ")

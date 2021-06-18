@@ -22,27 +22,14 @@ public class UserCat implements IUserCat, Serializable {
         this.users = new HashMap<>();
     }
 
-    /**
-     * Adiciona um user no catalogo de users
-     * @param us user a adicionar
-     */
     public void addUser(User us){
         this.users.put(us.getUser_id(),us.clone());
     }
 
-    /**
-     * Getter do catalogo de users
-     * @return catalogo de users
-     */
     public Map<String,User> getUsers(){
         return users.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e->e.getValue().clone()));
     }
 
-    /**
-     * Verifica se um determinado user existe no catalogo de users
-     * @param id id do user a procurar
-     * @return resultado da procura
-     */
     public boolean containsId(String id){
         return users.containsKey(id);
     }

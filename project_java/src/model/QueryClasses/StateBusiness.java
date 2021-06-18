@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Auxiliar da query10 faz o map dos businesses de uma cidade de um estado
+ */
 public class StateBusiness {
     private Map<String,Map<String, Map<String, businessReviews>>> states;
 

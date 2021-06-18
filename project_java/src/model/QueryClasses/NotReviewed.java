@@ -7,6 +7,9 @@ import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+/**
+ * Guarda business não avaliados
+ */
 public class NotReviewed implements Serializable {
     private TreeSet<Business> notReviewed;
     private Integer total;

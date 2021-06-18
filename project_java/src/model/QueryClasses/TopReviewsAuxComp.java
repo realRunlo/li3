@@ -2,6 +2,9 @@ package model.QueryClasses;
 
 import java.util.Comparator;
 
+/**
+ * Um comparator da classe TopReviews
+ */
 public class TopReviewsAuxComp implements Comparator<TopReviewsAux> {
 
 

@@ -1,5 +1,6 @@
 package model.QueryClasses;
 
+
 public class Query7aux {
     private String city;
     private String b_name;

@@ -3,6 +3,9 @@ package model.QueryClasses;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Elementos da classe TopReviews
+ */
 public class TopReviewsAux {
     private int date;
     private int total;

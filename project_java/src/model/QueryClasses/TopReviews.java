@@ -5,6 +5,9 @@ import model.Business;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Classe auxiliar guarda tops
+ */
 public class TopReviews {
     private int top;
     private Map<Integer, Map<String,TopReviewsAux>> busScore = new HashMap<>();
