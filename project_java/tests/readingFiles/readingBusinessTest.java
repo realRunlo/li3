@@ -6,10 +6,7 @@ import model.Model;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
@@ -17,19 +14,34 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Classe de teste de leitura e carregamento de dados
+ * de ficheiros assim como procura desses dados em diferentes
+ * colections
+ */
 public class readingBusinessTest {
     private Model data = new Model();
     private static final String businessesFile = "src/input_files/business_full.csv";
+    private static final String objectFile = "tests/businessObject";
     public readingBusinessTest(){}
 
     @Before
     public void setup() throws IOException {
         data.load("",businessesFile,"",false);
+        FileOutputStream fos = new FileOutputStream(objectFile);
+        int bufferSize = 16 * 1024;
+        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos, bufferSize));
+        oos.writeObject(data.getBusinesses());
+        oos.flush();
+        oos.close();
     }
 
-
+    /**
+     * Teste de diferentes leituras
+     * @throws IOException
+     */
     @Test
-    public void loadTest() throws IOException {
+    public void loadTest() throws IOException, ClassNotFoundException {
         double mili = (Math.pow(10,-6));
 
         double startTime = System.nanoTime();
@@ -54,16 +66,37 @@ public class readingBusinessTest {
         endTime = System.nanoTime();
         double timeLineByLine = (endTime - startTime) * mili;
 
+        startTime = System.nanoTime();
+        FileInputStream fis = new FileInputStream(objectFile);
+        int bufferSize = 16 * 1024;
+        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(fis, bufferSize));
+        Map<String,Business> s = (Map<String,Business>) ois.readObject() ;
+        ois.close();
+        endTime = System.nanoTime();
+        double timeObject = (endTime - startTime) * mili;
+
+        startTime = System.nanoTime();
+        FileInputStream fis2 = new FileInputStream(objectFile);
+        ObjectInputStream ois2 = new ObjectInputStream(fis2);
+        Map<String,Business> s2 = (Map<String,Business>) ois2.readObject() ;
+        ois2.close();
+        endTime = System.nanoTime();
+        double timeObjectNoBuffer = (endTime - startTime) * mili;
 
         System.out.println("------------Reading----------\n"+
                 "Used method: " + timeNormal +" miliseconds\n"+
                 "Char by char: " + timeCharByChar +" miliseconds\n"+
                 "Char by char No Buffer: " + timeCharByChar2 +" miliseconds\n"+
                 "Line by line: " + timeLineByLine +" miliseconds\n"+
+                "Object File (elements - "+ s.size() +"): " + timeObject +" miliseconds\n"+
+                "Object File No Buffer(elements - "+ s.size() +"): " + timeObjectNoBuffer +" miliseconds\n"+
                 "-------------------------------------\n"
         );
     }
 
+    /**
+     * Teste de procura de um negocio em diferentes collections
+     */
     @Test
     public void searchTest(){
         String id ="8zehGz9jnxPqXtOc7KaJxA";
@@ -113,7 +146,10 @@ public class readingBusinessTest {
         );
     }
 
-
+    /**
+     * Carregamento caracter a caracter com uso de um buffer
+     * @throws IOException
+     */
     private void charByChar() throws IOException {
         BusinessCat businesseTestCharByChar = new BusinessCat();
         BufferedReader r = new BufferedReader(new FileReader(businessesFile));
@@ -130,6 +166,10 @@ public class readingBusinessTest {
         }
     }
 
+    /**
+     * Carregamento caracter a caracter sem uso de buffer
+     * @throws IOException
+     */
     private void charByCharNoBuffer() throws IOException {
         BusinessCat businesseTestCharByChar = new BusinessCat();
         FileReader r = new FileReader(businessesFile);
@@ -146,6 +186,10 @@ public class readingBusinessTest {
         }
     }
 
+    /**
+     * Carregamento linha a linha
+     * @throws IOException
+     */
     private void lineByLine() throws IOException {
         BusinessCat businesseLineByLine = new BusinessCat();
         BufferedReader r = new BufferedReader(new FileReader(businessesFile));
@@ -158,6 +202,8 @@ public class readingBusinessTest {
             }
         }
     }
+
+
 
 
 }
