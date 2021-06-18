@@ -58,7 +58,6 @@ public class query1Test {
     public NotReviewed query1SearchBusinessHash(){
         NotReviewed results = new NotReviewed();
         Map<String, Business> businesses = data.getBusinesses();
-        AtomicInteger i = new AtomicInteger(0);
         businesses.forEach((k,v)->{
             if(!data.businessReviewed(v.getId())) results.addBusiness(v);
         });

@@ -46,58 +46,107 @@ public class query5Test {
      */
     @Test
     public void query5Test(){
-        double mili = (Math.pow(10,-6));
-        Map<String,Business> bus = data.getBusinesses();
-        double startTime = System.nanoTime();
-        int elementNormalSearch = query5(userTestSearch,bus).size();
-        double endTime = System.nanoTime();
-        double timeNormalSearch = (endTime - startTime) * mili;
+        double total = 0;
+        double startTime = 0;
+        double endTime = 0;
+        int elementNormalSearch = 0,elementNormalInsertion=0,elementsListSearch=0,
+                elementsListInsertion=0,elementSetSearch=0,elementSetInsertion=0,
+                elementLinkedSearch=0,elementLinkedInsertion=0,elementLinkedHashSearch=0,
+                elementLinkedHashInsertion=0;
+        double mili = (Math.pow(10, -6));
+        Map<String, Business> bus = data.getBusinesses();
 
-        startTime = System.nanoTime();
-        int elementNormalInsertion = query5(userTestInsertion,bus).size();
-        endTime = System.nanoTime();
-        double timeNormalInsertion = (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementNormalSearch = query5(userTestSearch, bus).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeNormalSearch = total/10;
+        total = 0;
 
-        startTime = System.nanoTime();
-        int elementsListSearch = query5TestList(businessesList,userTestSearch).size();
-        endTime = System.nanoTime();
-        double timeListSearch = (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementNormalInsertion = query5(userTestInsertion, bus).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeNormalInsertion = total/10;
+        total = 0;
 
-        startTime = System.nanoTime();
-        int elementsListInsertion = query5TestList(businessesList,userTestInsertion).size();
-        endTime = System.nanoTime();
-        double timeListInsertion= (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementsListSearch = query5TestList(businessesList, userTestSearch).size();
+            endTime = System.nanoTime();
+            total+= (endTime - startTime) * mili;
+        }
+        double timeListSearch = total/10;
+        total=0;
 
-        startTime = System.nanoTime();
-        int elementSetSearch = query5TestSet(businessesSet,userTestSearch).size();
-        endTime = System.nanoTime();
-        double timeSetSearch = (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementsListInsertion = query5TestList(businessesList, userTestInsertion).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeListInsertion = total/10;
+        total= 0;
 
-        startTime = System.nanoTime();
-        int elementSetInsertion = query5TestSet(businessesSet,userTestInsertion).size();
-        endTime = System.nanoTime();
-        double timeSetInsertion = (endTime - startTime) * mili;
 
-        startTime = System.nanoTime();
-        int elementLinkedSearch = query5TestLinkedList(businessesLinkedList,userTestSearch).size();
-        endTime = System.nanoTime();
-        double timeLinkedSearch = (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementSetSearch = query5TestSet(businessesSet, userTestSearch).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeSetSearch = total/10;
+        total = 0;
 
-        startTime = System.nanoTime();
-        int elementLinkedInsertion = query5TestLinkedList(businessesLinkedList,userTestInsertion).size();
-        endTime = System.nanoTime();
-        double timeLinkedInsertion= (endTime - startTime) * mili;
 
-        startTime = System.nanoTime();
-        int elementLinkedHashSearch = query5TestLinkedHashMap(businessesLinkedHash,userTestSearch).size();
-        endTime = System.nanoTime();
-        double timeLinkedHashSearch = (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementSetInsertion = query5TestSet(businessesSet, userTestInsertion).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeSetInsertion = total/10;
+        total= 0;
 
-        startTime = System.nanoTime();
-        int elementLinkedHashInsertion = query5TestLinkedHashMap(businessesLinkedHash,userTestInsertion).size();
-        endTime = System.nanoTime();
-        double timeLinkedHashInsertion = (endTime - startTime) * mili;
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementLinkedSearch = query5TestLinkedList(businessesLinkedList, userTestSearch).size();
+            endTime = System.nanoTime();
+            total+=(endTime - startTime) * mili;
+        }
+        double timeLinkedSearch = total/10;
+        total=0;
 
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementLinkedInsertion = query5TestLinkedList(businessesLinkedList, userTestInsertion).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeLinkedInsertion = total/10;
+        total=0;
+
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementLinkedHashSearch = query5TestLinkedHashMap(businessesLinkedHash, userTestSearch).size();
+            endTime = System.nanoTime();
+            total += (endTime - startTime) * mili;
+        }
+        double timeLinkedHashSearch = total/10;
+        total=0;
+
+        for(int i = 0;i<10;i++) {
+            startTime = System.nanoTime();
+            elementLinkedHashInsertion = query5TestLinkedHashMap(businessesLinkedHash, userTestInsertion).size();
+            endTime = System.nanoTime();
+            total+=(endTime - startTime) * mili;
+        }
+        double timeLinkedHashInsertion = total/10;
+        total=0;
 
 
         System.out.println("------------Query5----------\n"+
