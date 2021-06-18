@@ -519,9 +519,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
 
 
 
-
-
-
     //-----------------------------ESTATISTICAS--------------------------------------------------------
 
     /**
@@ -662,15 +659,5 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
 
         return sb.toString();
     }
-
-
-
-
-//TODO metodo de teste, apagar antes de entregar
-    //metodo de teste
-    public void testeReviews(){
-        reviews.getReviews().forEach((k,v)-> System.out.println(v.toString()));
-    }
-
 
 }

@@ -215,13 +215,14 @@ public class GestReviews {
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = query1.size();
-        AtomicBoolean valid = new AtomicBoolean(false);
+        boolean valid = false;
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
 
-        while(!valid.get()){
+        while(!valid){
             messages.normalMessage("Execution Time: " + time + " miliseconds");
+            messages.normalMessage("Total elements: "+ size);
             int i = 0;
             if (page.get() < 0) page.set(0);
             int element = valuesPage * page.get() + i;
@@ -243,7 +244,7 @@ public class GestReviews {
             }
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
-            getPage(page,currentPage,line,valid);
+            valid=getPage(page,currentPage,line);
         }
     }
 
@@ -259,12 +260,12 @@ public class GestReviews {
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = 1;
-        AtomicBoolean valid = new AtomicBoolean(false);
+        boolean valid = false;
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
 
-        while(!valid.get()){
+        while(!valid){
             messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
@@ -289,7 +290,7 @@ public class GestReviews {
             }
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
-            getPage(page,currentPage,line,valid);
+            valid=getPage(page,currentPage,line);
         }
     }
 
@@ -307,13 +308,13 @@ public class GestReviews {
             double endTime = System.nanoTime();
             double time = (endTime - startTime) * ( Math.pow(10,-6));
             int size = query3.size();
-            AtomicBoolean valid = new AtomicBoolean(false);
+            boolean valid = false;
             AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
             int valuesPage = 10, totalPages = size / valuesPage;
             AtomicReference<String> line = new AtomicReference<>("");
             int total = 0,unique = 0;float average = 0;
 
-            while (!valid.get()) {
+            while (!valid) {
                 messages.normalMessage("Execution Time: " + time + " miliseconds");
                 int i = 0;
                 if (page.get() < 0) page.set(0);
@@ -341,7 +342,7 @@ public class GestReviews {
                 }
                 //imprime a pagina
                 messages.printTable(format, values, page.get(), totalPages);
-                getPage(page,currentPage,line,valid);
+                valid=getPage(page,currentPage,line);
             }
         }else messages.errorMessage("Invalid user id");
     }
@@ -360,13 +361,13 @@ public class GestReviews {
             double endTime = System.nanoTime();
             double time = (endTime - startTime) * ( Math.pow(10,-6));
             int size = query4.size();
-            AtomicBoolean valid = new AtomicBoolean(false);
+            boolean valid = false;
             AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
             int valuesPage = 10, totalPages = size / valuesPage;
             AtomicReference<String> line = new AtomicReference<>("");
             int total = 0,unique = 0;float average = 0;
 
-            while (!valid.get()) {
+            while (!valid) {
                 messages.normalMessage("Execution Time: " + time + " miliseconds");
                 int i = 0;
                 if (page.get() < 0) page.set(0);
@@ -394,7 +395,7 @@ public class GestReviews {
                 }
                 //imprime a pagina
                 messages.printTable(format, values, page.get(), totalPages);
-                getPage(page,currentPage,line,valid);
+                valid=getPage(page,currentPage,line);
             }
         }else messages.errorMessage("Invalid business id");
     }
@@ -412,12 +413,12 @@ public class GestReviews {
             double endTime = System.nanoTime();
             double time = (endTime - startTime) * ( Math.pow(10,-6));
             int size = query5.size();
-            AtomicBoolean valid = new AtomicBoolean(false);
+            boolean valid = false;
             AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
             int valuesPage = 10, totalPages = size / valuesPage;
             AtomicReference<String> line = new AtomicReference<>("");
 
-            while (!valid.get()) {
+            while (!valid) {
                 messages.normalMessage("Execution Time: " + time + " miliseconds");
                 int i = 0;
                 if (page.get() < 0) page.set(0);
@@ -440,7 +441,7 @@ public class GestReviews {
                 }
                 //imprime a pagina
                 messages.printTable(format, values, page.get(), totalPages);
-                getPage(page,currentPage,line,valid);
+                valid=getPage(page,currentPage,line);
             }
         }else messages.errorMessage("Invalid user id");
     }
@@ -456,13 +457,13 @@ public class GestReviews {
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * ( Math.pow(10,-6));
         int size = query6.size();
-        AtomicBoolean valid = new AtomicBoolean(false);
+        boolean valid = false;
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
         Map<String,Business> businessMap = data.getBusinesses();
 
-        while (!valid.get()) {
+        while (!valid) {
             messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
@@ -489,7 +490,7 @@ public class GestReviews {
             }
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
-            getPage(page, currentPage, line, valid);
+            valid=getPage(page, currentPage, line);
         }
     }
 
@@ -504,12 +505,12 @@ public class GestReviews {
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = query7.size();
-        AtomicBoolean valid = new AtomicBoolean(false);
+        boolean valid = false;
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
 
-        while (!valid.get()) {
+        while (!valid) {
             messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
@@ -532,7 +533,7 @@ public class GestReviews {
             }
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
-            getPage(page,currentPage,line,valid);
+            valid=getPage(page,currentPage,line);
         }
     }
 
@@ -548,13 +549,13 @@ public class GestReviews {
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * ( Math.pow(10,-6));
         int size = query8.size();
-        AtomicBoolean valid = new AtomicBoolean(false);
+        boolean valid = false;
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
         Map<String, User> usersMap = data.getUsers();
 
-        while (!valid.get()) {
+        while (!valid) {
             messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
@@ -579,7 +580,7 @@ public class GestReviews {
             }
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
-            getPage(page, currentPage, line, valid);
+            valid=getPage(page, currentPage, line);
         }
     }
 
@@ -597,13 +598,13 @@ public class GestReviews {
             double endTime = System.nanoTime();
             double time = (endTime - startTime) * (Math.pow(10, -6));
             int size = query9.size();
-            AtomicBoolean valid = new AtomicBoolean(false);
+            boolean valid = false;
             AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
             int valuesPage = 10, totalPages = size / valuesPage;
             AtomicReference<String> line = new AtomicReference<>("");
             Map<String, User> usersMap = data.getUsers();
 
-            while (!valid.get()) {
+            while (!valid) {
                 messages.normalMessage("Execution Time: " + time + " miliseconds");
                 int i = 0;
                 if (page.get() < 0) page.set(0);
@@ -629,7 +630,7 @@ public class GestReviews {
                 }
                 //imprime a pagina
                 messages.printTable(format, values, page.get(), totalPages);
-                getPage(page, currentPage, line, valid);
+                valid = getPage(page, currentPage, line);
             }
         }else messages.errorMessage("Business doens't exist");
     }
@@ -646,12 +647,12 @@ public class GestReviews {
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * (Math.pow(10,-6));
         int size = query10.size();
-        AtomicBoolean valid = new AtomicBoolean(false);
+        boolean valid = false;
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
 
-        while (!valid.get()) {
+        while (!valid) {
             messages.normalMessage("Execution Time: " + time + " miliseconds");
             int i = 0;
             if (page.get() < 0) page.set(0);
@@ -677,33 +678,8 @@ public class GestReviews {
             }
             //imprime a pagina
             messages.printTable(format, values, page.get(), totalPages);
-            getPage(page,currentPage,line,valid);
+            valid = getPage(page,currentPage,line);
 
-        }
-    }
-
-
-
-
-
-    //TODO: metodo de teste,apagar para entrega
-    public void teste(int teste){
-        if(teste == 1 ) System.out.println(data.query1().toString());
-        if(teste == 3){
-            ArrayList<ReviewedPerMonth> users = data.query3("rKmD1FKz-XXD7spAgMCKDg");
-            users.forEach(u-> System.out.println(u.getTotalReviews() +", "+u.getUniqueReviews()+", "+u.getAverage()));
-        }
-        if(teste == 4) {
-            ArrayList<ReviewedPerMonth> months = data.query4("8zehGz9jnxPqXtOc7KaJxA");
-            months.forEach(k->System.out.println(k.toString()));
-        }
-        if(teste == 7){
-            data.query7().forEach(k -> {System.out.println();
-                System.out.println(k.getCity() +" "+k.getB_name());
-            });
-        }
-        if(teste ==10){
-            System.out.println(data.query10().toString());
         }
     }
 
@@ -801,10 +777,11 @@ public class GestReviews {
      * @param page local a atualizar a pagina
      * @param currentPage pagina atual
      * @param line linha a ser lida, caso de um comando especial
-     * @param valid controlo do ciclo da funcao chamadora
+     * @return true caso tenha sido usado um comando para sair do ciclo
      */
-    private void getPage(AtomicInteger page, AtomicInteger currentPage, AtomicReference<String> line,AtomicBoolean valid){
+    private boolean getPage(AtomicInteger page, AtomicInteger currentPage, AtomicReference<String> line){
         boolean validPage = true;
+        boolean valid = false;
         //pede pelo input de uma nova pagina ou para retornar
         try {
             line.set(scanner.nextLine());
@@ -815,10 +792,11 @@ public class GestReviews {
             validPage = false;
         }
         if (line.get().equals("r") || line.get().equals("return")) {
-            valid.set(true);
+            valid = true;
         } else if (line.get().equals("n")) page.incrementAndGet();
         else if (line.get().equals("p")) page.decrementAndGet();
         else if (!validPage) messages.errorMessage("Insert a valid command");
+        return valid;
     }
 
 
