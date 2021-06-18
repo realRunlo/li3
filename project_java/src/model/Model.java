@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5, Query7, Query10,Serializable {
+public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Query6, Query7, Query10,Serializable {
     private boolean loaded;
     private UserCat users;
     private ReviewCat reviews;
@@ -371,6 +371,21 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5, 
         return reviews_bizsList;
 
     }
+
+    /**
+     * Query6
+     * @param top numero de negocios por ano
+     * @return conjunto dos top negócios mais avaliados (com mais reviews) em cada
+     * ano, indicando o número total de distintos utilizadores que o avaliaram;
+     */
+    public List<TopReviewsAux> query6(int top){
+        TopReviews years = new TopReviews(top);
+        getReviews().forEach((k,v)->{
+            years.addReview(v.getDate().getYear(),v.getBusiness_id(),v.getUser_id());
+        });
+        return years.topBus();
+    }
+
 
 
     /**

@@ -175,7 +175,7 @@ public class GestReviews {
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
 
-        main.setSamePreCondition(new int[]{7,9,10},()->false);
+        main.setSamePreCondition(new int[]{9,10},()->false);
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2, this::query1);
@@ -183,6 +183,7 @@ public class GestReviews {
         main.setHandler(4,this::query3);
         main.setHandler(5, this::query4);
         main.setHandler(6, this::query5);
+        main.setHandler(7, this::query6);
         main.setHandler(8, this::query7);
         main.setHandler(11, this::query10);
         main.setHandler(12, ()->{
@@ -250,8 +251,8 @@ public class GestReviews {
      */
     private void query2(){
         List<String> format = turnFormat(new String[]{"Year","Month","Total Reviews","Unique Users"});
-        double startTime = System.nanoTime();
         int year = getInt("Insert a year"), month = getInt("Insert a month (number format)");
+        double startTime = System.nanoTime();
         ReviewedPerMonth query2 = data.query2(month,year);
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * (Math.pow(10,-6));
@@ -440,6 +441,54 @@ public class GestReviews {
                 getPage(page,currentPage,line,valid);
             }
         }else messages.errorMessage("Invalid user id");
+    }
+
+    /**
+     * Executa a query6 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    private void query6(){
+        List<String> format = turnFormat(new String[]{"Year","Business Id","Business Name","Total","Unique Users"});
+        double startTime = System.nanoTime();
+        List<TopReviewsAux> query6 = data.query6(getInt("Insert a top to calculate"));
+        double endTime = System.nanoTime();
+        double time = (endTime - startTime) * ( Math.pow(10,-6));
+        int size = query6.size();
+        AtomicBoolean valid = new AtomicBoolean(false);
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
+        Map<String,Business> businessMap = data.getBusinesses();
+
+        while (!valid.get()) {
+            messages.normalMessage("Execution Time: " + time + " miliseconds");
+            int i = 0;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size) {
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+            currentPage.set(page.get());
+            List<List<String>> values = new ArrayList<>();
+
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && element < size) {
+                TopReviewsAux b = query6.get(element);
+                List<String> business = new ArrayList<>();
+                business.add(String.valueOf(b.getDate()));
+                business.add(b.getBus());
+                business.add(businessMap.get(b.getBus()).getName());
+                business.add(String.valueOf(b.getTotal()));
+                business.add(String.valueOf(b.getUniqueUsers()));
+                values.add(business);
+                i++;
+                element = valuesPage * page.get() + i;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page.get(), totalPages);
+            getPage(page, currentPage, line, valid);
+        }
     }
 
     /**
