@@ -7,7 +7,7 @@ public class ReviewedPerMonth {
     private int uniqueReviews;
     private float average;
     private float totalScore;
-    private HashMap<String,Integer> uniqueUserReviews;
+    private HashMap<String,Integer> uniqueReviewsHash;
 
     /**
      * Construtor de ReviewedPerMonth
@@ -17,7 +17,7 @@ public class ReviewedPerMonth {
         uniqueReviews = 0;
         average = 0;
         totalScore = 0;
-        uniqueUserReviews = new HashMap<>();
+        uniqueReviewsHash = new HashMap<>();
     }
 
     /**
@@ -52,9 +52,9 @@ public class ReviewedPerMonth {
     public void incTotalReviews(float score,String user_id){
         totalScore += score;
         totalReviews++;
-        if(!uniqueUserReviews.containsKey(user_id)) {
+        if(!uniqueReviewsHash.containsKey(user_id)) {
             uniqueReviews++;
-            uniqueUserReviews.put(user_id,0);
+            uniqueReviewsHash.put(user_id,0);
         }
         average = totalScore/totalReviews;
     }

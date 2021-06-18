@@ -242,6 +242,13 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
     public boolean existsBusiness(String b_id){return this.businesses.containsId(b_id);}
 
     /**
+     * Verifica se foi carregado um user com o dado id
+     * @param u_id user a procurar
+     * @return resultado da procura
+     */
+    public boolean existsUser(String u_id){return this.users.containsId(u_id);}
+
+    /**
      * Query1
      * @return lista ordenada alfabeticamente com os identificadores dos negócios nunca
      * avaliados e o seu respetivo total
@@ -269,36 +276,20 @@ public class Model implements Statistics, Query1, Query3, Query4, Query7, Query1
      * @param user_id
      * @return
      */
-    public ArrayList<UserReviewsByMonth> query3(String user_id){
+    public ArrayList<ReviewedPerMonth> query3(String user_id){
 
         //contem reviews do dado user
         Map<String,Review> reviews = getReviews().values().stream()
                                     .filter((r)->r.getUser_id().equals(user_id))
                                     .collect(Collectors.toMap(Review::getReview_id, r->r));
-        ArrayList<UserReviewsByMonth> reviewsByMonth= new ArrayList<>();
-        int totalRevs = 0;
-        int variety = 0;
-        int totalStars = 0;
-        ArrayList<String> varietyList = new ArrayList<>(12);
-        for(int i = 1;i<=12;i++){
-            for(Review rev : reviews.values()){
-                String busId = rev.getBusiness_id();
-                if(!varietyList.contains(busId)){
-                    varietyList.add(busId);
-                    variety++;
-                }
+        ArrayList<ReviewedPerMonth> reviewsByMonth= new ArrayList<>(12);
 
-                if(rev.getDate().getMonthValue() == i){
-                    totalRevs++;
-                    totalStars += rev.getStars();
-                }
-                varietyList.clear();
+        for(int i = 0; i<12;i++) reviewsByMonth.add(new ReviewedPerMonth());
+        reviews.forEach((k,v)-> {
+        int month = v.getDate().getMonthValue();
+        reviewsByMonth.get(month - 1).incTotalReviews(v.getStars(), v.getBusiness_id());
             }
-            reviewsByMonth.add(new UserReviewsByMonth(totalRevs,variety,(double) totalStars/totalRevs));
-            totalRevs = 0;
-            totalStars = 0;
-            variety = 0;
-        }
+        );
 
         return reviewsByMonth;
     }

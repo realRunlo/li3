@@ -8,6 +8,7 @@ import view.UI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.nio.file.NoSuchFileException;
 import java.text.DateFormatSymbols;
 import java.util.*;
@@ -122,8 +123,13 @@ public class GestReviews {
         File f = new File(file);
         if(f.exists() && !f.isDirectory()){
             messages.normalMessage("Loading File...");
-            data = new Model(file);
-            messages.confirmationMessage("File Loaded");
+            try {
+                data = new Model(file);
+                messages.confirmationMessage("File Loaded");
+            }
+            catch(InvalidClassException e){
+                messages.errorMessage("Error reading object file");
+            }
         }else messages.errorMessage("Invalid file");
         menu.returnMenu();
     }
@@ -173,15 +179,21 @@ public class GestReviews {
 
         main.setHandler(1,()->messages.showInfo(data.statistics()));
         main.setHandler(2, this::query1);
-        main.setHandler(4,()->teste(3));
+        main.setHandler(4,this::query3);
         main.setHandler(5, this::query4);
         main.setHandler(8, this::query7);
         main.setHandler(11, this::query10);
         main.setHandler(12, ()->{
             String line = getString("Insert a name for the file");
-            messages.normalMessage("Saving File...");
-            data.saveModel(line);
-            messages.confirmationMessage("File saved");
+            try {
+                messages.normalMessage("Saving File...");
+                data.saveModel(line);
+                messages.confirmationMessage("File saved");
+            }catch(FileNotFoundException e){
+                messages.normalMessage("Invalid name, using default name...");
+                data.saveModel("gestReviews.dat");
+                messages.confirmationMessage("File saved");
+            }
         });
         main.SimpleRun();
     }
@@ -229,6 +241,59 @@ public class GestReviews {
             getPage(page,currentPage,line,valid);
         }
     }
+
+    /**
+     * Executa a query4 e faz os passos necessarios de modo
+     * a tornar os resultados obtidos paginaveis
+     */
+    private void query3(){
+        String u_id = getString("Insert a userId to analyse reviews on it by month");
+        if(data.existsUser(u_id)) {
+            List<String> format = turnFormat(new String[]{"Month","Total Reviews","Unique Businesses","Average Score"});
+            double startTime = System.nanoTime();
+            ArrayList<ReviewedPerMonth> query3 = data.query3(u_id);
+            double endTime = System.nanoTime();
+            double time = (endTime - startTime) * ( Math.pow(10,-6));
+            int size = query3.size();
+            AtomicBoolean valid = new AtomicBoolean(false);
+            AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+            int valuesPage = 10, totalPages = size / valuesPage;
+            AtomicReference<String> line = new AtomicReference<>("");
+            int total = 0,unique = 0;float average = 0;
+
+            while (!valid.get()) {
+                messages.normalMessage("Execution Time: " + time + " miliseconds");
+                int i = 0;
+                if (page.get() < 0) page.set(0);
+                int element = valuesPage * page.get() + i;
+                if (element > size){
+                    page.set(currentPage.get());
+                    element = valuesPage * page.get() + i;
+                }
+                currentPage.set(page.get());
+                List<List<String>> values = new ArrayList<>();
+
+                //vai buscar os elementos para imprimir na pagina
+                while (i < valuesPage && element < size) {
+                    List<String> month = new ArrayList<>();
+                    month.add(monthString(element));
+                    total = query3.get((element)).getTotalReviews();
+                    unique = query3.get((element)).getUniqueReviews();
+                    average = query3.get((element)).getAverage();
+                    month.add(String.valueOf(total));
+                    month.add(String.valueOf(unique));
+                    month.add(String.valueOf(average));
+                    values.add(month);
+                    i++;
+                    element = valuesPage * page.get() + i;
+                }
+                //imprime a pagina
+                messages.printTable(format, values, page.get(), totalPages);
+                getPage(page,currentPage,line,valid);
+            }
+        }else messages.errorMessage("Invalid user id");
+    }
+
 
     /**
      * Executa a query4 e faz os passos necessarios de modo
@@ -405,8 +470,8 @@ public class GestReviews {
     public void teste(int teste){
         if(teste == 1 ) System.out.println(data.query1().toString());
         if(teste == 3){
-            ArrayList<UserReviewsByMonth> users = data.query3("rKmD1FKz-XXD7spAgMCKDg");
-            users.forEach(u-> System.out.println(u.getTotalReviews() +", "+u.getVariety()+", "+u.getAverage()));
+            ArrayList<ReviewedPerMonth> users = data.query3("rKmD1FKz-XXD7spAgMCKDg");
+            users.forEach(u-> System.out.println(u.getTotalReviews() +", "+u.getUniqueReviews()+", "+u.getAverage()));
         }
         if(teste == 4) {
             ArrayList<ReviewedPerMonth> months = data.query4("8zehGz9jnxPqXtOc7KaJxA");
