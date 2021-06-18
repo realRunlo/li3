@@ -41,7 +41,6 @@ public class GestReviews {
     };
     private final String[] MainMenu = new String[]{
             "Main Menu",
-            "Statistics",
             "Query1",
             "Query2",
             "Query3",
@@ -52,6 +51,7 @@ public class GestReviews {
             "Query8",
             "Query9",
             "Query10",
+            "Statistics",
             "Save Object File"
     };
     /**
@@ -175,20 +175,18 @@ public class GestReviews {
      */
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
-
-
-        main.setHandler(1,()->messages.showInfo(data.statistics()));
-        main.setHandler(2, this::query1);
-        main.setHandler(3, this::query2);
-        main.setHandler(4, this::query3);
-        main.setHandler(5, this::query4);
-        main.setHandler(6, this::query5);
-        main.setHandler(7, this::query6);
-        main.setHandler(8, this::query7);
-        main.setHandler(9, this::query8);
-        main.setHandler(10, this::query9);
-        main.setHandler(11, this::query10);
-        main.setHandler(12, ()->{
+        
+        main.setHandler(1, this::query1);
+        main.setHandler(2, this::query2);
+        main.setHandler(3, this::query3);
+        main.setHandler(4, this::query4);
+        main.setHandler(5, this::query5);
+        main.setHandler(6, this::query6);
+        main.setHandler(7, this::query7);
+        main.setHandler(8, this::query8);
+        main.setHandler(9, this::query9);
+        main.setHandler(10, this::query10);
+        main.setHandler(11, ()->{
             String line = getString("Insert a name for the file");
             try {
                 messages.normalMessage("Saving File...");
@@ -200,6 +198,7 @@ public class GestReviews {
                 messages.confirmationMessage("File saved");
             }
         });
+        main.setHandler(12,()->messages.showInfo(data.statistics()));
         main.SimpleRun();
     }
 
@@ -499,7 +498,7 @@ public class GestReviews {
      * a tornar os resultados obtidos paginaveis
      */
     private void query7(){
-        List<String> format = turnFormat(new String[]{"City","Business_name"});
+        List<String> format = turnFormat(new String[]{"City","Business Id","Business Name","Total Reviews"});
         double startTime = System.nanoTime();
         List<Query7aux> query7 = data.query7();
         double endTime = System.nanoTime();
@@ -509,6 +508,7 @@ public class GestReviews {
         AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
         int valuesPage = 10, totalPages = size / valuesPage;
         AtomicReference<String> line = new AtomicReference<>("");
+        Map<String,Business> businessMap = data.getBusinesses();
 
         while (!valid) {
             messages.normalMessage("Execution Time: " + time + " miliseconds");
@@ -525,8 +525,15 @@ public class GestReviews {
             //vai buscar os elementos para imprimir na pagina
             while (i < valuesPage && element < size) {
                 List<String> business = new ArrayList<>();
-                business.add(query7.get(element).getCity());
-                business.add(query7.get(element).getB_name());
+                String city = query7.get(element).getCity();
+                String b_id =query7.get(element).getB_id();
+                String b_name = businessMap.get(b_id).getName();
+                int total = query7.get(element).getTotalReviews();
+                business.add(city);
+                business.add(b_id);
+                business.add(b_name);
+                business.add(String.valueOf(total));
+
                 values.add(business);
                 i++;
                 element = valuesPage * page.get() + i;

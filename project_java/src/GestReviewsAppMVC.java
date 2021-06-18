@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class GestReviewsAppMVC {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        
+
         GestReviews execute = new GestReviews();
         execute.run();
     }
