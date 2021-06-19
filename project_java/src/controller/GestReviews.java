@@ -84,6 +84,7 @@ public class GestReviews {
      * @throws ClassNotFoundException ClassNotFoundException
      */
     public void run() throws IOException, ClassNotFoundException {
+        messages.showInfo(showWelcome());
         UI initial = new UI(InitialMenu);
         initial.setPreCondition(2,()->data.getLoaded());
 
@@ -91,6 +92,8 @@ public class GestReviews {
         initial.setHandler(2,()->mainMenu());
 
         initial.SimpleRun();
+
+        showTermination();
     }
 
     /**
@@ -946,6 +949,34 @@ public class GestReviews {
         else if (line.get().equals("p")) page.decrementAndGet();
         else if (!validPage) messages.errorMessage("Insert a valid command");
         return valid;
+    }
+
+    /**
+     * Metodo que gera a mensagem de boas vindas ao utilizador
+     * @return mensagem
+     */
+    private String showWelcome(){
+        StringBuilder sb = new StringBuilder();
+              sb.append("         _____  _____ _____  \n")
+                .append("        / ____|/ ____|  __ \\ \n")
+                .append("       | (___ | |  __| |__) |\n")
+                .append("        \\___ \\| | |_ |  _  / \n")
+                .append("        ____) | |__| | | \\ \\ \n")
+                .append("       |_____/ \\_____|_|  \\_\\ \n")
+                .append("       Java edition\n")
+                .append("Made by: \n")
+                .append("Group: 6\n")
+                .append("Developers: Gonçalo Braz,Gonçalo Pereira,Maria Sofia\n");
+
+
+        return sb.toString();
+    }
+
+    /**
+     * Imprime uma mensagem de despedida
+     */
+    private void showTermination(){
+        messages.informationMessage("Bye, we hope you enjoyed.");
     }
 
 
