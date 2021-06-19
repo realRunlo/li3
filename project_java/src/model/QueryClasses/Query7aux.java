@@ -1,6 +1,8 @@
 package model.QueryClasses;
 
-
+/**
+ * Auxiliar query7
+ */
 public class Query7aux {
     private String city;
     private String b_id;

@@ -2,6 +2,9 @@ package model;
 
 import java.io.Serializable;
 
+/**
+ * User
+ */
 public class User implements IUser, Serializable {
 
     private String user_id;

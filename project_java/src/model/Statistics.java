@@ -4,6 +4,9 @@ import model.QueryClasses.ReviewedPerMonth;
 
 import java.util.List;
 
+/**
+ * Interface estatisticas
+ */
 public interface Statistics {
 
     /**

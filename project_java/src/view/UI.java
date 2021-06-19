@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * User interface
+ */
 public class UI {
 
 

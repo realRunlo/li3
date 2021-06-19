@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Review
+ */
 public class Review implements IReview, Serializable {
 
     private String review_id;

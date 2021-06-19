@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Interface user
+ */
 public interface IUser {
     /**
      * Getter do id do user

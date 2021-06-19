@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Business catalogo
+ */
 public class BusinessCat implements IBusinessCat, Serializable {
 
     private Map<String,Business> bussinesses;

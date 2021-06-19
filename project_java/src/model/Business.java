@@ -3,6 +3,9 @@ package model;
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Business
+ */
 public class Business implements IBusiness, Serializable {
     private String id;
     private String name;

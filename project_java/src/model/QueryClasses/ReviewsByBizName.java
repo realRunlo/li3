@@ -3,6 +3,9 @@ package model.QueryClasses;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Reviews pelo nome do negócio
+ */
 public class ReviewsByBizName {
     private String business_name;
     private int total_reviews;

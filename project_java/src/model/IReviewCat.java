@@ -2,6 +2,9 @@ package model;
 
 import java.util.Map;
 
+/**
+ * Interface review catalogo
+ */
 public interface IReviewCat {
 
     /**

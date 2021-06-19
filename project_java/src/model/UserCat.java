@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Catalogo user
+ */
 public class UserCat implements IUserCat, Serializable {
 
     private Map<String,User> users;

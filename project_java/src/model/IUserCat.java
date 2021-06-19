@@ -2,6 +2,9 @@ package model;
 
 import java.util.Map;
 
+/**
+ * Interface user catalogo
+ */
 public interface IUserCat {
 
     /**

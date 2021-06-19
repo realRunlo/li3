@@ -2,6 +2,9 @@ package model.QueryClasses;
 
 import java.io.Serializable;
 
+/**
+ * Informação das reviews sobre um business
+ */
 public class businessReviews implements Serializable {
     private int totalReviews;
     private int totalScore;

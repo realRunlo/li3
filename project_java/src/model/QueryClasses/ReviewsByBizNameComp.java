@@ -2,6 +2,9 @@ package model.QueryClasses;
 
 import java.util.Comparator;
 
+/**
+ * Comparator da classe ReviewsByBizName
+ */
 public class ReviewsByBizNameComp implements Comparator<ReviewsByBizName> {
 
 

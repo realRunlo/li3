@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Interface business
+ */
 public interface IBusiness {
 
     /**

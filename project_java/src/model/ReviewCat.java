@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Catalogo review
+ */
 public class ReviewCat implements IReviewCat, Serializable {
 
     private Map<String,Review> reviews;

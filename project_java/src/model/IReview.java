@@ -2,6 +2,9 @@ package model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Interface review
+ */
 public interface IReview {
 
     /**

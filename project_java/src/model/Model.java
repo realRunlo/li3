@@ -15,6 +15,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/**
+ * Modelo,agrupa os dados e metodos de modelação dos mesmos
+ */
 public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Query6, Query7,Query8,Query9, Query10,Serializable {
     private boolean loaded;
     private UserCat users;
@@ -247,11 +250,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
      */
     public boolean existsUser(String u_id){return this.users.containsId(u_id);}
 
-    /**
-     * Query1
-     * @return lista ordenada alfabeticamente com os identificadores dos negócios nunca
-     * avaliados e o seu respetivo total
-     */
     public NotReviewed query1(){
         NotReviewed results = new NotReviewed();
         Map<String,Business> businesses = getBusinesses();
@@ -265,13 +263,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return results;
     }
 
-    /**
-     * Query2
-     * @param month mes das reviews a procurar
-     * @param year ano das reviews a procurar
-     * @return número total global de reviews
-     * realizadas e o número total de users distintos que as realizaram
-     */
     public ReviewedPerMonth query2(int month, int year){
         ReviewedPerMonth result = new ReviewedPerMonth();
         if(month >0 && month <13 && year<= LocalDateTime.now().getYear()){
@@ -285,15 +276,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return result;
     }
 
-
-
-
-    /**
-     * Query3
-     * @param user_id
-     * @return para cada mês, quantas reviews fez,
-     * quantos negócios distintos avaliou e que nota média atribuiu
-     */
     public ArrayList<ReviewedPerMonth> query3(String user_id){
 
         //contem reviews do dado user
@@ -312,13 +294,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return reviewsByMonth;
     }
 
-
-    /**
-     * Query4
-     * @param b_id codigo do negocio a analisar
-     * @return mês a mês, quantas vezes foi avaliado,
-     * por quantos users diferentes e a média de classificação
-     */
     public ArrayList<ReviewedPerMonth> query4(String b_id){
         //filtrar para ter apenas as reviews sobre o negocio em questao
         Map<String,Review> reviews = getReviews().values().stream()
@@ -336,13 +311,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return monthReviews;
     }
 
-    /**
-     * Query5
-     * @param user_id codigo do user a analisar
-     * @return lista de nomes de negócios que mais
-     * avaliou (e quantos), ordenada por ordem decrescente de quantidade e, para
-     * quantidades iguais, por ordem alfabética dos negócios
-     */
     public ArrayList<ReviewsByBizName> query5(String user_id){
 
         Map<String,Review> reviews = getReviews().values().stream()
@@ -369,12 +337,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
 
     }
 
-    /**
-     * Query6
-     * @param top numero de negocios por ano
-     * @return conjunto dos top negócios mais avaliados (com mais reviews) em cada
-     * ano, indicando o número total de distintos utilizadores que o avaliaram;
-     */
     public List<TopReviewsAux> query6(int top){
         TopReviews years = new TopReviews(top);
         getReviews().forEach((k,v)->{
@@ -383,13 +345,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return years.topBus(new TopReviewsAuxComp());
     }
 
-
-
-    /**
-     * Query7
-     * @return para cada cidade, a lista dos três mais famosos negócios em termos de
-     * número de reviews;
-     */
     public List<Query7aux> query7(){
 
         //Hash das diferentes cidades
@@ -438,13 +393,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return resultsList;
     }
 
-    /**
-     * Query8
-     * @param top numero de top user reviewers
-     * @return códigos dos top utilizadores que
-     * avaliaram mais negócios diferentes, indicando quantos, sendo o critério de
-     * ordenação a ordem decrescente do número de negócios
-     */
     public List<TopReviewsAux> query8(int top){
         //reutiliza a estrutura da query6 visto as querys serem bastante similares,
         //a unica diferenca e que colocara todas as reviews no mesmo ano
@@ -462,13 +410,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return userMostReviews.topBus(comparator);
     }
 
-    /**
-     * Query9
-     * @param b_id negocio cujas reviews procura
-     * @param top top users
-     * @return o conjunto dos top users que mais o
-     * avaliaram e, para cada um, qual o valor médio de classificação
-     */
     public List<TopReviewsAux> query9(String b_id, int top){
         TopReviews usersScore = new TopReviews(top);
         getReviews().forEach((k,v)->{
@@ -478,15 +419,6 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         return usersScore.topBus(new TopReviewsAuxComp());
     }
 
-
-
-
-
-    /**
-     * Query10
-     * @return para cada estado, cidade a cidade, a média de classificação de cada
-     * negócio
-     */
     public StateBusiness query10(){
         //hash de estados em que para cada estado tera uma hash das cidades do estado,
         //que, por sua vez terao um hash dos negocios e respetiva media

@@ -1,5 +1,8 @@
 package model.QueryClasses;
 
+/**
+ * Elemento da state business
+ */
 public class StateBusinessAux {
     private businessReviews b;
     private String id;

@@ -18,7 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-
+/**
+ * Controlador
+ */
 public class GestReviews {
     private Model data;
     private UI messages = new UI(new String[]{});
@@ -66,7 +68,7 @@ public class GestReviews {
      * @param userFile ficheiro para carregar os users
      * @param businessFile ficheiro para carregar os businesses
      * @param reviewFile ficheiro para carregar as reviews
-     * @throws IOException
+     * @throws IOException IOException
      */
     public GestReviews(String userFile, String businessFile, String reviewFile) throws IOException {
         data = new Model(userFile,businessFile,reviewFile,false);
@@ -74,8 +76,8 @@ public class GestReviews {
 
     /**
      * Metodo que inicia os menus do programa
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws IOException IOException
+     * @throws ClassNotFoundException ClassNotFoundException
      */
     public void run() throws IOException, ClassNotFoundException {
         UI initial = new UI(InitialMenu);
@@ -89,8 +91,8 @@ public class GestReviews {
 
     /**
      * Menu de carregamento de dados
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws IOException IOException
+     * @throws ClassNotFoundException ClassNotFoundException
      */
     private void loadData() throws IOException, ClassNotFoundException {
         UI load = new UI(LoadDataMenu);
@@ -113,8 +115,8 @@ public class GestReviews {
      * @param menu menu atual
      * @param defaultFile indica se o utilizador pretende carregar um ficheiro
      *                    por ele escolhido
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws IOException IOException
+     * @throws ClassNotFoundException ClassNotFoundException
      */
     private void loadObject(UI menu,boolean defaultFile) throws IOException, ClassNotFoundException {
         String file = "gestReviews.dat";
@@ -170,8 +172,8 @@ public class GestReviews {
     /**
      * Menu principal do programa, onde se podera utilizar as diversas
      * queries e analisar as estatisticas dos dados
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws IOException IOException
+     * @throws ClassNotFoundException ClassNotFoundException
      */
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
