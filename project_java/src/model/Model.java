@@ -453,10 +453,10 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
             userMostReviews.addReview(0,v.getUser_id(),v.getBusiness_id(),v.getStars());
         });
         Comparator<TopReviewsAux> comparator = (t1, t2) -> {
-            if(t1.getUniqueUsers() == t2.getUniqueUsers()){
-                return t1.getBus().compareTo(t1.getBus());
+            if(t1.getUnique() == t2.getUnique()){
+                return t1.getValue().compareTo(t1.getValue());
             }else{
-                return t2.getUniqueUsers() - t1.getUniqueUsers();
+                return t2.getUnique() - t1.getUnique();
             }
         };
         return userMostReviews.topBus(comparator);
