@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
  */
 public class TopReviews {
     private int top;
-    private Map<Integer, Map<String,TopReviewsAux>> busScore = new HashMap<>();
+    private Map<Integer, Map<String,TopReviewsAux>> elementScore = new HashMap<>();
 
     /**
      * Construtor de TopReviews
      * @param top guarda o top pretendido para quando for a devolver
-     *            o conjunto dos negocios mais avaliados
+     *            o conjunto dos elementos mais avaliados/ quem mais avaliaram
      */
     public TopReviews(int top){
         this.top = top;
@@ -24,27 +24,28 @@ public class TopReviews {
     /**
      * Adiciona uma review em um negocio em uma certa data
      * @param date data da review
-     * @param b_id negocio a ser avaliado
-     * @param u_id user que avaliou
+     * @param key elemento a ser avaliado
+     * @param value value que avaliou
      */
-    public void addReview(int date,String b_id,String u_id,float score){
-        if(!busScore.containsKey(date))
-            busScore.put(date,new HashMap<>());
-        if(!busScore.get(date).containsKey(b_id))
-            busScore.get(date).put(b_id,new TopReviewsAux(b_id,date));
+    public void addReview(int date,String key,String value,float score){
+        if(!elementScore.containsKey(date))
+            elementScore.put(date,new HashMap<>());
+        if(!elementScore.get(date).containsKey(key))
+            elementScore.get(date).put(key,new TopReviewsAux(key,date));
 
-        busScore.get(date).get(b_id).addReview(u_id,score);
+        elementScore.get(date).get(key).addReview(value,score);
     }
 
 
     /**
-     * Torna o map dos scores dos negocios em diferentes anos em uma lista
-     * com apenas 'top' negocios em cada ano
-     * @return lista de busScore
+     * Torna o map dos scores em diferentes datas em uma lista
+     * com apenas 'top' keys em cada data,
+     * @param comparator comparador utilizador pelo treeSet
+     * @return lista de elementScore
      */
     public List<TopReviewsAux> topBus(Comparator<TopReviewsAux> comparator){
         Map<Integer,TreeSet<TopReviewsAux>> sort = new HashMap<>();
-        busScore.forEach((k,v)-> {
+        elementScore.forEach((k,v)-> {
             sort.put(k,new TreeSet<>(comparator));
             v.forEach((s,t) ->{
                 sort.get(k).add(t);

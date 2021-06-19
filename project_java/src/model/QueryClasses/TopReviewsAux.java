@@ -10,17 +10,17 @@ public class TopReviewsAux {
     private int date;
     private int total;
     private float totalScore;
-    private String bus;
-    private Set<String> uniqueUsers = new HashSet<>();
+    private String value;
+    private Set<String> unique = new HashSet<>();
 
     /**
      * Construtor de TopReviewsAux
-     * @param bus business_id do business a guardar
+     * @param value id do elemento a guardar
      * @param date data da review
      */
-    public TopReviewsAux(String bus, int date){
+    public TopReviewsAux(String value, int date){
         this.date = date;
-        this.bus = bus;
+        this.value = value;
         this.total = 0;
         this.totalScore = 0;
     }
@@ -28,10 +28,10 @@ public class TopReviewsAux {
     /**
      * Adiciona uma review verificando se o user que a realizou
      * ja tinha feito review antes na data da classe
-     * @param u_id user quer fez a review
+     * @param key user/business da review
      */
-    public void addReview(String u_id,float score){
-        uniqueUsers.add(u_id);
+    public void addReview(String key,float score){
+        unique.add(key);
         total++;
         totalScore+=score;
     }
@@ -40,7 +40,7 @@ public class TopReviewsAux {
      * Retorna o numero de users distintos que fizeram reviews
      * @return total de users distintos
      */
-    public int getUniqueUsers(){return uniqueUsers.size();}
+    public int getUnique(){return unique.size();}
 
     /**
      * Retorna o total de reviews feitas
@@ -52,7 +52,7 @@ public class TopReviewsAux {
      * Retorna o id
      * @return id
      */
-    public String getBus(){return bus;}
+    public String getValue(){return this.value;}
 
     /**
      * Devolve a data

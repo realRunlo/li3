@@ -3,6 +3,7 @@ package controller;
 import model.Business;
 import model.Model;
 import model.QueryClasses.*;
+import model.Review;
 import model.User;
 import view.UI;
 
@@ -54,7 +55,10 @@ public class GestReviews {
             "Query9",
             "Query10",
             "Statistics",
-            "Save Object File"
+            "Save Object File",
+            "User Catalog",
+            "Business Catalog",
+            "Reviews Catalog"
     };
     /**
      * Construtor de GestReviews
@@ -177,7 +181,7 @@ public class GestReviews {
      */
     private void mainMenu() throws IOException, ClassNotFoundException {
         UI main = new UI(MainMenu);
-        
+
         main.setHandler(1, this::query1);
         main.setHandler(2, this::query2);
         main.setHandler(3, this::query3);
@@ -201,6 +205,9 @@ public class GestReviews {
             }
         });
         main.setHandler(12,()->messages.showInfo(data.statistics()));
+        main.setHandler(13, this::userCat);
+        main.setHandler(14, this::businessCat);
+        main.setHandler(15, this::reviewCat);
         main.SimpleRun();
     }
 
@@ -481,10 +488,10 @@ public class GestReviews {
                 TopReviewsAux b = query6.get(element);
                 List<String> business = new ArrayList<>();
                 business.add(String.valueOf(b.getDate()));
-                business.add(b.getBus());
-                business.add(businessMap.get(b.getBus()).getName());
+                business.add(b.getValue());
+                business.add(businessMap.get(b.getValue()).getName());
                 business.add(String.valueOf(b.getTotal()));
-                business.add(String.valueOf(b.getUniqueUsers()));
+                business.add(String.valueOf(b.getUnique()));
                 values.add(business);
                 i++;
                 element = valuesPage * page.get() + i;
@@ -580,9 +587,9 @@ public class GestReviews {
             while (i < valuesPage && element < size) {
                 TopReviewsAux u = query8.get(element);
                 List<String> users = new ArrayList<>();
-                users.add(u.getBus());
-                users.add(usersMap.get(u.getBus()).getName());
-                users.add(String.valueOf(u.getUniqueUsers()));
+                users.add(u.getValue());
+                users.add(usersMap.get(u.getValue()).getName());
+                users.add(String.valueOf(u.getUnique()));
                 values.add(users);
                 i++;
                 element = valuesPage * page.get() + i;
@@ -629,9 +636,9 @@ public class GestReviews {
                 while (i < valuesPage && element < size) {
                     TopReviewsAux u = query9.get(element);
                     List<String> users = new ArrayList<>();
-                    users.add(u.getBus());
-                    users.add(usersMap.get(u.getBus()).getName());
-                    users.add(String.valueOf(u.getUniqueUsers()));
+                    users.add(u.getValue());
+                    users.add(usersMap.get(u.getValue()).getName());
+                    users.add(String.valueOf(u.getUnique()));
                     users.add(String.valueOf(u.getAverage()));
                     values.add(users);
                     i++;
@@ -682,6 +689,139 @@ public class GestReviews {
                 business.add(query10.get(element).getId());
                 business.add(String.valueOf(query10.get(element).getBusinessReviews().calcAverage()));
                 values.add(business);
+                i++;
+                element = valuesPage * page.get() + i;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page.get(), totalPages);
+            valid = getPage(page,currentPage,line);
+
+        }
+    }
+
+    /**
+     * Opcao que imprime o catalogo de users
+     */
+    public void userCat(){
+        List<String> format = turnFormat(new String[]{"User Id","User Name"});
+        List<User> userCat = new ArrayList<>(data.getUsers().values());
+        int size = userCat.size();
+        boolean valid = false;
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
+
+        while (!valid) {
+            int i = 0;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+
+            currentPage.set(page.get());
+            List<List<String>> values = new ArrayList<>();
+
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && element < size) {
+                List<String> users = new ArrayList<>();
+                User u = userCat.get(element);
+                users.add(u.getUser_id());
+                users.add(u.getName());
+                values.add(users);
+                i++;
+                element = valuesPage * page.get() + i;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page.get(), totalPages);
+            valid = getPage(page,currentPage,line);
+
+        }
+    }
+
+    /**
+     * Opcao que imprime o catalogo de businesses
+     */
+    public void businessCat(){
+        List<String> format = turnFormat(new String[]{"Business Id","Business Name","City","State","Categories"});
+        List<Business> businessCat = new ArrayList<>(data.getBusinesses().values());
+        int size = businessCat.size();
+        boolean valid = false;
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
+
+        while (!valid) {
+            int i = 0;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+
+            currentPage.set(page.get());
+            List<List<String>> values = new ArrayList<>();
+
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && element < size) {
+                List<String> businesses = new ArrayList<>();
+                Business b = businessCat.get(element);
+                businesses.add(b.getId());
+                businesses.add(b.getName());
+                businesses.add(b.getCity());
+                businesses.add(b.getState());
+                businesses.add(b.getCategories());
+                values.add(businesses);
+                i++;
+                element = valuesPage * page.get() + i;
+            }
+            //imprime a pagina
+            messages.printTable(format, values, page.get(), totalPages);
+            valid = getPage(page,currentPage,line);
+
+        }
+    }
+
+
+    /**
+     * Opcao que imprime o catalogo de reviews
+     */
+    public void reviewCat(){
+        List<String> format = turnFormat(new String[]{"Review Id","User Id","Business Id","Stars","Useful","Funny","Cool","Date"});
+        List<Review> reviewCat = new ArrayList<>(data.getReviews().values());
+        int size = reviewCat.size();
+        boolean valid = false;
+        AtomicInteger page = new AtomicInteger(0), currentPage = new AtomicInteger(0);
+        int valuesPage = 10, totalPages = size / valuesPage;
+        AtomicReference<String> line = new AtomicReference<>("");
+
+        while (!valid) {
+            int i = 0;
+            if (page.get() < 0) page.set(0);
+            int element = valuesPage * page.get() + i;
+            if (element > size){
+                page.set(currentPage.get());
+                element = valuesPage * page.get() + i;
+            }
+
+            currentPage.set(page.get());
+            List<List<String>> values = new ArrayList<>();
+
+            //vai buscar os elementos para imprimir na pagina
+            while (i < valuesPage && element < size) {
+                List<String> reviews = new ArrayList<>();
+                Review r = reviewCat.get(element);
+                reviews.add(r.getReview_id());
+                reviews.add(r.getUser_id());
+                reviews.add(r.getBusiness_id());
+                reviews.add(String.valueOf(r.getStars()));
+                reviews.add(String.valueOf(r.getUseful()));
+                reviews.add(String.valueOf(r.getFunny()));
+                reviews.add(String.valueOf(r.getCool()));
+                reviews.add(r.getDate().toString());
+                values.add(reviews);
                 i++;
                 element = valuesPage * page.get() + i;
             }
