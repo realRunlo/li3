@@ -463,8 +463,9 @@ public class GestReviews {
      */
     private void query6(){
         List<String> format = turnFormat(new String[]{"Year","Business Id","Business Name","Total","Unique Users"});
+        int top = getInt("Insert a top to calculate");
         double startTime = System.nanoTime();
-        List<TopReviewsAux> query6 = data.query6(getInt("Insert a top to calculate"));
+        List<TopReviewsAux> query6 = data.query6(top);
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * ( Math.pow(10,-6));
         int size = query6.size();
@@ -563,8 +564,9 @@ public class GestReviews {
      */
     private void query8(){
         List<String> format = turnFormat(new String[]{"User Id","User Name","Total Reviews"});
+        int top = getInt("Insert a top to calculate");
         double startTime = System.nanoTime();
-        List<TopReviewsAux> query8 = data.query8(getInt("Insert a top to calculate"));
+        List<TopReviewsAux> query8 = data.query8(top);
         double endTime = System.nanoTime();
         double time = (endTime - startTime) * ( Math.pow(10,-6));
         int size = query8.size();
@@ -641,7 +643,7 @@ public class GestReviews {
                     List<String> users = new ArrayList<>();
                     users.add(u.getValue());
                     users.add(usersMap.get(u.getValue()).getName());
-                    users.add(String.valueOf(u.getUnique()));
+                    users.add(String.valueOf(u.getTotal()));
                     users.add(String.valueOf(u.getAverage()));
                     values.add(users);
                     i++;

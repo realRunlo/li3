@@ -400,11 +400,15 @@ public class Model implements Statistics, Query1,Query2, Query3, Query4,Query5,Q
         getReviews().forEach((k,v)->{
             userMostReviews.addReview(0,v.getUser_id(),v.getBusiness_id(),v.getStars());
         });
-        Comparator<TopReviewsAux> comparator = (t1, t2) -> {
-            if(t1.getUnique() == t2.getUnique()){
-                return t1.getValue().compareTo(t1.getValue());
-            }else{
-                return t2.getUnique() - t1.getUnique();
+        //compara usando o numero total de reviews unicas
+        Comparator<TopReviewsAux> comparator = new Comparator<TopReviewsAux>() {
+            @Override
+            public int compare(TopReviewsAux o1, TopReviewsAux o2) {
+                if(o1.getUnique() == o2.getUnique()){
+                    return o1.getValue().compareTo(o2.getValue());
+                }else{
+                    return o2.getTotal() - o1.getTotal();
+                }
             }
         };
         return userMostReviews.topBus(comparator);

@@ -3,6 +3,7 @@ package model.QueryClasses;
 import model.Business;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +33,6 @@ public class TopReviews {
             elementScore.put(date,new HashMap<>());
         if(!elementScore.get(date).containsKey(key))
             elementScore.get(date).put(key,new TopReviewsAux(key,date));
-
         elementScore.get(date).get(key).addReview(value,score);
     }
 
@@ -45,6 +45,7 @@ public class TopReviews {
      */
     public List<TopReviewsAux> topBus(Comparator<TopReviewsAux> comparator){
         Map<Integer,TreeSet<TopReviewsAux>> sort = new HashMap<>();
+        AtomicInteger i = new AtomicInteger(0);
         elementScore.forEach((k,v)-> {
             sort.put(k,new TreeSet<>(comparator));
             v.forEach((s,t) ->{
@@ -52,6 +53,7 @@ public class TopReviews {
             });
         });
         List<TopReviewsAux> result = new ArrayList<>();
+        //transforma os resultados ordenados em uma lista
         sort.forEach((k,v)->{
             List<TopReviewsAux> yearTop;
             if(v.size() < top){
